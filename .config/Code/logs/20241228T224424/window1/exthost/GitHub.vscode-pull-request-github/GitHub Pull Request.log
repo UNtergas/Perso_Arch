@@ -1,6 +1,0 @@
-2024-12-28 22:44:29.568 [warning] /home/untergas/.ssh/config: ENOENT: no such file or directory, open '/home/untergas/.ssh/config'
-2024-12-28 22:44:29.568 [info] Activation> Extension version: 0.102.0
-2024-12-28 22:44:30.186 [info] Looking for git repository
-2024-12-28 22:44:30.186 [info] Found 0 repositories during activation
-2024-12-28 22:44:30.186 [info] Git repository found, initializing review manager and pr tree view.
-2024-12-28 22:44:30.186 [info] Registering git provider
