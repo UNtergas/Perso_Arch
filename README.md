@@ -34,3 +34,6 @@ polybar
 pomodorino
 
 maim + xdotool (for rofi screenshot)
+
+for changing the grub theme to tartaurus following this guide:
+https://github.com/AllJavi/tartarus-grub

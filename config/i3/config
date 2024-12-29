@@ -442,13 +442,13 @@ exec --no-startup-id /usr/bin/dunst
 # `yay -S autotiling ;) (it is in AUR)
 #exec_always --no-startup-id autotiling
 
-###############
-# Auto start app#
-###############
+##################
+# Auto start app # 
+##################
 #exec --no-startup-id sleep 2 && xfce4-terminal
 #exec --no-startup-id sleep 7 && firefox https://github.com/endeavouros-team/endeavouros-i3wm-setup/blob/main/force-knowledge.md
 #exec --no-startup-id sleep 3 && thunar
-exec --no-startup-id solaar
+# exec --no-startup-id solaar
 exec --no-startup-id /usr/bin/pomodorino
 exec_always --no-startup-id ~/.config/i3/scripts/polybar &
 
