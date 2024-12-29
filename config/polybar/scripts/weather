@@ -37,8 +37,8 @@ get_duration() {
 
 }
 
-KEY="7db0f30093810add6fbd87bbf25c42f4"
-CITY="6454979"
+KEY="open_weather_api_key"
+CITY="open_weather_city_id"
 UNITS="metric"
 SYMBOL="°"
 
