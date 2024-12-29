@@ -4,8 +4,6 @@ i3 and rofi with basic setup for duo monitor
 ## Dependancy Requirement 
 beside already installed by endeavousOs with i3wm
 
-Caskaydia Code Nerd Font
-
 autorandr
 after installing and config run>> systemctl --user enable autorandr
 
