@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+# Screenshot save directory
+SAVE_DIR="$HOME/Pictures/Screenshots"
+mkdir -p "$SAVE_DIR"
+
+# Get current date and time for the filename
+TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+
+# Screenshot options
+OPTIONS=("Full Screen" "Current Window" "Select Area" "Cancel")
+
+# Show a popup menu using Zenity
+CHOICE=$(zenity --list --title="Screenshot Options" --text="Choose a screenshot option:" \
+    --column="Option" "${OPTIONS[@]}")
+
+case $CHOICE in
+    "Full Screen")
+        scrot "$SAVE_DIR/screenshot_$TIMESTAMP.png"
+        notify-send "Screenshot Saved" "Full screen saved to $SAVE_DIR/screenshot_$TIMESTAMP.png"
+        ;;
+    "Current Window")
+        scrot -u "$SAVE_DIR/screenshot_$TIMESTAMP.png"
+        notify-send "Screenshot Saved" "Current window saved to $SAVE_DIR/screenshot_$TIMESTAMP.png"
+        ;;
+    "Select Area")
+        scrot -s "$SAVE_DIR/screenshot_$TIMESTAMP.png"
+        notify-send "Screenshot Saved" "Selected area saved to $SAVE_DIR/screenshot_$TIMESTAMP.png"
+        ;;
+    "Cancel")
+        notify-send "Screenshot" "Operation canceled."
+        exit 0
+        ;;
+    *)
+        notify-send "Screenshot" "No valid option selected."
+        exit 1
+        ;;
+esac

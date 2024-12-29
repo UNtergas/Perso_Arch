@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Get the player name, metadata, and status
+player=$(playerctl -l | head -n 1 2>/dev/null)  # Get the first available player
+metadata=$(playerctl -p "$player" metadata --format "{{ title }} - {{ artist }} " 2>/dev/null)
+status=$(playerctl -p "$player" status 2>/dev/null)
+
+if [[ $status == "Playing" || $status == "Paused" ]]; then
+    echo "$metadata |$player| "  # Show player name and metadata
+else
+    echo "No media playing"
+fi
