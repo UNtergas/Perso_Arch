@@ -2,6 +2,8 @@
 i3 and rofi with basic setup for duo monitor
 
 ## Dependancy Requirement 
+beside already installed by endeavousOs with i3wm
+
 autorandr
 after installing and config run>> systemctl --user enable autorandr
 
@@ -24,3 +26,11 @@ discord
 i3lock-color
 
 picom
+
+obsidian
+
+polybar
+
+pomodorino
+
+maim + xdotool (for rofi screenshot)

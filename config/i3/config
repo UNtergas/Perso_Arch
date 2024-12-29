@@ -23,7 +23,7 @@
 # is used in the bar {} block below.
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
-font pango: CaskaydiaMono Nerd Font Propo 10
+font pango: CaskaydiaMono Nerd Font Propo 11
 
 # set the mod key to the winkey:
 set $mod Mod4
@@ -54,8 +54,8 @@ for_window [class=".*"] border pixel 4
 # hide_edge_borders both
 
 # Set inner/outer gaps
-gaps inner 6
-gaps outer 3
+gaps inner 7
+gaps outer 0
 
 # show window title bars (not officially supported with i3gaps)
 #default_border normal
@@ -315,7 +315,7 @@ bindsym $mod+Shift+s exec --no-startup-id ~/.config/rofi/applets/bin/screenshot.
 set $ws1 "1:"
 set $ws2 "2:"
 set $ws3 "3:"
-set $ws4 "4:"
+set $ws4 "4:󱞁"
 set $ws5 "5:"
 set $ws6 "6"
 set $ws7 "7"
@@ -336,14 +336,14 @@ set $ws10 "10"
 assign [class="Alacritty"] $ws1
 assign [class="(?i)firefox"] $ws2
 assign [class="Thunar"] $ws3
-assign [class="thunderbird"] $ws4
+assign [class="obsidian"] $ws4
 assign [class="Spotify"] $ws5
 # automatic set focus new window if it opens on another workspace than the current:
-for_window [class=Xfce4-terminal] focus
+for_window [class=Alacritty] focus
 for_window [class=(?i)firefox] focus
 for_window [class=Thunar] focus
-for_window [class=Thunderbird] focus
-for_window [class=TelegramDesktop] focus
+for_window [class=obsidian] focus
+for_window [class=Spotify] focus
 
 ##############
 # compositor #
@@ -442,10 +442,16 @@ exec --no-startup-id /usr/bin/dunst
 # `yay -S autotiling ;) (it is in AUR)
 #exec_always --no-startup-id autotiling
 
-# Autostart apps as you like
+###############
+# Auto start app#
+###############
 #exec --no-startup-id sleep 2 && xfce4-terminal
 #exec --no-startup-id sleep 7 && firefox https://github.com/endeavouros-team/endeavouros-i3wm-setup/blob/main/force-knowledge.md
 #exec --no-startup-id sleep 3 && thunar
+exec --no-startup-id solaar
+exec --no-startup-id /usr/bin/pomodorino
+exec_always --no-startup-id ~/.config/i3/scripts/polybar &
+
 
 ###############
 # system tray #
@@ -522,10 +528,10 @@ client.urgent             $darkred       $darkred     $foreground $yellow      $
 # Start i3bar to display a workspace bar
 # (plus the system information i3status finds out, if available)
 bar {
-    font pango: CaskaydiaMono Nerd Font Propo 10
+    font pango: CaskaydiaMono Nerd Font Propo 11
     status_command i3blocks -c ~/.config/i3/i3blocks.conf
     position bottom
-    height 25
+    height 28
     tray_padding 0
 
     # When strip_workspace_numbers is set to yes,
