@@ -1,14 +1,13 @@
-output DisplayPort-0
-off
 output DisplayPort-1
 off
 output eDP
-crtc 0
+off
+output DisplayPort-0
+crtc 1
 gamma 1.0:0.833:0.769
-mode 1920x1200
+mode 1920x1080
 pos 0x0
-primary
-rate 90.00
+rate 100.00
 x-prop-colorspace Default
 x-prop-max_bpc 16
 x-prop-non_desktop 0

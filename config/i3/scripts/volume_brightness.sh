@@ -6,7 +6,8 @@
 # See README.md for usage instructions
 bar_color="#a9b665"
 volume_step=1
-brightness_step=2.5
+brightness_step=8
+max_brightness=255
 max_volume=100
 
 # Uses regex to get volume from pactl
@@ -21,7 +22,8 @@ function get_mute {
 
 # Uses regex to get brightness from xbacklight
 function get_brightness {
-    xbacklight | grep -Po '[0-9]{1,3}' | head -n 1
+    # xbacklight | grep -Po '[0-9]{1,3}' | head -n 1
+    brightnessctl g | awk '{print int($1)}'
 }
 
 # Returns a mute icon, a volume-low icon, or a volume-high icon, depending on the volume
@@ -53,7 +55,8 @@ function show_volume_notif {
 function show_brightness_notif {
     brightness=$(get_brightness)
     get_brightness_icon
-    dunstify -t 1000 -r 2593 -u normal "$brightness_icon $brightness%" -h int:value:$brightness -h string:hlcolor:$bar_color
+    brightness_percent=$((brightness * 100 / max_brightness))
+    dunstify -t 1000 -r 2593 -u normal "$brightness_icon $brightness%" -h int:value:$brightness_percent -h string:hlcolor:$bar_color
 }
 
 # Main function - Takes user input, "volume_up", "volume_down", "brightness_up", or "brightness_down"
@@ -84,13 +87,15 @@ case $1 in
 
     brightness_up)
     # Increases brightness and displays the notification
-    xbacklight -inc $brightness_step -time 0 
+    # xbacklight -inc $brightness_step -time 0 
+    brightnessctl s +$brightness_step%
     show_brightness_notif
     ;;
 
     brightness_down)
     # Decreases brightness and displays the notification
-    xbacklight -dec $brightness_step -time 0
+    # xbacklight -dec $brightness_step -time 0
+    brightnessctl s $brightness_step-%
     show_brightness_notif
     ;;
 esac
