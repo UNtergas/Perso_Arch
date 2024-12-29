@@ -35,5 +35,7 @@ pomodorino
 
 maim + xdotool (for rofi screenshot)
 
+brigthnessctl (since the xbacklight dont work for some reason)
+
 for changing the grub theme to tartaurus following this guide:
 https://github.com/AllJavi/tartarus-grub
