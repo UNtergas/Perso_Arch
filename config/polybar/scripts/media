@@ -6,7 +6,7 @@ metadata=$(playerctl -p "$player" metadata --format "{{ title }} - {{ artist }} 
 status=$(playerctl -p "$player" status 2>/dev/null)
 
 if [[ $status == "Playing" || $status == "Paused" ]]; then
-    echo "$metadata |$player| "  # Show player name and metadata
+    echo "$metadata|$player|"  # Show player name and metadata
 else
     echo "No media playing"
 fi

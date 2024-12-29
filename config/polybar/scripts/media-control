@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Get the command argument (pause, next, prev)
+action=$1
+player=$(playerctl -l | head -n 1 2>/dev/null)  # Get the first available player
+
+case $action in
+    pause)
+        playerctl -p "$player" play-pause
+        ;;
+    next)
+        playerctl -p "$player" next
+        ;;
+    prev)
+        playerctl -p "$player" previous
+        ;;
+    *)
+        echo "Invalid action"
+        ;;
+esac
