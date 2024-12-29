@@ -1,0 +1,70 @@
+2024-12-28 23:11:54.784 [warning] [certificates] Failed to parse certificate # ACCVRAIZ1
+ Error: error:0900006e:PEM routines:OPENSSL_internal:NO_START_LINE
+    at new X509Certificate (node:internal/crypto/x509:119:21)
+    at /home/untergas/.vscode/extensions/github.copilot-1.254.0/lib/src/network/certificateReaders.ts:79:36
+    at Array.filter (<anonymous>)
+    at yae.removeExpiredCertificates (/home/untergas/.vscode/extensions/github.copilot-1.254.0/lib/src/network/certificateReaders.ts:77:32)
+    at yae.getAllRootCAs (/home/untergas/.vscode/extensions/github.copilot-1.254.0/lib/src/network/certificateReaders.ts:68:38)
+    at eme.createSecureContext (/home/untergas/.vscode/extensions/github.copilot-1.254.0/lib/src/network/certificates.ts:46:23) {
+  opensslErrorStack: [
+    'error:0c00006d:ASN.1 encoding routines:OPENSSL_internal:DECODE_ERROR'
+  ],
+  library: 'PEM routines',
+  function: 'OPENSSL_internal',
+  reason: 'NO_START_LINE',
+  code: 'ERR_OSSL_PEM_NO_START_LINE',
+  vslsStack: [
+    CallSite {},
+    CallSite {},
+    CallSite {},
+    CallSite {},
+    CallSite {},
+    CallSite {}
+  ]
+}
+2024-12-28 23:11:54.784 [warning] [certificates] Failed to parse certificate # ACCVRAIZ1
+ Error: error:0900006e:PEM routines:OPENSSL_internal:NO_START_LINE
+    at new X509Certificate (node:internal/crypto/x509:119:21)
+    at /home/untergas/.vscode/extensions/github.copilot-1.254.0/lib/src/network/certificateReaders.ts:79:36
+    at Array.filter (<anonymous>)
+    at yae.removeExpiredCertificates (/home/untergas/.vscode/extensions/github.copilot-1.254.0/lib/src/network/certificateReaders.ts:77:32)
+    at yae.getAllRootCAs (/home/untergas/.vscode/extensions/github.copilot-1.254.0/lib/src/network/certificateReaders.ts:68:38)
+    at eme.createSecureContext (/home/untergas/.vscode/extensions/github.copilot-1.254.0/lib/src/network/certificates.ts:46:23) {
+  opensslErrorStack: [
+    'error:0c00006d:ASN.1 encoding routines:OPENSSL_internal:DECODE_ERROR'
+  ],
+  library: 'PEM routines',
+  function: 'OPENSSL_internal',
+  reason: 'NO_START_LINE',
+  code: 'ERR_OSSL_PEM_NO_START_LINE',
+  vslsStack: [
+    CallSite {},
+    CallSite {},
+    CallSite {},
+    CallSite {},
+    CallSite {},
+    CallSite {}
+  ]
+}
+2024-12-28 23:11:54.784 [info] [certificates] Removed 2 expired certificates
+2024-12-28 23:11:55.249 [info] [fetcher] Using Helix fetcher.
+2024-12-28 23:11:55.829 [info] [fetcher] Using Helix fetcher.
+2024-12-28 23:11:55.829 [info] [code-referencing] Public code references are enabled.
+2024-12-28 23:23:09.993 [warning] [relatedFiles] unknown language shellscript
+2024-12-28 23:36:55.756 [info] [fetcher] Using Helix fetcher.
+2024-12-28 23:36:55.756 [info] [code-referencing] Public code references are enabled.
+2024-12-28 23:51:51.752 [info] [fetchCompletions] request.response: [https://proxy.individual.githubcopilot.com/v1/engines/copilot-codex/completions] took 274 ms
+2024-12-28 23:51:51.756 [info] [streamChoices] solution 0 returned. finish reason: [stop]
+2024-12-28 23:51:51.758 [info] [streamChoices] request done: headerRequestId: [b0651a98-a4e0-4728-8c38-0b850c65d9ae] model deployment ID: [d120-20240927061848]
+2024-12-28 23:51:52.588 [info] [code-referencing] Calling Match
+2024-12-28 23:51:53.265 [info] [code-referencing] Match found
+2024-12-28 23:51:53.266 [info] [code-referencing] Calling FilesForMatch
+2024-12-28 23:59:12.131 [info] [fetchCompletions] request.response: [https://proxy.individual.githubcopilot.com/v1/engines/copilot-codex/completions] took 298 ms
+2024-12-28 23:59:12.132 [info] [streamChoices] solution 0 returned. finish reason: [stop]
+2024-12-28 23:59:12.134 [info] [streamChoices] request done: headerRequestId: [59ed5baa-69fd-4bc9-8b44-c6e1a531153c] model deployment ID: [d128-20240927130714]
+2024-12-29 00:01:56.099 [info] [fetcher] Using Helix fetcher.
+2024-12-29 00:01:56.099 [info] [code-referencing] Public code references are enabled.
+2024-12-29 00:26:56.615 [info] [fetcher] Using Helix fetcher.
+2024-12-29 00:26:56.615 [info] [code-referencing] Public code references are enabled.
+2024-12-29 00:51:58.200 [info] [fetcher] Using Helix fetcher.
+2024-12-29 00:51:58.200 [info] [code-referencing] Public code references are enabled.

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# PICTURE=/tmp/i3lock.png
+# SCREENSHOT="scrot -z $PICTURE"
+
+# BLUR="5x4"
+
+# $SCREENSHOT
+# magick $PICTURE -blur $BLUR $PICTURE
+# i3lock -i $PICTURE
+# rm $PICTURE
+
+
+# Temporary file for the screenshot
+PICTURE=/tmp/i3lock.png
+SCREENSHOT="scrot $PICTURE"
+
+# Take a screenshot and blur it
+$SCREENSHOT
+convert $PICTURE -blur 20x15 $PICTURE
+
+# Lock the screen with the blurred screenshot
+i3lock -t -i $PICTURE \
+    --clock --time-pos="w/2:h/2" --date-pos="tx:ty+80" \
+    --time-size=80 --date-size=40 \
+    --time-color=ffffffff --date-color=ffffffff \
+    --indicator --ind-pos="w/2:h-100" --radius=20 \
+    --ring-width=4 --ring-color=ffffffff --keyhl-color=00ff00ff \
+    --inside-color=00000000 --line-color=00000000 \
+    --separator-color=00000000 --insidever-color=00000000 \
+    --ringver-color=ffffff88 --verif-text="Checking" --verif-color=ffffffff --verif-pos="w/2:h/2" \
+    --wrong-text="Wrong password!" --wrong-color=ffffffff  --wrong-pos="w/2:h/2"\
+    --noinput-text="" --insidewrong-color=00000000 --ringwrong-color=ff0000ff
+
+# Clean up the temporary screenshot
+rm -f $PICTURE

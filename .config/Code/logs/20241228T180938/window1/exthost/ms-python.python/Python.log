@@ -1,0 +1,12 @@
+2024-12-28 18:48:54.117 [info] Experiment 'pythonRecommendTensorboardExt' is active
+2024-12-28 18:48:54.117 [info] Experiment 'pythonTerminalEnvVarActivation' is active
+2024-12-28 18:48:54.117 [info] Experiment 'pythonTestAdapter' is active
+2024-12-28 18:48:54.117 [info] Native locator: Refresh started
+2024-12-28 18:48:54.179 [info] Native locator: Refresh started
+2024-12-28 18:48:54.237 [info] > conda info --json
+2024-12-28 18:48:54.269 [info] > pyenv which python
+2024-12-28 18:48:54.269 [info] cwd: .
+2024-12-28 18:48:54.461 [info] Native locator: Refresh finished in 621 ms
+2024-12-28 18:48:54.492 [info] Python interpreter path: /usr/bin/python
+2024-12-28 18:48:54.672 [info] Shell integration status changed, can confirm it's working.
+2024-12-28 18:48:55.362 [info] Starting Jedi language server for i3.

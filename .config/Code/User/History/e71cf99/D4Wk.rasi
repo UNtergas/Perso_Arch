@@ -1,0 +1,107 @@
+/*******************************************************
+ * ROFI configs i3 powermenu for EndeavourOS
+ * Updated to align with Aditya Shakya's style
+ * Maintainer: joekamprad [joekamprad //a_t// endeavouros.com]
+ *******************************************************/
+
+/*****----- Configuration -----*****/
+configuration {
+    font:             "JetBrains Mono Nerd Font 10";  /* Updated to match the style */
+    show-icons:       false;
+    icon-theme:       "Qogir";
+    scroll-method:    0;
+    disable-history:  false;
+    fullscreen:       false;
+    hide-scrollbar:   true;
+    sidebar-mode:     false;
+}
+
+/*****----- Global Properties -----*****/
+* {
+    font:             "JetBrains Mono Nerd Font 10";
+    background:       #1d2021;  /* Gruvbox primary background */
+    background-alt:   #282828;  /* Gruvbox medium background */
+    foreground:       #d4be98;  /* Gruvbox foreground */
+    selected:         #8f9a52;  /* Darker Gruvbox green for selected state */
+    active:           #5e8180;  /* Darker Gruvbox blue for active state */
+    urgent:           #b85651;  /* Darker Gruvbox red for urgent state */
+}
+
+/*****----- Main Window -----*****/
+window {
+    background-color: @background;
+    transparency:     "real";
+    width:            550px;
+    location:         center;  /* Changed to center for a balanced layout */
+    border-radius:    10px;
+    border:           0px solid;
+    padding:          15px;
+}
+
+/*****----- Listview -----*****/
+listview {
+    lines:   4;
+    columns: 1;
+    spacing: 10px;
+    margin:  10px;
+    background-color: transparent;
+}
+
+/*****----- Elements -----*****/
+element {
+    padding:             15px;
+    border-radius:       10px;
+    background-color:    @background-alt;
+    text-color:          @foreground;
+}
+element-text {
+    background-color:    transparent;
+    text-color:          inherit;
+}
+element.normal.normal {
+    background-color:    @background;
+    text-color:          @foreground;
+}
+element.normal.urgent {
+    background-color:    @urgent;
+    text-color:          @foreground;
+}
+element.normal.active {
+    background-color:    @active;
+    text-color:          @foreground;
+}
+element.selected.normal {
+    background-color:    @selected;
+    text-color:          @background;
+}
+element.alternate.normal {
+    background-color:    @background-alt;
+    text-color:          @foreground;
+}
+
+/*****----- Scrollbar -----*****/
+scrollbar {
+    width:        4px;
+    handle-color: @foreground;
+    handle-width: 8px;
+}
+
+/*****----- Inputbar -----*****/
+
+textbox-prompt-colon {
+    str:                 "Set Power Profile:";
+    margin:              0px 0.3em 0em 0em;
+    text-color:          @foreground;
+}
+
+/*****----- Buttons -----*****/
+button {
+    padding:             10px;
+    border-radius:       5px;
+    background-color:    @background-alt;
+    text-color:          @foreground;
+}
+button.selected {
+    background-color:    @selected;
+    text-color:          @background;
+}

@@ -1,0 +1,9 @@
+2024/12/28-22:44:41.464 406b4 Reusing MANIFEST /home/untergas/.config/discord/Local Storage/leveldb/MANIFEST-000001
+2024/12/28-22:44:41.474 406b4 Recovering log #4
+2024/12/28-22:44:41.475 406b4 Reusing old log /home/untergas/.config/discord/Local Storage/leveldb/000004.log 
+2024/12/28-22:45:42.175 406b5 Level-0 table #7: started
+2024/12/28-22:45:42.186 406b5 Level-0 table #7: 46037 bytes OK
+2024/12/28-22:45:42.187 406b5 Delete type=0 #4
+2024/12/28-23:14:17.767 406b5 Level-0 table #9: started
+2024/12/28-23:14:17.816 406b5 Level-0 table #9: 849775 bytes OK
+2024/12/28-23:14:17.818 406b5 Delete type=0 #6

@@ -1,0 +1,153 @@
+/*******************************************************
+ * ROFI configs i3 keyhint-menu for EndeavourOS
+ * Updated to resemble Aditya Shakya's launcher style
+ *******************************************************/
+
+/*****----- Configuration -----*****/
+configuration {
+    font:                "JetBrains Mono Nerd Font 10";
+    show-icons:          false;
+    icon-theme:          "Qogir";
+    display-drun:        "KeyHint";
+    drun-display-format: "{name}";
+    scroll-method:       0;
+    disable-history:     false;
+    fullscreen:          false;
+    hide-scrollbar:      true;
+    sidebar-mode:        false;
+}
+
+/*****----- Global Properties -----*****/
+* {
+    font:                        "JetBrains Mono Nerd Font 10";
+    background:                  #1d2021;  /* Gruvbox primary background */
+    background-alt:              #282828;  /* Gruvbox medium background */
+    foreground:                  #d4be98;  /* Gruvbox foreground */
+    selected:                    #8f9a52;  /* Darker Gruvbox green for selected state */
+    active:                      #5e8180;  /* Darker Gruvbox blue for active state */
+    urgent:                      #b85651;  /* Darker Gruvbox red for urgent state */
+}
+
+/*****----- Main Window -----*****/
+window {
+    location:            center;
+    anchor:              center;
+    background-color: @background;
+    border:           0;
+    padding:          30;
+}
+
+/*****----- Configuration -----*****/
+listview {
+    lines:   10;
+    columns: 1;
+}
+mainbox {
+    border:  0;
+    padding: 0;
+}
+message {
+    border:       2px 0px 0px;
+    border-color: @background-alt;
+    padding:      1px;
+}
+textbox {
+    text-color: @foreground;
+}
+listview {
+    fixed-height: 0;
+    border:       8px 0px 0px;
+    border-color: @background-alt;
+    spacing:      8px;
+    scrollbar:    false;
+    padding:      2px 0px 0px;
+}
+element {
+    border:  0;
+    padding: 1px;
+}
+element-text {
+    background-color: inherit;
+    text-color:       inherit;
+}
+element.normal.normal {
+    background-color: @background;
+    text-color:       @foreground;
+}
+element.normal.urgent {
+    background-color: @urgent;
+    text-color:       @foreground;
+}
+element.normal.active {
+    background-color: @active;
+    text-color:       @foreground;
+}
+element.selected.normal {
+    background-color: @selected;
+    text-color:       @foreground;
+}
+element.selected.urgent {
+    background-color: @urgent;
+    text-color:       @foreground;
+}
+element.selected.active {
+    background-color: @active;
+    text-color:       @foreground;
+}
+element.alternate.normal {
+    background-color: @background-alt;
+    text-color:       @foreground;
+}
+element.alternate.urgent {
+    background-color: @urgent;
+    text-color:       @foreground;
+}
+element.alternate.active {
+    background-color: @active;
+    text-color:       @foreground;
+}
+scrollbar {
+    width:        4px;
+    border:       0;
+    handle-color: @foreground;
+    handle-width: 8px;
+    padding:      0;
+}
+mode-switcher {
+    border:       2px 0px 0px;
+    border-color: @background-alt;
+}
+button {
+    spacing:    0;
+    text-color: @foreground;
+}
+button.selected {
+    background-color: @selected;
+    text-color:       @foreground;
+}
+inputbar {
+    spacing:    0;
+    text-color: @foreground;
+    padding:    1px;
+}
+case-indicator {
+    spacing:    0;
+    text-color: @foreground;
+}
+entry {
+    spacing:    0;
+    text-color: @foreground;
+}
+prompt {
+    spacing:    0;
+    text-color: @foreground;
+}
+inputbar {
+    children:   [ prompt, textbox-prompt-colon, entry, case-indicator ];
+}
+textbox-prompt-colon {
+    expand:     false;
+    str:        ":";
+    margin:     0px 0.3em 0em 0em;
+    text-color: @foreground;
+}

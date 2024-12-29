@@ -1,0 +1,25 @@
+{
+    "git.enableSmartCommit": true,
+    "git.autofetch": true,
+    "liveServer.settings.donotVerifyTags": true,
+    "editor.formatOnSave": true,
+    "editor.accessibilitySupport": "off",
+    "git.confirmSync": false,
+    "typescript.tsserver.log": "verbose",
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "workbench.colorTheme": "Gruvbox Dark Hard",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "githubPullRequests.pullBranch": "never",
+    "files.trimTrailingWhitespace": true,
+    "explorer.confirmDelete": false,
+    "workbench.iconTheme": "a-file-icon-vscode",
+    "editor.fontFamily": "Cascadia Mono, OCR A, Pixelify Sans, MV Boli",
+    "editor.fontWeight": "normal",
+    "editor.fontLigatures": true,
+    "editor.codeActionsOnSave": {},
+    "workbench.productIconTheme": "a-file-icon-vscode-product-icon-theme",
+    "files.autoSave": "afterDelay",
+}

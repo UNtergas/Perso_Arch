@@ -1,0 +1,39 @@
+2024-12-28 22:44:29.701 [info] Using the Electron fetcher.
+2024-12-28 22:44:29.701 [info] Initializing Git extension service.
+2024-12-28 22:44:29.701 [info] Successfully activated the vscode.git extension.
+2024-12-28 22:44:29.701 [info] Enablement state of the vscode.git extension: true.
+2024-12-28 22:44:29.701 [info] Successfully registered Git commit message provider.
+2024-12-28 22:44:31.198 [info] Logged in as UNtergas
+2024-12-28 22:44:31.645 [info] Got Copilot token for UNtergas
+2024-12-28 22:44:31.680 [info] copilot token chat_enabled: true, sku: free_educational
+2024-12-28 22:44:31.693 [info] Registering default platform agent...
+2024-12-28 22:44:31.695 [info] Successfully activated the GitHub.vscode-pull-request-github extension.
+2024-12-28 22:44:31.695 [info] [githubTitleAndDescriptionProvider] Initializing GitHub PR title and description provider provider.
+2024-12-28 22:44:31.695 [info] Successfully registered GitHub PR title and description provider.
+2024-12-28 22:44:32.146 [info] Fetched model metadata in 496ms 425c5144-be92-462a-92fc-d153d44a5a7e
+2024-12-28 22:44:32.149 [info] activationBlocker from 'languageModelAccess' took for 2231ms
+2024-12-28 22:59:33.551 [info] Fetched model metadata in 1091ms bfeb7dd7-3950-413d-932b-e27165941054
+2024-12-28 23:09:31.651 [info] Logged in as UNtergas
+2024-12-28 23:09:32.593 [info] Got Copilot token for UNtergas
+2024-12-28 23:09:32.600 [info] copilot token chat_enabled: true, sku: free_educational
+2024-12-28 23:24:33.637 [info] Fetched model metadata in 1030ms c848bc46-7374-4af0-b3b2-ff3acab841eb
+2024-12-28 23:34:32.597 [info] Logged in as UNtergas
+2024-12-28 23:34:33.330 [info] Got Copilot token for UNtergas
+2024-12-28 23:34:33.338 [info] copilot token chat_enabled: true, sku: free_educational
+2024-12-28 23:49:34.280 [info] Fetched model metadata in 934ms 55637d56-d4ff-40a4-8df1-53daeaa6d3ad
+2024-12-28 23:59:33.335 [info] Logged in as UNtergas
+2024-12-28 23:59:33.913 [info] Got Copilot token for UNtergas
+2024-12-28 23:59:33.920 [info] copilot token chat_enabled: true, sku: free_educational
+2024-12-29 00:14:34.654 [info] Fetched model metadata in 705ms 3efefdf8-eb4d-4ad2-a9aa-f6906338c58b
+2024-12-29 00:24:33.919 [info] Logged in as UNtergas
+2024-12-29 00:24:34.540 [info] Got Copilot token for UNtergas
+2024-12-29 00:24:34.547 [info] copilot token chat_enabled: true, sku: free_educational
+2024-12-29 00:39:35.290 [info] Fetched model metadata in 717ms 1928d7bd-e906-4978-b873-8262c533cb87
+2024-12-29 00:49:34.546 [info] Logged in as UNtergas
+2024-12-29 00:49:35.671 [info] Got Copilot token for UNtergas
+2024-12-29 00:49:35.680 [info] copilot token chat_enabled: true, sku: free_educational
+2024-12-29 00:49:36.411 [info] Fetched model metadata in 727ms 93833806-9691-42a7-b152-0491239eaa41
+2024-12-29 01:04:37.451 [info] Fetched model metadata in 1019ms 3f16aa70-3eed-452b-8b2b-6de28677fb25
+2024-12-29 01:14:35.677 [info] Logged in as UNtergas
+2024-12-29 01:14:36.397 [info] Got Copilot token for UNtergas
+2024-12-29 01:14:36.405 [info] copilot token chat_enabled: true, sku: free_educational

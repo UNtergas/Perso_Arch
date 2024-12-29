@@ -1,0 +1,10 @@
+[Unit]
+Description=Autorandr - Automatic display configuration
+After=graphical.target
+
+[Service]
+ExecStart=/usr/bin/autorandr --change
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

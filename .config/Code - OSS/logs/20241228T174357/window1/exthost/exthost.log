@@ -1,0 +1,15 @@
+2024-12-28 17:43:58.963 [info] Extension host with pid 31534 started
+2024-12-28 17:43:58.963 [info] Skipping acquiring lock for /home/untergas/.config/Code - OSS/User/workspaceStorage/8a464b4f5a3ef6dfd9ee43c2dfba3f34.
+2024-12-28 17:43:58.968 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
+2024-12-28 17:43:58.997 [info] ExtensionService#_doActivateExtension vscode.git-base, startup: true, activationEvent: '*', root cause: vscode.git
+2024-12-28 17:43:59.000 [info] ExtensionService#_doActivateExtension vscode.git, startup: true, activationEvent: '*'
+2024-12-28 17:43:59.052 [info] ExtensionService#_doActivateExtension vscode.github, startup: true, activationEvent: '*'
+2024-12-28 17:43:59.105 [info] Eager extensions activated
+2024-12-28 17:43:59.122 [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch, startup: false, activationEvent: 'onStartupFinished'
+2024-12-28 17:43:59.124 [info] ExtensionService#_doActivateExtension vscode.merge-conflict, startup: false, activationEvent: 'onStartupFinished'
+2024-12-28 17:52:18.633 [info] ExtensionService#_doActivateExtension vscode.configuration-editing, startup: false, activationEvent: 'onLanguage:json'
+2024-12-28 17:52:18.646 [info] ExtensionService#_doActivateExtension vscode.extension-editing, startup: false, activationEvent: 'onLanguage:json'
+2024-12-28 17:52:18.659 [info] ExtensionService#_doActivateExtension vscode.json-language-features, startup: false, activationEvent: 'onLanguage:json'
+2024-12-28 17:52:18.722 [info] ExtensionService#_doActivateExtension vscode.npm, startup: false, activationEvent: 'onLanguage:json'
+2024-12-28 17:53:36.846 [info] Extension host terminating: renderer closed the MessagePort
+2024-12-28 17:53:36.853 [info] Extension host with pid 31534 exiting with code 0

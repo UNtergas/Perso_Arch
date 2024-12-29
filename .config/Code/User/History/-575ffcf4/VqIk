@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+# PICTURE=/tmp/i3lock.png
+# SCREENSHOT="scrot -z $PICTURE"
+
+# BLUR="5x4"
+
+# $SCREENSHOT
+# magick $PICTURE -blur $BLUR $PICTURE
+# i3lock -i $PICTURE
+# rm $PICTURE
+
+
+
+PICTURE=/tmp/i3lock.png
+SCREENSHOT="scrot -z $PICTURE"
+
+BLUR="5x4"
+
+# Take a screenshot and blur it
+$SCREENSHOT
+magick $PICTURE -blur $BLUR $PICTURE
+
+# Lock the screen with time and password field
+i3lock \
+  -i $PICTURE \
+  --time-str="%H:%M:%S" \
+  --date-str="%A, %d %B %Y" \
+  --inside-color=00000066 \
+  --ring-color=ffffff88 \
+  --line-color=00000000 \
+  --keyhl-color=88c0d0ff \
+  --bshl-color=d08770ff \
+  --separator-color=00000000 \
+  --insidever-color=00000066 \
+  --insidewrong-color=00000066 \
+  --ringver-color=88c0d0ff \
+  --ringwrong-color=bf616aff \
+  --verif-text="Verifying..." \
+  --wrong-text="Wrong!" \
+  --noinput-text="No input" \
+  --lock-text="Locking..." \
+  --time-color=ffffffaa \
+  --date-color=ffffffaa \
+  --time-font="Fira Code" \
+  --date-font="Fira Code" \
+  --time-size=48 \
+  --date-size=24 \
+  --indicator \
+  --radius=120 \
+  --ring-width=10
+
+# Remove the temporary image
+rm $PICTURE
