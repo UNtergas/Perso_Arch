@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Detect connected monitors using hyprctl
+MONITORS=$(hyprctl monitors | grep "DP-2")
+
+if [ -n "$MONITORS" ]; then
+    # External monitor is connected
+    echo "External monitor detected. Setting environment variables..."
+    hyprctl keyword env GDK_SCALE 1
+    hyprctl keyword env XCURSOR_SIZE 24
+else
+    # Only laptop monitor is connected
+    echo "External monitor not detected. Setting environment variables..."
+    hyprctl keyword env GDK_SCALE 2
+    hyprctl keyword env XCURSOR_SIZE 32
+fi
+
+# Optionally, reload Hyprland to apply changes (if needed)
+hyprctl reload

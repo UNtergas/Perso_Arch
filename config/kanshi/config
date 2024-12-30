@@ -1,0 +1,14 @@
+# Profile for laptop monitor only
+profile {
+    output eDP-1 enable scale 2 
+}
+
+# Profile for both monitors
+
+profile {
+    output eDP-1 disable     
+    output DP-2 enable scale 1 enable 
+
+}
+
+

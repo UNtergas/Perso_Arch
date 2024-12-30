@@ -39,3 +39,42 @@ brigthnessctl (since the xbacklight dont work for some reason)
 
 for changing the grub theme to tartaurus following this guide:
 https://github.com/AllJavi/tartarus-grub
+
+
+For hyprland
+pre-installed package:
+
+yad
+thunar
+mpv
+imagemagick
+xorg-xwayland
+playerctl
+rofi
+
+install require:
+-from pacman
+hyprland
+swaybg
+swayidle
+swaylock
+wlroots
+wl-clipboard
+waybar
+wofi
+foot
+mako
+grim
+slurp
+wf-recorder
+geany
+mpd
+mpc
+viewnior
+xdg-desktop-portal-wlr
+pastel
+python-pywal
+
+from yay
+light
+xfce-polkit
