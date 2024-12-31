@@ -78,3 +78,7 @@ python-pywal
 from yay
 light
 xfce-polkit
+
+### Polybar on gnome wayland
+since xwindow won work on wayland, to achieve the same result replace xwindow with a script module using the window calls extension
+https://github.com/ickyicky/window-calls
