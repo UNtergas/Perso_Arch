@@ -3,23 +3,23 @@
 get_icon() {
     case $1 in
         # Icons and captions for Nerd Fonts
-        01d) icon=" Clear";;       # Clear sky (day)
-        01n) icon=" Clear";;       # Clear sky (night)
-        02d) icon=" Partly Cloudy";; # Few clouds (day)
-        02n) icon=" Partly Cloudy";; # Few clouds (night)
-        03*) icon=" Scattered Clouds";; # Scattered clouds
-        04*) icon=" Overcast";;    # Broken clouds
-        09d) icon=" Showers";;     # Shower rain (day)
-        09n) icon=" Showers";;     # Shower rain (night)
-        10d) icon=" Rain";;        # Rain (day)
-        10n) icon=" Rain";;        # Rain (night)
-        11d) icon=" Thunderstorm";; # Thunderstorm (day)
-        11n) icon=" Thunderstorm";; # Thunderstorm (night)
-        13d) icon=" Snow";;        # Snow (day)
-        13n) icon=" Snow";;        # Snow (night)
-        50d) icon=" Mist";;        # Mist or fog (day)
-        50n) icon=" Mist";;        # Mist or fog (night)
-        *)    icon=" Unknown";;    # Default/Unknown
+        01d) icon="  Clear";;       # Clear sky (day)
+        01n) icon="  Clear";;       # Clear sky (night)
+        02d) icon="  Partly Cloudy";; # Few clouds (day)
+        02n) icon="  Partly Cloudy";; # Few clouds (night)
+        03*) icon="  Scattered Clouds";; # Scattered clouds
+        04*) icon="  Overcast";;    # Broken clouds
+        09d) icon="  Showers";;     # Shower rain (day)
+        09n) icon="  Showers";;     # Shower rain (night)
+        10d) icon="  Rain";;        # Rain (day)
+        10n) icon="  Rain";;        # Rain (night)
+        11d) icon="  Thunderstorm";; # Thunderstorm (day)
+        11n) icon="  Thunderstorm";; # Thunderstorm (night)
+        13d) icon="  Snow";;        # Snow (day)
+        13n) icon="  Snow";;        # Snow (night)
+        50d) icon="  Mist";;        # Mist or fog (day)
+        50n) icon="  Mist";;        # Mist or fog (night)
+        *)   icon="  Unknown";;    # Default/Unknown
     esac
 
     echo $icon
@@ -74,11 +74,11 @@ if [ -n "$current" ] && [ -n "$forecast" ]; then
 
 
     if [ "$current_temp" -gt "$forecast_temp" ]; then
-        trend="󰔳 Cooling"
+        trend="󰔳 Cool"
     elif [ "$forecast_temp" -gt "$current_temp" ]; then
         trend="󰔴 Stable"
     else
-        trend="󰔵 Warming"
+        trend="󰔵 Warm"
     fi
 
 
@@ -87,11 +87,11 @@ if [ -n "$current" ] && [ -n "$forecast" ]; then
     now=$(date +%s)
 
     if [ "$sun_rise" -gt "$now" ]; then
-        daytime="󰖚 Night $(get_duration "$((sun_rise-now))")"
+        daytime="󰖚 $(get_duration "$((sun_rise-now))")"
     elif [ "$sun_set" -gt "$now" ]; then
-        daytime=" Day $(get_duration "$((sun_set-now))")"
+        daytime=" $(get_duration "$((sun_set-now))")"
     else
-        daytime="󰖚 Night $(get_duration "$((sun_rise-now))")"
+        daytime="󰖚 $(get_duration "$((sun_rise-now))")"
     fi
 
     echo "$(get_icon "$current_icon") $current_temp$SYMBOL $trend $daytime"
