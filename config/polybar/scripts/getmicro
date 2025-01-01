@@ -6,5 +6,5 @@ MUTED=$(pactl get-source-mute @DEFAULT_SOURCE@ | grep -o "yes")
 if [ "$MUTED" == "yes" ]; then
     echo "%{F#ea6962}  Muted"  # Adjust the icon to your preference
 else
-    echo " On"
+    echo "%{F#b8bb26}%{F-} On"
 fi
