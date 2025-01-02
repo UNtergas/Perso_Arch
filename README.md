@@ -93,7 +93,7 @@ extension needed:
 - [Vitals](https://extensions.gnome.org/extension/1460/vitals/)
 - [Space Bar](https://extensions.gnome.org/extension/5338/space-bar/)
 - [Date Menu Formatter](https://extensions.gnome.org/extension/4655/date-menu-formatter/)
-- [Arc Menu]([https://extensions.gnome.org/extension/1228/arcmenu/](https://extensions.gnome.org/extension/3628/arcmenu/)
+- [Arc Menu](https://extensions.gnome.org/extension/3628/arcmenu/)
 - [Window Calls](https://extensions.gnome.org/extension/4724/window-calls/)
 - [Auto Move Windows](https://extensions.gnome.org/extension/16/auto-move-windows/)
 - [Pop Shell](https://github.com/pop-os/shell)
