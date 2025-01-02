@@ -101,3 +101,10 @@ tiling-assistant@ubuntu.com
 ubuntu-appindicators@ubuntu.com
 pomodoro@arun.codito.in
 
+**extension setting loading**
+
+dconf load /org/gnome/shell/extensions/ < gnome-extensions-settings.dconf
+
+**keybind loading**
+
+dconf load /org/gnome/settings-daemon/plugins/media-keys/ < gnome-keybindings.dconf
