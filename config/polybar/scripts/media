@@ -8,7 +8,7 @@ status=$(playerctl -p "$player" status 2>/dev/null)
 # Check if Spotify is running and playing/paused
 if [[ $player == "spotify" && ($status == "Playing" || $status == "Paused") ]]; then
     # Set the maximum label length for Polybar
-    maxlen=20
+    maxlen=25
 
     # If the metadata length exceeds maxlen, create a scrolling effect
     if [ ${#metadata} -gt $maxlen ]; then
