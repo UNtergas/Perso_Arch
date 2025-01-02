@@ -84,3 +84,20 @@ since xwindow won work on wayland, to achieve the same result replace xwindow wi
 https://github.com/ickyicky/window-calls
 
 Adding a script to refresh polybar scaling using dpi, replace with your monitor using xrandr
+### Replicate the i3wm on gnome wayland
+extension needed:
+just-perfection-desktop@just-perfection
+user-theme@gnome-shell-extensions.gcampax.github.com
+dash-to-panel@jderose9.github.com
+Vitals@CoreCoding.com
+space-bar@luchrioh
+date-menu-formatter@marcinjakubowski.github.com
+arcmenu@arcmenu.com
+window-calls@domandoman.xyz
+auto-move-windows@gnome-shell-extensions.gcampax.github.com
+pop-shell@system76.com
+ding@rastersoft.com
+tiling-assistant@ubuntu.com
+ubuntu-appindicators@ubuntu.com
+pomodoro@arun.codito.in
+
