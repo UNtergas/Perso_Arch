@@ -1,4 +1,4 @@
-# EndeavousOS Config
+# EndeavousOS And Ubuntu Gnome Config
 i3 and rofi with basic setup for duo monitor
 
 ## Dependancy Requirement 
