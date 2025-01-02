@@ -84,22 +84,20 @@ since xwindow won work on wayland, to achieve the same result replace xwindow wi
 https://github.com/ickyicky/window-calls
 
 Adding a script to refresh polybar scaling using dpi, replace with your monitor using xrandr
-### Replicate the i3wm on gnome wayland
+### Replicate the i3wm tiling look on gnome wayland
 extension needed:
-just-perfection-desktop@just-perfection
-user-theme@gnome-shell-extensions.gcampax.github.com
-dash-to-panel@jderose9.github.com
-Vitals@CoreCoding.com
-space-bar@luchrioh
-date-menu-formatter@marcinjakubowski.github.com
-arcmenu@arcmenu.com
-window-calls@domandoman.xyz
-auto-move-windows@gnome-shell-extensions.gcampax.github.com
-pop-shell@system76.com
-ding@rastersoft.com
-tiling-assistant@ubuntu.com
-ubuntu-appindicators@ubuntu.com
-pomodoro@arun.codito.in
+
+- [Just Perfection Desktop](https://extensions.gnome.org/extension/3843/just-perfection/)
+- [User Themes](https://extensions.gnome.org/extension/19/user-themes/)
+- [Dash to Panel](https://extensions.gnome.org/extension/1160/dash-to-panel/)
+- [Vitals](https://extensions.gnome.org/extension/1460/vitals/)
+- [Space Bar](https://extensions.gnome.org/extension/5338/space-bar/)
+- [Date Menu Formatter](https://extensions.gnome.org/extension/4655/date-menu-formatter/)
+- [Arc Menu]([https://extensions.gnome.org/extension/1228/arcmenu/](https://extensions.gnome.org/extension/3628/arcmenu/))
+- [Window Calls](https://extensions.gnome.org/extension/4724/window-calls/)
+- [Auto Move Windows](https://extensions.gnome.org/extension/16/auto-move-windows/)
+- [Pop Shell](https://github.com/pop-os/shell)
+- [Pomodoro Timer](https://extensions.gnome.org/extension/53/pomodoro/)
 
 **extension setting loading**
 
