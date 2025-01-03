@@ -74,7 +74,10 @@ volume() {
 format() {
   perl_filter='if (/.*\[(\d+%)\] (\[(-?\d+\.\d+dB)\] )?\[(on|off)\]/) {'
   perl_filter+='CORE::say $4 eq "off" ? "%{F#ea6962} MUTE" : '
-  perl_filter+='($1 eq "0%" ? "%{F#e78a4e} %{F-} $1" : ($1 le "50%" ? "%{F#e78a4e} %{F-} $1" : "%{F#fabd2f} %{F-} $1"));'
+  perl_filter+='($1 eq "0%" ? "%{F#e78a4e} %{F-}$1" : '
+  perl_filter+='($1 eq "100%" ? "%{F#fabd2f} %{F-}$1" : '
+  perl_filter+='(int($1) <= 50 ? "%{F#e78a4e} %{F-}$1" : "%{F#fabd2f} %{F-}$1")));'
+
   perl_filter+='exit}'
   output=$(perl -ne "$perl_filter")
   echo "$LABEL$output"

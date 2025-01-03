@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Get the default PulseAudio sink and remove the last digit
+DEFAULT_SINK=$(pactl info | grep "Default Sink" | cut -d ' ' -f3 | sed -E 's/.*bluez_output\.([0-9A-F_]+)\.?.*/\1/' | tr '_' ':')
+
+# List connected Bluetooth devices
+CONNECTED_DEVICES=$(bluetoothctl devices Connected)
+
+# Find the matching connected headphone device
+for device in $(echo "$CONNECTED_DEVICES" | awk '{print $2}'); do
+    if [[ "$DEFAULT_SINK" == *$device* ]]; then
+        DEVICE_NAME=$(echo "$CONNECTED_DEVICES" | grep $device | cut -d ' ' -f 3-)
+        echo "%{F#79c} %{F-}$DEVICE_NAME"
+        exit 0
+    fi
+done
+
+echo "%{F#ea6962}󰓃%{F-} Speaker"
+exit 1
