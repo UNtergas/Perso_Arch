@@ -22,6 +22,7 @@
   
     "modules-right": [
         "tray",
+        "power-profiles-daemon",
         "disk",
         "cpu",
         "memory",
@@ -32,7 +33,6 @@
         "custom/keyboard",         
         "bluetooth",
         "battery",
-        "custom/wifi",
         "clock#date",
         "clock#time",
         "custom/power"
@@ -126,7 +126,6 @@
       "format-alt": "<span color='#8ec07c' > 󱧥 </span>{time}",
       "tooltip": false
     },
-  
     "clock#date": {
       "format": "<span color='#8ec07c' >󰃭 </span>{:%a %d %b}",
       "tooltip": false,
@@ -186,17 +185,6 @@
       "max-length": 40
     },
   
-    "custom/wifi": {
-      "exec": "~/.config/waybar/scripts/wifi-status.sh",
-      "return-type": "json",
-      "format": "{}",
-      "tooltip": true,
-      "on-click": "~/.config/waybar/scripts/wifi-menu.sh",
-      "interval": 1,
-      "min-length": 1,
-      "max-length": 12
-    },
-  
     "bluetooth": {
       "format": "<span color='#458588'> 󰂰</span>",
       "format-disabled": "<span color='#458588'> 󰂲</span>",
@@ -225,8 +213,7 @@
         "tooltip": false,
         "on-click": "spotify --enable-features=UseOzonePlatform --ozone-platform=wayland",
         "interval": 1,
-        "min-length": 1,
-        "max-length": 40
+        "max-length":30
     },
     "custom/notification": {
       "tooltip": false,

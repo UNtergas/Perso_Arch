@@ -5,10 +5,15 @@ player=$(playerctl -l | grep spotify | head -n 1 2>/dev/null)  # Get Spotify pla
 metadata=$(playerctl -p "$player" metadata --format "{{ title }}" 2>/dev/null)
 status=$(playerctl -p "$player" status 2>/dev/null)
 
-# Check if Spotify is running and playing/paused
+# Escape special characters for Pango markup
+escape_markup() {
+    echo "$1" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'"'"'/\&apos;/g'
+}
+
+# Prepare the output
 if [[ $player == "spotify" && ($status == "Playing" || $status == "Paused") ]]; then
     # Set the maximum label length for Polybar
-    maxlen=25
+    maxlen=30
 
     # If the metadata length exceeds maxlen, create a scrolling effect
     if [ ${#metadata} -gt $maxlen ]; then
@@ -16,9 +21,10 @@ if [[ $player == "spotify" && ($status == "Playing" || $status == "Paused") ]]; 
         metadata="${metadata:offset:maxlen} ${metadata:0:offset}"  # Loop text back to the start
     fi
 
-    # Output the metadata
-    echo "$metadata"
+    # Escape metadata for Waybar and print
+    metadata=$(escape_markup "$metadata")
+    echo "$metadata 󰓃"
 else
     # Fallback if Spotify is not running
-    echo "Spotify not running"
+    echo "Spotify not running 󰓄"
 fi
