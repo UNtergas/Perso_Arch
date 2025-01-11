@@ -32,7 +32,6 @@ rofi_cmd() {
 	rofi -theme-str "window {width: 50%;}" \
 		-theme-str "listview {columns: 5; lines: 1;}" \
 		-theme-str 'textbox-prompt-colon {str: " ";}' \
-		-theme-str 'inputbar {background-image: url("'$background_image'", height);}' \
 		-dmenu \
 		-p "Screenshot" \
 		-mesg "DIR: ${dir}" \

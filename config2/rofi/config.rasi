@@ -60,6 +60,7 @@ window {
     // Style Values
     width:                      60%;
     background-color:           @background;
+    border-color:               rgba(0, 0, 0, 0.4);
 }
 
 /* ----- Main Box ----- */

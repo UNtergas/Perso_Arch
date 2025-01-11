@@ -25,7 +25,7 @@ configuration {
     
     text-selected:               @background;
     text-color:                  @foreground;
-    border-color:                @selected;
+    border-color:                rgba(0, 0, 0, 0.4);
 }
 
 /*
@@ -58,6 +58,7 @@ mainbox {
 
 /*****----- Inputbar -----*****/
 inputbar {
+    background-image:            url("~/.config/rofi/.current_wallpaper",width);
     enabled:                     true;
     spacing:                     25px;
     padding:                     100px 50px;
