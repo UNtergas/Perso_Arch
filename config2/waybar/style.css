@@ -53,8 +53,8 @@ padding-right: 5px;
 #battery.warning,
 #clock {
 font-family: CaskaydiaCove Nerd Font;
-font-size: 12px;
-font-weight: 400;
+font-size: 13px;
+font-weight: 600;
 color: #202020;
 background: #202020;
 border-radius: 2px;
@@ -129,6 +129,7 @@ tooltip {
 #window {
 color: #fbf1c7;
 background: #3c3835;
+font-size: 14px ;
 margin-right: 60px;
 /* border: 2px solid #d3869b; */
 }
@@ -177,7 +178,6 @@ color: #cc241d;
 #custom-backlight {
 color: #f6c657;
 background: #3c3835;
-font-size: 12px;
 }
 
 /* ================================ */
@@ -185,7 +185,6 @@ font-size: 12px;
 /* ================================ */
 #memory {
 color: #458588;
-font-size: 12px;
 }
 
 /* ================================ */
@@ -243,16 +242,22 @@ margin: 1px 1px;
 #custom-notification {
 color: #fbf1c7;
 background: #3c3835;
+font-size: 16px;
+font-weight: 800;
 }
 
 #custom-spotify{
-	font-size: 12px;
+	font-size: 13px;
+	font-weight: 600;
 }
 
 #custom-power{
 	color: #cc241d;
+	font-size: 16px;
+	font-weight: 800;
 }
 
 #custom-nightlight{
 	color: #d8a657;
 }
+

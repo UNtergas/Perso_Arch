@@ -1,7 +1,7 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 22,
+    "height": 24,
     "spacing": 5,
     "margin-top" :0,
     "margin-right" :0,
@@ -14,7 +14,8 @@
         "custom/nightlight",
         "custom/paddc",
         "hyprland/window",
-        "custom/spotify"
+        "custom/spotify",
+        "custom/cava_mviz"
     ],
   
     // "modules-center": ["hyprland/window","custom/paddc"],
@@ -51,6 +52,8 @@
         "active-only": false,
         "all-outputs": true,
         "warp-on-scroll": false,
+        "on-scroll-up": "hyprctl dispatch workspace e+1",
+        "on-scroll-down": "hyprctl dispatch workspace e-1",
         "format": "{icon}",
         "format-icons": {
             // "1": "<span color='#d8a657' >󰊠</span>",
@@ -59,17 +62,12 @@
             // "4": "<span color='#458588' >󰊠</span>",
             // "5": "<span color='#b16286' >󰊠</span>",
             // "6": "<span color='#689d6a' >󰊠</span>",
-            "active": "<span color='#689d6a'>󰊠</span>",
-            "default": "<span color='#fbf1c7'>󰊠</span>",
-            "empty": "<span color='#fbf1c7'></span>",
-        },
-        "persistent-workspaces": {
-          "*": 6
-      }
+            "active": "<span color='#689d6a'>󰊠</span>"
+        }
     },
   
     "hyprland/window": {
-      "format": "<span foreground= '#458588'></span> {class}",
+      "format": "<span foreground= '#658588'> </span> {class}",
       "max-length": 50
     },
   
@@ -77,7 +75,6 @@
       "icon-size": 15,
       "spacing": 8
     },
-  
     "pulseaudio": {
       "format": "{icon} {volume}%",
         "tooltip": false,
@@ -156,7 +153,10 @@
       "format": " ",
       "tooltip": false,
     },
-    
+    "custom/cava_mviz": {
+      "exec": "~/.config/hypr/scripts/WaybarCava.sh",
+      "format": "{}"
+    },
     "custom/keyboard": {
         "exec": "cat ~/.cache/kb_layout",
         "interval": 1,
@@ -222,8 +222,8 @@
     "custom/spotify":{
         "exec": "~/.config/waybar/scripts/media",
         "format": "<span color='#a9b665'> </span>{}",
-        "tooltip": true,
-        "on-click": "spotify",
+        "tooltip": false,
+        "on-click": "spotify --enable-features=UseOzonePlatform --ozone-platform=wayland",
         "interval": 1,
         "min-length": 1,
         "max-length": 40
@@ -257,10 +257,9 @@
 
 
     "cpu": {
-        "interval": 10,
-        "format": "{}% ",
-        "max-length": 10,
-        "on-click": "btop"
+        "format": "{usage}% 󰍛",
+        "interval": 1,
+        "min-length": 5
     },
     "temperature": {
         // "thermal-zone": 2,

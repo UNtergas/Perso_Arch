@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Create FIFO pipe if it doesn't exist
+if [ ! -p /tmp/cava.fifo ]; then
+    mkfifo /tmp/cava.fifo
+fi
+
+# Kill existing cava instances if running
+pkill -f "cava"
+
+# Run Cava with the config
+cava -p ~/.config/cava/config | while read -r line; do
+    echo "$line"
+done
