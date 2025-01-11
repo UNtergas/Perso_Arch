@@ -1,0 +1,258 @@
+/* ================================ */
+/*            Common CSS            */
+/* ================================ */
+* {
+	/* `otf-font-awesome` is required to be installed for icons */
+	padding: 0;
+	border-radius: 0;
+	min-height: 0;
+	margin: 0;
+	border: none;
+	text-shadow: none;
+	transition: none;
+	box-shadow: none;
+}
+
+/* the whole window */
+window#waybar {
+background: #3c3835;
+color: #fff4d2;
+padding: 0px 0px;
+margin: 0;
+border-radius: 5px;
+}
+
+.modules-left {
+padding-left: 5px;
+}
+
+.modules-right {
+padding-right: 5px;
+}
+
+#custom-rofi,
+#workspaces button,
+#workspaces button:hover,
+#workspaces button.visible,
+#workspaces button.visible:hover,
+#workspaces button.active,
+#workspaces button.active:hover,
+#workspaces button.urgent,
+#window,
+#tray,
+#disk,
+#cpu,
+#temperature,
+#temperature.critical,
+#backlight,
+#custom-memory,
+#pulseaudio,
+#pulseaudio.muted,
+#battery,
+#battery.critical,
+#battery.warning,
+#clock {
+font-family: CaskaydiaCove Nerd Font;
+font-size: 12px;
+font-weight: 400;
+color: #202020;
+background: #202020;
+border-radius: 2px;
+}
+
+#window,
+#tray,
+#disk,
+#cpu,
+#temperature,
+#temperature.critical,
+#backlight,
+#custom-memory,
+#pulseaudio,
+#pulseaudio.muted,
+#battery,
+#battery.critical,
+#battery.warning,
+#clock {
+padding-right: 2px;
+margin: 0px 0px;
+}
+
+#custom-rofi {
+/* border: 2px solid #458588; */
+/* border-radius: 5px; */
+background: #3c3835;
+padding: 0 6px;
+margin: 5px 5px;
+}
+
+/* ================================ */
+/*       workspaces module          */
+/* ================================ */
+#workspaces {
+margin: 0px;
+}
+
+#workspaces button {
+color: #fff4d2;
+background: #3c3835;
+/* border: 2px solid #fff4d2; */
+min-width: 25px;
+margin: 0px 0px;
+}
+
+#workspaces button:hover {
+background: #aaa187;
+/* border: 2px solid #fff4d2; */
+/* border-radius: 5px; */
+}
+
+
+#workspaces button.urgent {
+/* border: 2px solid #cc241d;
+border-radius: 5px; */
+background: #ea6962;
+}
+/* ================================ */
+/*           Pop up tooltip          */
+/* ================================ */
+
+
+tooltip {
+	background: rgba(40, 40, 40, 0.76);
+	border-radius: 2px;
+  }
+/* ================================ */
+/*            window                 */
+/* ================================ */
+
+#window {
+color: #fbf1c7;
+background: #3c3835;
+margin-right: 60px;
+/* border: 2px solid #d3869b; */
+}
+
+/* ================================ */
+/*            tray                 */
+/* ================================ */
+
+#tray {
+/* padding: 0 6px; */
+background: #3c3835;
+}
+
+/* ================================ */
+/*            disk                 */
+/* ================================ */
+
+#disk {
+color: #ea6962;
+background: #3c3835;
+}
+
+/* ================================ */
+/*            cpu                  */
+/* ================================ */
+#cpu {
+color: #e78a4e;
+background: #3c3835;
+}
+
+/* ================================ */
+/*            temp                  */
+/* ================================ */
+#temperature {
+color: #d8a657;
+background: #3c3835;
+}
+
+#temperature.critical {
+color: #cc241d;
+}
+
+/* ================================ */
+/*            backlight             */
+/* ================================ */
+#custom-backlight {
+color: #f6c657;
+background: #3c3835;
+font-size: 12px;
+}
+
+/* ================================ */
+/*            memory                */
+/* ================================ */
+#memory {
+color: #458588;
+font-size: 12px;
+}
+
+/* ================================ */
+/*         pulseaudio               */
+/* ================================ */
+#pulseaudio {
+color: #fbf1c7;
+background: #3c3835;
+}
+
+#pulseaudio.muted {
+color: #ea6962;
+background: #3c3835;
+}
+
+/* ================================ */
+/*            battery               */
+/* ================================ */
+#battery {
+color: #fbf1c7;
+background: #3c3835;
+}
+
+#battery.critical {
+color: #cc241d;
+background: #3c3835;
+}
+
+#battery.warning {
+color: #e78a4e;
+background: #3c3835;
+}
+/* ================================ */
+/*            clock                 */
+/* ================================ */
+#clock.time {
+color: #fbf1c7;
+background: #3c3835;
+}
+
+#clock.date {
+color: #fbf1c7;
+background: #3c3835;
+}
+
+#mpris {
+color: #fbf1c7;
+/* border: 2px solid #3c3835;
+border-radius: 21px; */
+background: #3c3835;
+padding: 5px 5px;
+margin: 1px 1px; 
+}
+
+#custom-notification {
+color: #fbf1c7;
+background: #3c3835;
+}
+
+#custom-spotify{
+	font-size: 12px;
+}
+
+#custom-power{
+	color: #cc241d;
+}
+
+#custom-nightlight{
+	color: #d8a657;
+}

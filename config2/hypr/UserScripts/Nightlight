@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Configuration
+LOW_TEMP=5200
+HIGH_TEMP=6500
+LAT=47
+LONG=2
+DURATION=1800
+
+# Check if wlsunset is running
+if pgrep -x "wlsunset" > /dev/null; then
+    echo "wlsunset is running. Stopping it..."
+    pkill wlsunset
+else
+    echo "Starting wlsunset with defined settings..."
+    wlsunset -t $LOW_TEMP -T $HIGH_TEMP -l $LAT -L $LONG -d $DURATION &
+fi

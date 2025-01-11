@@ -1,0 +1,20 @@
+profile LAPTOP_ONLY {
+    output eDP-1 enable scale 2
+    exec notify-send "Switching to Laptop Only" -u low
+    exec echo "Xft.dpi: 180" | xrdb -merge
+    
+}
+
+profile DOCK_ONLY {
+    output eDP-1 disable
+    output DP-2 enable scale 1
+    exec notify-send "Switching to External Only on DP-2" -u low
+    exec echo "Xft.dpi: 96" | xrdb -merge
+}
+
+profile DOCK_ONLY_TWO {
+    output eDP-1 disable
+    output DP-1 enable scale 1
+    exec notify-send "Switching to External Only on DP-1" -u low
+    exec echo "Xft.dpi: 96" | xrdb -merge
+}

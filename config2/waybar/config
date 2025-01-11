@@ -1,0 +1,284 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 22,
+    "spacing": 5,
+    "margin-top" :0,
+    "margin-right" :0,
+    "margin-left" :0,
+  
+    "modules-left": [
+        "custom/notification",
+        "hyprland/workspaces",
+        "custom/paddc",
+        "custom/nightlight",
+        "custom/paddc",
+        "hyprland/window",
+        "custom/spotify"
+    ],
+  
+    // "modules-center": ["hyprland/window","custom/paddc"],
+  
+    "modules-right": [
+        "tray",
+        "disk",
+        "cpu",
+        "memory",
+        "temperature",
+        "pulseaudio#microphone",
+        "pulseaudio",
+        "custom/backlight",
+        "custom/keyboard",         
+        "bluetooth",
+        "battery",
+        "custom/wifi",
+        "clock#date",
+        "clock#time",
+        "custom/power"
+    ],
+  
+    "custom/rofi": {
+      "format": "<span color='#98971a' >󰮯</span>",
+      "on-click": "rofi -show drun",
+      "on-click-right": "wlogout",
+      "escape" : true,
+      "tooltip" : false
+      },
+  
+    // Modules configuration
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "active-only": false,
+        "all-outputs": true,
+        "warp-on-scroll": false,
+        "format": "{icon}",
+        "format-icons": {
+            // "1": "<span color='#d8a657' >󰊠</span>",
+            // "2": "<span color='#98971a' >󰊠</span>",
+            // "3": "<span color='#d79921' >󰊠</span>",
+            // "4": "<span color='#458588' >󰊠</span>",
+            // "5": "<span color='#b16286' >󰊠</span>",
+            // "6": "<span color='#689d6a' >󰊠</span>",
+            "active": "<span color='#689d6a'>󰊠</span>",
+            "default": "<span color='#fbf1c7'>󰊠</span>",
+            "empty": "<span color='#fbf1c7'></span>",
+        },
+        "persistent-workspaces": {
+          "*": 6
+      }
+    },
+  
+    "hyprland/window": {
+      "format": "<span foreground= '#458588'></span> {class}",
+      "max-length": 50
+    },
+  
+    "tray": {
+      "icon-size": 15,
+      "spacing": 8
+    },
+  
+    "pulseaudio": {
+      "format": "{icon} {volume}%",
+        "tooltip": false,
+        "format-muted": " Muted",
+        "on-click": "pamixer -t",
+        "on-scroll-up": "pamixer -i 2",
+        "on-scroll-down": "pamixer -d 2",
+        "scroll-step": 5,
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        }
+    },
+    "pulseaudio#microphone": {
+        "format": "{format_source}",
+        "format-source": " {volume}%",
+        "tooltip": false,
+        "format-source-muted": " Muted",
+        "on-click": "pamixer --default-source -t",
+        "on-scroll-up": "pamixer --default-source -i 2",
+        "on-scroll-down": "pamixer --default-source -d 2",
+        "scroll-step": 5
+    },
+    "battery#bat2": {
+      "bat": "BAT2"
+    },
+  
+    "battery": {
+      "interval": 1,
+      "states": {
+        "good": 99,
+        "warning": 30,
+        "critical": 20
+      },
+      "format-icons": [" "," "," "," "," "],
+      "format": "<span color='#8ec07c' > {icon}</span>{capacity}%",
+      "format-critical": "<span color='#cc241d' > {icon}</span>{capacity}%",
+      "format-warning": "<span color='#d8a657' > {icon}</span>{capacity}%",
+      "format-full": "<span color='#8ec07c' > {icon}</span>{capacity}%",
+      "format-charging": "<span color='#8ec07c' > 󰂅 </span>{capacity}%",
+      "format-charging-warning": "<span color='#d8a657' > 󰢝 </span>{capacity}%",
+      "format-charging-critical": "<span color='#cc241d' > 󰢜 </span>{capacity}%",
+      "format-plugged": "<span color='#8ec07c' > 󰂅 </span>{capacity}%",
+      "format-alt": "<span color='#8ec07c' > 󱧥 </span>{time}",
+      "tooltip": false
+    },
+  
+    "clock#date": {
+      "format": "<span color='#8ec07c' >󰃭 </span>{:%a %d %b}",
+      "tooltip": false,
+    },
+  
+    "clock#time": {
+      "format": "<span color='#cc241d' >󱑂 </span>{:%I:%M %p}",
+      "tooltip": false,
+      // "tooltip-format": "Standard Time: {:%I:%M %p}",
+      "min-length": 8,
+      "max-length": 12
+    },
+  
+    "custom/backlight": {
+        "exec": "~/.config/waybar/scripts/brightness-control.sh",
+        "format": "{}",
+        "on-scroll-up": "~/.config/waybar/scripts/brightness-control.sh -o i",
+        "on-scroll-down": "~/.config/waybar/scripts/brightness-control.sh -o d",
+        "interval": 1,
+        "min-length": 6,
+        "max-length": 10
+    },
+    "custom/paddc": {
+      "format": " ",
+      "tooltip": false,
+    },
+    
+    "custom/keyboard": {
+        "exec": "cat ~/.cache/kb_layout",
+        "interval": 1,
+        "format": "{}",
+        "on-click": "~/.config/hypr/scripts/SwitchKeyboardLayout.sh"
+    },
+    "custom/nightlight":{
+        "exec": "~/.config/waybar/scripts/getNightLight",
+        "format": "{}",
+        "interval":1,
+        "on-click": "~/.config/hypr/UserScripts/Nightlight"
+    },
+    
+    "keyboard-state": {
+        "numlock": false,
+        "scrolllock": false,
+        "capslock": true,
+        "format": "{icon}",
+        "format-icons": {
+            "locked": "Capslock",
+            "unlocked": ""
+        }
+    },
+
+    "mpris": {
+      "format": "<span color='#cc241d'> 󰎇</span> {title}  ",
+      "max-length": 40
+    },
+  
+    "custom/wifi": {
+      "exec": "~/.config/waybar/scripts/wifi-status.sh",
+      "return-type": "json",
+      "format": "{}",
+      "tooltip": true,
+      "on-click": "~/.config/waybar/scripts/wifi-menu.sh",
+      "interval": 1,
+      "min-length": 1,
+      "max-length": 12
+    },
+  
+    "bluetooth": {
+      "format": "<span color='#458588'> 󰂰</span>",
+      "format-disabled": "<span color='#458588'> 󰂲</span>",
+      "format-connected": "<span color='#458588'> 󰂱</span>",
+      "format-connected-battery": "<span color='#458588'> 󰂱</span>",
+  
+      "tooltip-format": 
+        "{num_connections} connected",
+      "tooltip-format-disabled": 
+        "Bluetooth Disabled",
+      "tooltip-format-connected": 
+        "{num_connections} connected\n{device_enumerate}",
+      "tooltip-format-enumerate-connected": 
+        "{device_alias}",
+      "tooltip-format-enumerate-connected-battery": 
+        "{device_alias}: {device_battery_percentage}%",
+  
+      "on-click": "blueman-manager",
+      "interval": 1,
+      "min-length": 1,
+      "max-length": 10
+    },
+    "custom/spotify":{
+        "exec": "~/.config/waybar/scripts/media",
+        "format": "<span color='#a9b665'> </span>{}",
+        "tooltip": true,
+        "on-click": "spotify",
+        "interval": 1,
+        "min-length": 1,
+        "max-length": 40
+    },
+    "custom/notification": {
+      "tooltip": false,
+      "rotate": 0,
+      "format": " {icon}",
+      "format-icons": {
+        "notification": "󰅸 ",
+        "none": "󰂜 ",
+        "dnd-notification": "󰅸 ",
+        "dnd-none": "󱏨 ",
+        "inhibited-notification": "󰅸 ",
+        "inhibited-none": "󰂜 ",
+        "dnd-inhibited-notification": "󰅸 ",
+        "dnd-inhibited-none": "󱏨 "
+      },
+      "return-type": "json",
+      "exec-if": "which swaync-client",
+      "exec": "swaync-client -swb",
+      "on-click-right": "swaync-client -d -sw",
+      "on-click": "swaync-client -t -sw",
+      "escape": true
+    },
+    "custom/power": {
+        "format": "",
+        "tooltip": false,
+        "on-click": "exec ~/.config/hypr/scripts/Wlogout.sh"
+    },
+
+
+    "cpu": {
+        "interval": 10,
+        "format": "{}% ",
+        "max-length": 10,
+        "on-click": "btop"
+    },
+    "temperature": {
+        // "thermal-zone": 2,
+        // "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
+        "critical-threshold": 70,
+        "format-critical": "{temperatureC}°C ",
+        "format": "{temperatureC}°C "
+    },
+    "memory": {
+        "interval": 30,
+        "format": "{}% ",
+        "max-length": 10
+    },
+    
+    "disk": {
+        "interval": 30,
+        "format": "{specific_free:0.1f}G 󰋊",
+        "unit": "GB"
+        // 0.25 GB out of 2000.00 GB available. Alternatively 241.3MiB out of 1.9TiB available.
+    }
+  }

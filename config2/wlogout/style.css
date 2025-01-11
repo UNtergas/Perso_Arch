@@ -1,0 +1,75 @@
+* {
+	background-image: none;
+	box-shadow: none;
+}
+
+window {
+    color: #ebdbb2; /* text */
+    background-color: rgba(40, 40, 40, 0.76);
+  }
+  
+button {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 50%;
+  border-style: solid;
+  border-radius: 4px;
+  border-width: 2px;
+  border-color: #ebdbb2;
+  background-color: rgba(40, 40, 40, 0.76);
+  margin: 10px;
+  transition:
+    box-shadow 0.3s ease-in-out,
+    background-color 0.3s ease-in-out;
+}
+
+button:hover {
+  background-color: rgba(104, 157, 106, 0.92);
+  color: #282828;
+}
+
+button:focus {
+  background-color: #ebdbb2;
+  color: #282828;
+}
+
+#lock {
+  background-image: image(url("./new_icons/lock.png"));
+}
+#lock:focus {
+  background-image: image(url("./new_icons/lock-hover.png"));
+}
+#lock:hover {
+  background-image: image(url("./new_icons/lock-hover.png"));
+}
+
+#logout {
+  background-image: image(url("./new_icons/logout.png"));
+}
+#logout:focus {
+  background-image: image(url("./new_icons/logout-hover.png"));
+}
+#logout:hover {
+  background-image: image(url("./new_icons/logout-hover.png"));
+}
+
+
+#shutdown {
+  background-image: image(url("./new_icons/power.png"));
+}
+#shutdown:focus {
+  background-image: image(url("./new_icons/power-hover.png"));
+}
+#shutdown:hover {
+  background-image: image(url("./new_icons/power-hover.png"));
+}
+
+#reboot {
+  background-image: image(url("./new_icons/restart.png"));
+}
+#reboot:focus {
+  background-image: image(url("./new_icons/restart-hover.png"));
+}
+#reboot:hover {
+  background-image: image(url("./new_icons/restart-hover.png"));
+}

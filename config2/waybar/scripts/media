@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Get the player name, metadata, and status
+player=$(playerctl -l | grep spotify | head -n 1 2>/dev/null)  # Get Spotify player only
+metadata=$(playerctl -p "$player" metadata --format "{{ title }}" 2>/dev/null)
+status=$(playerctl -p "$player" status 2>/dev/null)
+
+# Check if Spotify is running and playing/paused
+if [[ $player == "spotify" && ($status == "Playing" || $status == "Paused") ]]; then
+    # Set the maximum label length for Polybar
+    maxlen=25
+
+    # If the metadata length exceeds maxlen, create a scrolling effect
+    if [ ${#metadata} -gt $maxlen ]; then
+        offset=$(( $(date +%s) % (${#metadata} + 3) ))  # Offset scroll based on time (+3 adds padding)
+        metadata="${metadata:offset:maxlen} ${metadata:0:offset}"  # Loop text back to the start
+    fi
+
+    # Output the metadata
+    echo "$metadata"
+else
+    # Fallback if Spotify is not running
+    echo "Spotify not running"
+fi

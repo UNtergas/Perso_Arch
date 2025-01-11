@@ -1,0 +1,172 @@
+#!/bin/bash
+
+theme="~/.config/rofi/config-screenshot.rasi"
+
+iDIR="$HOME/.config/swaync/icons"
+sDIR="$HOME/.config/hypr/scripts"
+notify_cmd_shot="notify-send -h string:x-canonical-private-synchronous:shot-notify -u low -i ${iDIR}/picture.png"
+
+time=$(date "+%d-%b_%H-%M-%S")
+dir="$(xdg-user-dir)/Pictures/Screenshots"
+before=$(ls "$dir" -1q | wc -l)
+if [[ ! -d "$dir" ]]; then
+	mkdir -p "$dir"
+fi
+file="Screenshot_${time}_${RANDOM}.png"
+
+active_window_class=$(hyprctl -j activewindow | jq -r '(.class)')
+active_window_file="Screenshot_${time}_${active_window_class}.png"
+active_window_path="${dir}/${active_window_file}"
+background_image="~/.config/rofi/.current_wallpaper"
+
+
+option_1=""
+option_2=""
+option_3=""
+option_4=""
+option_5=""
+
+
+# Rofi CMD
+rofi_cmd() {
+	rofi -theme-str "window {width: 50%;}" \
+		-theme-str "listview {columns: 5; lines: 1;}" \
+		-theme-str 'textbox-prompt-colon {str: " ";}' \
+		-theme-str 'inputbar {background-image: url("'$background_image'", height);}' \
+		-dmenu \
+		-p "Screenshot" \
+		-mesg "DIR: ${dir}" \
+		-markup-rows \
+		-theme "${theme}"
+}
+
+# Pass variables to rofi dmenu
+run_rofi() {
+	echo -e "$option_1\n$option_2\n$option_3\n$option_4\n$option_5" | rofi_cmd
+}
+
+
+
+
+# notify and view screenshot
+notify_view() {
+    if [[ "$1" == "active" ]]; then
+        if [[ -e "${active_window_path}" ]]; then
+            ${notify_cmd_shot} "Screenshot of '${active_window_class}' Saved."
+            "${sDIR}/Sounds.sh" --screenshot
+        else
+            ${notify_cmd_shot} "Screenshot of '${active_window_class}' not Saved"
+            "${sDIR}/Sounds.sh" --error
+        fi
+    elif [[ "$1" == "swappy" ]]; then
+		${notify_cmd_shot} "Screenshot Captured."
+    else
+        local check_file="$dir/$file"
+        if [[ -e "$check_file" ]]; then
+            ${notify_cmd_shot} "Screenshot Saved."
+            "${sDIR}/Sounds.sh" --screenshot
+        else
+            ${notify_cmd_shot} "Screenshot NOT Saved."
+            "${sDIR}/Sounds.sh" --error
+        fi
+    fi
+}
+
+
+
+# countdown
+countdown() {
+	for sec in $(seq $1 -1 1); do
+		notify-send -h string:x-canonical-private-synchronous:shot-notify -t 1000 -i "$iDIR"/timer.png "Taking shot in : $sec"
+		sleep 1
+	done
+}
+
+# take shots
+shotnow() {
+	cd ${dir} && grim - | tee "$file" | wl-copy
+	sleep 2
+	notify_view
+}
+
+shot5() {
+	countdown '5'
+	sleep 1 && cd ${dir} && grim - | tee "$file" | wl-copy
+	sleep 1
+	notify_view
+	
+}
+
+shot10() {
+	countdown '10'
+	sleep 1 && cd ${dir} && grim - | tee "$file" | wl-copy
+	notify_view
+}
+
+shotwin() {
+	w_pos=$(hyprctl activewindow | grep 'at:' | cut -d':' -f2 | tr -d ' ' | tail -n1)
+	w_size=$(hyprctl activewindow | grep 'size:' | cut -d':' -f2 | tr -d ' ' | tail -n1 | sed s/,/x/g)
+	cd ${dir} && grim -g "$w_pos $w_size" - | tee "$file" | wl-copy
+	notify_view
+}
+
+shotarea() {
+	tmpfile=$(mktemp)
+	grim -g "$(slurp)" - >"$tmpfile"
+	if [[ -s "$tmpfile" ]]; then
+		wl-copy <"$tmpfile"
+		mv "$tmpfile" "$dir/$file"
+	fi
+	notify_view
+}
+
+shotactive() {
+    active_window_class=$(hyprctl -j activewindow | jq -r '(.class)')
+    active_window_file="Screenshot_${time}_${active_window_class}.png"
+    active_window_path="${dir}/${active_window_file}"
+
+    hyprctl -j activewindow | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | grim -g - "${active_window_path}"
+	sleep 1
+    notify_view "active"  
+}
+
+shotswappy() {
+	tmpfile=$(mktemp)
+	grim -g "$(slurp)" - >"$tmpfile" && "${sDIR}/Sounds.sh" --screenshot && notify_view "swappy"
+	swappy -f - <"$tmpfile"
+	rm "$tmpfile"
+}
+
+run_cmd() {
+	if [[ "$1" == '--opt1' ]]; then
+		shotnow "$before" 
+	elif [[ "$1" == '--opt2' ]]; then
+		shotswappy "$before"
+	elif [[ "$1" == '--opt3' ]]; then
+		shotwin "$before"
+	elif [[ "$1" == '--opt4' ]]; then
+		shot5 "$before"
+	elif [[ "$1" == '--opt5' ]]; then
+		shot10 "$before"
+	fi
+}
+
+
+chosen="$(run_rofi)"
+case ${chosen} in
+    $option_1)
+		run_cmd --opt1
+        ;;
+    $option_2)
+		run_cmd --opt2
+        ;;
+    $option_3)
+		run_cmd --opt3
+        ;;
+    $option_4)
+		run_cmd --opt4
+        ;;
+    $option_5)
+		run_cmd --opt5
+        ;;
+esac
