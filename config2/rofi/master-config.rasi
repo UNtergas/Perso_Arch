@@ -71,10 +71,9 @@ inputbar {
     border-radius:               5px;
     padding:                     20px;
     background-color:            transparent;
-    background-image:            url("~/.config/rofi/images/e.jpg", height);
     orientation:                 vertical;
     children:                    ["entry", "dummy", "mode-switcher" ];
-    background-image:            url("~/.config/rofi/.current_wallpaper",height);
+    background-image:            url("~/.config/rofi/.current_wallpaper",width);
 }
 
 /* ---- Entry input ---- */

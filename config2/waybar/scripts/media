@@ -23,7 +23,7 @@ if [[ $player == "spotify" && ($status == "Playing" || $status == "Paused") ]]; 
 
     # Escape metadata for Waybar and print
     metadata=$(escape_markup "$metadata")
-    echo "$metadata 󰓃"
+    echo "$metadata"
 else
     # Fallback if Spotify is not running
     echo "Spotify not running 󰓄"

@@ -65,7 +65,7 @@ window {
 
 /* ----- Main Box ----- */
 mainbox {
-	  padding:					 15px;
+	padding:					 15px;
     enabled:                     true;
     orientation:                 horizontal;
     children:                    [ "inputbar", "listbox" ];

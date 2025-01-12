@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Check if powerprofilesctl is available
+if ! command -v powerprofilesctl &> /dev/null; then
+    echo "Error: powerprofilesctl is not installed."
+    exit 1
+fi
+
+# Get the current power profile
+current_profile=$(powerprofilesctl get)
+
+# Map the profile to the desired icons
+case "$current_profile" in
+    "performance")
+        icon="" # Lightning bolt icon
+        ;;
+    "balanced")
+        icon="" # Scales icon
+        ;;
+    "power-saver")
+        icon="" # Leaf icon
+        ;;
+    *)
+        icon="" # Unknown profile (Question mark icon)
+        ;;
+esac
+
+# Output the profile with the corresponding icon
+echo "$icon $current_profile"

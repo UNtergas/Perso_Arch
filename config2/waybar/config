@@ -22,7 +22,6 @@
   
     "modules-right": [
         "tray",
-        "power-profiles-daemon",
         "disk",
         "cpu",
         "memory",
@@ -32,6 +31,8 @@
         "custom/backlight",
         "custom/keyboard",         
         "bluetooth",
+        "custom/paddc",
+        "custom/powermode",
         "battery",
         "clock#date",
         "clock#time",
@@ -213,7 +214,13 @@
         "tooltip": false,
         "on-click": "spotify --enable-features=UseOzonePlatform --ozone-platform=wayland",
         "interval": 1,
-        "max-length":30
+        "max-length": 30
+    },
+    "custom/powermode":{
+      "exec": "~/.config/waybar/scripts/powermode",
+      "format": "{}",
+      "interval": 1,
+      "on-click": "exec ~/.config/rofi/scripts/powermode"
     },
     "custom/notification": {
       "tooltip": false,

@@ -1,0 +1,54 @@
+#!/bin/bash
+
+option_1=""
+option_2=" "
+option_3=" "
+
+# Check if powerprofilesctl is available
+if ! command -v powerprofilesctl &> /dev/null; then
+    notify-send "Power Profile Error" "powerprofilesctl is not installed."
+    exit 1
+fi
+
+# Rofi Configuration
+theme="~/.config/rofi/config-screenshot.rasi"
+
+rofi_cmd() {
+    rofi -theme-str "window {width: 35%;}" \
+         -theme-str "listview {columns: 3; lines: 1;}" \
+         -theme-str 'textbox-prompt-colon {str: "";}' \
+         -dmenu \
+         -p "Select Power Mode" \
+         -markup-rows \
+         -theme "${theme}"
+}
+
+# Run the Rofi menu and display options
+run_rofi() {
+    echo -e "$option_1\n$option_2\n$option_3" | rofi_cmd
+}
+
+# Apply the selected power mode
+change_power_mode() {
+    case "$1" in
+        "$option_1")
+            powerprofilesctl set performance
+            notify-send "Power Mode Changed" "Mode: Performance ()"
+            ;;
+        "$option_2")
+            powerprofilesctl set balanced
+            notify-send "Power Mode Changed" "Mode: Balanced ()"
+            ;;
+        "$option_3")
+            powerprofilesctl set power-saver
+            notify-send "Power Mode Changed" "Mode: Power Saver ()"
+            ;;
+        *)
+            exit 1
+            ;;
+    esac
+}
+
+# Capture the selection
+chosen="$(run_rofi)"
+change_power_mode "$chosen"
