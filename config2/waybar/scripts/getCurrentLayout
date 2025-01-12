@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Define the keyboard layouts to cycle through (simplified for display)
+LAYOUTS=("xkb:us::eng" "Unikey")
+
+# Get the current layout from IBus
+CURRENT_LAYOUT=$(ibus engine)
+
+# Display simplified layout names instead of full IBus engine strings
+case "$CURRENT_LAYOUT" in
+    "xkb:us::eng")
+        DISPLAY_LAYOUT="us"
+        ;;
+    "Unikey")
+        DISPLAY_LAYOUT="vn"
+        ;;
+    *)
+        DISPLAY_LAYOUT="$CURRENT_LAYOUT"
+        ;;
+esac
+
+# Output the simplified layout
+echo "$DISPLAY_LAYOUT"

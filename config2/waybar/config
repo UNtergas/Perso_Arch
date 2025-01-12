@@ -158,10 +158,10 @@
       "format": "{}"
     },
     "custom/keyboard": {
-        "exec": "cat ~/.cache/kb_layout",
+        "exec": "~/.config/waybar/scripts/getCurrentLayout",
         "interval": 1,
-        "format": "{}",
-        "on-click": "~/.config/hypr/scripts/SwitchKeyboardLayout.sh"
+        "format": " {}",
+        "on-click": "~/.config/hypr/scripts/ibuskeyboard.sh"
     },
     "custom/nightlight":{
         "exec": "~/.config/waybar/scripts/getNightLight",

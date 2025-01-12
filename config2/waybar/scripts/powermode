@@ -5,7 +5,6 @@ if ! command -v powerprofilesctl &> /dev/null; then
     echo "Error: powerprofilesctl is not installed."
     exit 1
 fi
-
 # Get the current power profile
 current_profile=$(powerprofilesctl get)
 
