@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration
-LOW_TEMP=5200
+LOW_TEMP=5500
 HIGH_TEMP=6500
 LAT=47
 LONG=2
