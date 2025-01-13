@@ -106,3 +106,5 @@ dconf load /org/gnome/shell/extensions/ < gnome-extensions-settings.dconf
 **keybind loading**
 
 dconf load /org/gnome/settings-daemon/plugins/media-keys/ < gnome-keybindings.dconf
+
+## Config2 folder is reserver for hyprland
