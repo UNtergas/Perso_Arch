@@ -33,7 +33,7 @@ async function applyStyle() {
   const COMPILED_STYLE_DIR = `${GLib.get_user_cache_dir()}/ags/user/generated`
   if (options.recompileSass) {
     Utils.exec(`mkdir -p ${COMPILED_STYLE_DIR}`);
-    Utils.exec(`sassc ${App.configDir}/scss/main.scss ${COMPILED_STYLE_DIR}/style.css`);
+    Utils.exec(`sass ${App.configDir}/scss/main.scss ${COMPILED_STYLE_DIR}/style.css`);
   }
   App.resetCss();
   App.applyCss(`${COMPILED_STYLE_DIR}/style.css`);
@@ -44,6 +44,8 @@ applyStyle().catch(print);
 
 
 const Windows = () => [
+  // Lockscreen(),
+  // Powermenu(),
   // Dock(),
   // Verification(),
   Overview(),

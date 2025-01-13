@@ -1,19 +1,13 @@
 window#overview .overview {
   background-color: $crust;
   border: 2px solid $overlay0;
-  border-radius: 20px;
-  padding: 15px;
-  margin: 30px;
-  box-shadow: rgba(0, 0, 0, 0.6) 0 0 10px 10px;
-
-  display: grid;  
-  grid-template-columns: repeat(3, 1fr);  // Maximum 3 workspaces per row
-  gap: 20px;  // Consistent spacing
-  justify-content: center;
-  align-content: center;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 10px;
+  box-shadow: rgba(0, 0, 0, 0.6) 0 0 2px 2px;
 
   &.horizontal>* {
-    margin: 0 10px;
+    margin: 0 3px;
 
     &:first-child {
       margin-left: 0;
@@ -43,9 +37,9 @@ window#overview .overview {
     }
 
     >widget {
-      border-radius: 20px;
+      border-radius: 5px;
       background-color: $base;
-      margin: 10px;
+      margin: 5px;
       border: 2px solid rgba(0, 0, 0, 0);
 
       &:hover {
@@ -61,7 +55,7 @@ window#overview .overview {
       background-color: rgba(0, 0, 0, .3);
       border: 2px solid $surface0;
       margin: 10px;
-      border-radius: 10px;
+      border-radius: 5px;
       padding: 0px;
 
       &:active,

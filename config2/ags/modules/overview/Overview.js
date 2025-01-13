@@ -6,7 +6,7 @@ import { range } from "../../lib/utils.js"
 const hyprland = await Service.import("hyprland")
 
 const Overview = (ws) => Widget.Box({
-  class_name: "overview",
+  class_name: "overview horizontal",
   // spacing: 10,
   children: ws > 0
     ? range(ws).map(Workspace)

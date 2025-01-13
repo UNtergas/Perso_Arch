@@ -1,7 +1,7 @@
 
 const options = {
-  recompileSass: false,
-  monitorCSS: false,
+  recompileSass: true,
+  monitorCSS: true,
   theme: {
     PopupTransitionDuration: 400,
     PopupCloseDuration: 300,
@@ -14,8 +14,8 @@ const options = {
     reboot: 'reboot',
   },
   overview: {
-    scale: 8,
-    workspaces: 8,
+    scale: 6,
+    workspaces: 9,
     monochromeIcon: false,
   },
   notifications: {
@@ -76,7 +76,7 @@ const options = {
       low: 30,
     },
     workspaces: {
-      workspaces: 10,
+      workspaces: 7,
     },
     taskbar: {
       monochrome: false,
