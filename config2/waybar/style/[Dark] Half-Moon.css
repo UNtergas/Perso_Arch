@@ -143,7 +143,9 @@ margin-right: 10px;
 
 #tray {
 /* padding: 0 6px; */
-background: #3c3835;
+margin: 2.5px;
+padding: 0 3px;
+background: #716964;
 }
 
 /* ================================ */
