@@ -14,7 +14,7 @@ const options = {
     reboot: 'reboot',
   },
   overview: {
-    scale: 6,
+    scale: 8,
     workspaces: 9,
     monochromeIcon: false,
   },

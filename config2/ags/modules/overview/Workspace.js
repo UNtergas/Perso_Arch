@@ -10,7 +10,7 @@ const hyprland = await Service.import("hyprland")
 const dispatch = (args) => hyprland.messageAsync(`dispatch ${args}`)
 
 const size = (id) => {
-  const def = { h: 768, w: 1024 }
+  const def = { h: 1200, w: 1600}
   const ws = hyprland.getWorkspace(id)
   if (!ws)
     return def
@@ -25,8 +25,8 @@ export default (id) => Widget.Box({
   class_name: "workspace",
   vpack: "center",
   css: `
-        min-width: ${scale(size(id).w)}px;
-        min-height: ${scale(size(id).h)}px;
+        max-width : ${scale(size(id).w)};px;
+        max-height : ${scale(size(id).h)};px;
     `,
   setup: box => box.hook(hyprland, () => {
     box.toggleClassName("active", hyprland.active.workspace.id === id)
