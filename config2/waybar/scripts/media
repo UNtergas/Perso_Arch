@@ -26,5 +26,5 @@ if [[ $player == "spotify" && ($status == "Playing" || $status == "Paused") ]]; 
     echo "$metadata"
 else
     # Fallback if Spotify is not running
-    echo "Spotify not running 󰓄"
+    echo "Spotify not running"
 fi

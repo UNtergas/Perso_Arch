@@ -25,4 +25,4 @@ case "$current_profile" in
 esac
 
 # Output the profile with the corresponding icon
-echo "$icon $current_profile"
+echo "$icon"

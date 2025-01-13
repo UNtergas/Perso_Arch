@@ -137,7 +137,7 @@
       "format": "<span color='#cc241d' >󱑂 </span>{:%I:%M %p}",
       "tooltip": false,
       // "tooltip-format": "Standard Time: {:%I:%M %p}",
-      "min-length": 8,
+      "min-length": 10,
       "max-length": 12
     },
   
@@ -206,7 +206,7 @@
   
       "on-click": "blueman-manager",
       "interval": 1,
-      "min-length": 1,
+      "min-length": 3,
       "max-length": 10
     },
     "custom/spotify":{
@@ -254,7 +254,7 @@
     "cpu": {
         "format": "{usage}% 󰍛",
         "interval": 1,
-        "min-length": 5
+        "min-length": 4
     },
     "temperature": {
         // "thermal-zone": 2,
@@ -266,7 +266,8 @@
     "memory": {
         "interval": 30,
         "format": "{}% ",
-        "max-length": 10
+        "max-length": 7,
+        "min-length":6
     },
     
     "disk": {
