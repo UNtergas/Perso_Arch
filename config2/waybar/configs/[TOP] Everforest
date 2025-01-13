@@ -73,10 +73,12 @@
         "google-chrome": "<span foreground='#d8a657'></span> chrome",
         "spotify": "<span foreground='#a9b665'></span> spotify",
         "discord": "<span foreground='#d3869b'></span> discord",
-        "jetbrains-webstorm": "<span foreground='#ea6962'><</span> jetbrains",
+        "jetbrains-webstorm": "<span foreground='#ea6962'></span> webstorm",
+        "jetbrains-idea": "<span foreground='#ea6962'></span> idea",
         "thunar": "<span foreground='#d79921'></span> thunar",
         "obsidian": "<span foreground='#8f3f71'>󰆦</span> obsidian",
         "blueman-manager": "<span foreground= '#558588'>󰂯</span> blueman",
+        "pavucontrol": "<span foreground= '#689d6a'>󱀞</span> pavucontrol",
         "gnome-terminal-server":"<span foreground= '#d4be98'> </span> gnome-term",
       }
     },
