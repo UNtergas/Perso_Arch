@@ -107,6 +107,9 @@ background: #aaa187;
 /* border-radius: 5px; */
 }
 
+#workspaces button.active{
+	color: #fbf1c7;
+}
 
 #workspaces button.urgent {
 /* border: 2px solid #cc241d;
@@ -130,7 +133,7 @@ tooltip {
 color: #fbf1c7;
 background: #3c3835;
 font-size: 13px ;
-margin-right: 40px;
+margin-right: 10px;
 /* border: 2px solid #d3869b; */
 }
 
@@ -216,6 +219,12 @@ background: #3c3835;
 #battery.warning {
 color: #e78a4e;
 background: #3c3835;
+}
+/* ================================ */
+/*            bluetoot              */
+/* ================================ */
+#bluetooth{
+	font-size: 16px;
 }
 /* ================================ */
 /*            clock                 */

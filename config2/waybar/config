@@ -31,7 +31,6 @@
         "custom/backlight",
         "custom/keyboard",         
         "bluetooth",
-        "custom/paddc",
         "custom/powermode",
         "battery",
         "clock#date",
@@ -47,24 +46,20 @@
       "tooltip" : false
       },
   
-    // Modules configuration
     "hyprland/workspaces": {
         "disable-scroll": true,
-        "active-only": false,
         "all-outputs": true,
         "warp-on-scroll": false,
+        "sort-by-number": true,
+        "show-special": false,
+        "on-click": "activate",
         "on-scroll-up": "hyprctl dispatch workspace e+1",
         "on-scroll-down": "hyprctl dispatch workspace e-1",
         "format": "{icon}",
         "format-icons": {
-            // "1": "<span color='#d8a657' >󰊠</span>",
-            // "2": "<span color='#98971a' >󰊠</span>",
-            // "3": "<span color='#d79921' >󰊠</span>",
-            // "4": "<span color='#458588' >󰊠</span>",
-            // "5": "<span color='#b16286' >󰊠</span>",
-            // "6": "<span color='#689d6a' >󰊠</span>",
             "active": "<span color='#689d6a'>󰊠</span>"
         }
+        
     },
   
     "hyprland/window": {
@@ -134,11 +129,11 @@
     },
   
     "clock#time": {
-      "format": "<span color='#cc241d' >󱑂 </span>{:%I:%M %p}",
-      "tooltip": false,
-      // "tooltip-format": "Standard Time: {:%I:%M %p}",
-      "min-length": 10,
-      "max-length": 12
+      "format": "<span color='#d3869b' >󱑂 </span>{:%H:%M}",
+      "tooltip": true,
+      "tooltip-format": "Standard Time: {:%I:%M %p}",
+      "min-length": 8,
+      "max-length": 10,
     },
   
     "custom/backlight": {
@@ -147,7 +142,7 @@
         "on-scroll-up": "~/.config/waybar/scripts/brightness-control.sh -o i",
         "on-scroll-down": "~/.config/waybar/scripts/brightness-control.sh -o d",
         "interval": 1,
-        "min-length": 6,
+        "min-length": 7,
         "max-length": 10
     },
     "custom/paddc": {
@@ -207,7 +202,7 @@
       "on-click": "blueman-manager",
       "interval": 1,
       "min-length": 3,
-      "max-length": 10
+      "max-length": 6
     },
     "custom/spotify":{
         "exec": "~/.config/waybar/scripts/media",
