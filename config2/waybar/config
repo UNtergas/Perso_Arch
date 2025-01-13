@@ -11,9 +11,10 @@
         "custom/notification",
         "hyprland/workspaces",
         "custom/paddc",
+        "custom/cycle_wall",
         "custom/nightlight",
-        "custom/paddc",
         "hyprland/window",
+        "custom/paddc",
         "custom/spotify",
         "custom/cava_mviz"
     ],
@@ -60,8 +61,24 @@
     },
   
     "hyprland/window": {
-      "format": "<span foreground= '#658588'> </span> {class}",
-      "max-length": 50
+      // "format": "<span foreground= '#558588'> </span> {class}",
+      // "max-length": 40,
+      "format": "{class}",
+      "max-length": 40,
+      "rewrite": {
+        "": "<span foreground= '#98971a'>󰒲</span> idle",
+        "kitty": "<span foreground= '#d4be98'></span> term",
+        "code": "<span foreground= '#558588'>󰨞</span> code",
+        "firefox": "<span foreground='#e78a4e'></span> firefox",
+        "google-chrome": "<span foreground='#d8a657'></span> chrome",
+        "spotify": "<span foreground='#a9b665'></span> spotify",
+        "discord": "<span foreground='#d3869b'></span> discord",
+        "jetbrains-webstorm": "<span foreground='#ea6962'><</span> jetbrains",
+        "thunar": "<span foreground='#d79921'></span> thunar",
+        "obsidian": "<span foreground='#8f3f71'>󰆦</span> obsidian",
+        "blueman-manager": "<span foreground= '#558588'>󰂯</span> blueman",
+        "gnome-terminal-server":"<span foreground= '#d4be98'> </span> gnome-term",
+      }
     },
   
     "tray": {
@@ -132,7 +149,6 @@
       "min-length": 8,
       "max-length": 10,
     },
-  
     "custom/backlight": {
         "exec": "~/.config/waybar/scripts/brightness-control.sh",
         "format": "{}",
@@ -237,11 +253,16 @@
       "escape": true
     },
     "custom/power": {
-        "format": "  ",
+        "format": "",
         "tooltip": false,
         "on-click": "exec ~/.config/hypr/scripts/Wlogout.sh",
     },
-
+    "custom/cycle_wall": {
+      "format": " ",
+      "on-click": "~/.config/hypr/UserScripts/WallpaperSelect.sh",
+      "tooltip": true,
+      "tooltip-format": "Left Click: Wallpaper Menu"
+    },
     "group/motherboard": {
       "orientation": "horizontal",
       "modules": [
