@@ -6,6 +6,7 @@
  * Rofi Theme File
  * Rofi Version: 1.7.3
  **/
+@theme "~/.config/rofi/wallust/colors-rofi.rasi"
 
 /*****----- Configuration -----*****/
 configuration {
@@ -19,7 +20,7 @@ configuration {
     background:                  #1d2021;  /* Gruvbox primary background */
     background-alt:              #282828;  /* Gruvbox medium background */
     foreground:                  #EBDBB2FF;  /* Gruvbox foreground */
-    selected:                    #8f9a52;  /* Darker Gruvbox green for selected state */
+    selected:                    @urgent-background;  /* Darker Gruvbox green for selected state */
     active:                      #5e8180;  /* Darker Gruvbox blue for active state */
     urgent:                      #b85651;
     

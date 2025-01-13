@@ -35,7 +35,7 @@ configuration {
     background:                  #1d2021;  /* Gruvbox primary background */
     background-alt:              #282828;  /* Gruvbox medium background */
     foreground:                  #EBDBB2FF;  /* Gruvbox foreground */
-    selected:                    #8f9a52;  /* Darker Gruvbox green for selected state */
+    selected:                    @urgent-background;  /* Darker Gruvbox green for selected state */
     active:                      #5e8180;  /* Darker Gruvbox blue for active state */
     urgent:                      #b85651;
     
@@ -58,7 +58,7 @@ window {
     anchor:                     center;
 
     // Style Values
-    width:                      60%;
+    width:                      55%;
     background-color:           @background;
     border-color:               rgba(0, 0, 0, 0.4);
 }
@@ -75,10 +75,10 @@ mainbox {
 
 /* ---- Inputbar ---- */
 inputbar {
+    width: 30%;
     border-radius:               5px;
     padding:                     20px;
     background-color:            transparent;
-    background-image:            url("~/.config/rofi/images/e.jpg", height);
     orientation:                 vertical;
     children:                    ["entry", "dummy", "mode-switcher" ];
     background-image:            url("~/.config/rofi/.current_wallpaper",height);
@@ -139,7 +139,7 @@ mode-switcher{
     background-color:            transparent;
 }
 button {
-    width:                       5%;
+    width:                       3%;
     padding:                     12px;
     border-radius:               5px;
     background-color:            @text-selected;

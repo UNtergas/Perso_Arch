@@ -33,15 +33,15 @@ change_power_mode() {
     case "$1" in
         "$option_1")
             powerprofilesctl set performance
-            notify-send "Power Mode Changed" "Mode: Performance ()"
+            notify-send "Power Mode Changed" "Mode: Performance  "
             ;;
         "$option_2")
             powerprofilesctl set balanced
-            notify-send "Power Mode Changed" "Mode: Balanced ()"
+            notify-send "Power Mode Changed" "Mode: Balanced  "
             ;;
         "$option_3")
             powerprofilesctl set power-saver
-            notify-send "Power Mode Changed" "Mode: Power Saver ()"
+            notify-send "Power Mode Changed" "Mode: Power Saver  " 
             ;;
         *)
             exit 1
