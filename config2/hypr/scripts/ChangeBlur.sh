@@ -11,7 +11,7 @@ if [ "${STATE}" == "2" ]; then
 	hyprctl keyword decoration:blur:passes 1
  	notify-send -e -u low -i "$notif" "Less blur"
 else
-	hyprctl keyword decoration:blur:size 4
+	hyprctl keyword decoration:blur:size 7
 	hyprctl keyword decoration:blur:passes 2
   	notify-send -e -u low -i "$notif" "Normal blur"
 fi

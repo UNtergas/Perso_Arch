@@ -17,9 +17,9 @@
 window#waybar {
 background: #3c3835;
 color: #fff4d2;
-padding: 0px 0px;
-margin: 0;
-border-radius: 5px;
+padding: 0px 6px;
+margin: 0px;
+border-radius: 0px;
 }
 
 .modules-left {
@@ -108,7 +108,9 @@ background: #aaa187;
 }
 
 #workspaces button.active{
-	color: #fbf1c7;
+	color: #689d6a;
+	font-weight: 900;
+	margin: 2px;
 }
 
 #workspaces button.urgent {
@@ -143,7 +145,7 @@ margin-right: 10px;
 
 #tray {
 /* padding: 0 6px; */
-margin: 2.5px;
+margin: 3px;
 padding: 0 3px;
 background: #716964;
 }
@@ -175,6 +177,7 @@ background: #3c3835;
 
 #temperature.critical {
 color: #cc241d;
+background: #3c3835;
 }
 
 /* ================================ */
@@ -233,7 +236,8 @@ background: #3c3835;
 /* ================================ */
 #clock.time {
 color: #fbf1c7;
-background: #3c3835;
+background: #202020;
+margin: 2px;
 }
 
 #clock.date {
@@ -251,21 +255,28 @@ margin: 1px 1px;
 }
 
 #custom-notification {
-color: #fbf1c7;
-background: #3c3835;
+color: #202020;
+background: #689d6a;
+margin: 3px;
+padding: 0 1px;		
+border-radius: 2px;
 font-size: 16px;
-font-weight: 800;
+font-weight: 900;
 }
 
 #custom-spotify{
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: 600;
 }
 
 #custom-power{
-	color: #cc241d;
+	color: #fbf1c7;
+	background: #cc241d;
 	font-size: 16px;
 	font-weight: 800;
+	margin: 3px;
+	padding: 0 1px;		
+	border-radius: 2px;
 }
 
 #custom-nightlight{

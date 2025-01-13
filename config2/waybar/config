@@ -2,7 +2,7 @@
     "layer": "top",
     "position": "top",
     "height": 24,
-    "spacing": 5,
+    "spacing": 4,
     "margin-top" :0,
     "margin-right" :0,
     "margin-left" :0,
@@ -22,10 +22,7 @@
   
     "modules-right": [
         "tray",
-        "disk",
-        "cpu",
-        "memory",
-        "temperature",
+        "group/motherboard",
         "pulseaudio#microphone",
         "pulseaudio",
         "custom/backlight",
@@ -55,7 +52,7 @@
         "on-click": "activate",
         "on-scroll-up": "hyprctl dispatch workspace e+1",
         "on-scroll-down": "hyprctl dispatch workspace e-1",
-        "format": "{icon}",
+        "format": "{}",
         "format-icons": {
             "active": "<span color='#689d6a'>󰊠</span>"
         }
@@ -240,22 +237,31 @@
       "escape": true
     },
     "custom/power": {
-        "format": "",
+        "format": "  ",
         "tooltip": false,
-        "on-click": "exec ~/.config/hypr/scripts/Wlogout.sh"
+        "on-click": "exec ~/.config/hypr/scripts/Wlogout.sh",
     },
 
+    "group/motherboard": {
+      "orientation": "horizontal",
+      "modules": [
+        "disk",
+        "cpu",
+        "memory",
+        "temperature"
+      ]
+    },
 
     "cpu": {
         "format": "{usage}% 󰍛",
         "interval": 1,
-        "min-length": 4
+        "min-length": 5
     },
     "temperature": {
         // "thermal-zone": 2,
-        // "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
+        "hwmon-path": "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon5/temp1_input",
         "critical-threshold": 70,
-        "format-critical": "{temperatureC}°C ",
+        "format-critical": "{temperatureC}°C 󰈸",
         "format": "{temperatureC}°C "
     },
     "memory": {
