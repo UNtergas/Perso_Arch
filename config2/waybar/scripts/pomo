@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# GNOME Pomodoro D-Bus Service and Object Path
+SERVICE="org.gnome.Pomodoro"
+OBJECT_PATH="/org/gnome/Pomodoro"
+
+# Function to check if GNOME Pomodoro is running
+check_running() {
+    if ! pgrep -x "gnome-pomodoro" > /dev/null; then
+        echo "GNOME Pomodoro is not running!"
+        exit 1
+    fi
+}
+
+# Function to get a D-Bus property and clean output
+get_property() {
+    gdbus call --session \
+        --dest "$SERVICE" \
+        --object-path "$OBJECT_PATH" \
+        --method org.freedesktop.DBus.Properties.Get \
+        "$SERVICE" "$1" | grep -oE 'true|false|[0-9.]+|[a-zA-Z_]+'
+}
+
+# Function to display the current Pomodoro status
+show_status() {
+    check_running
+    state=$(get_property "State")
+    is_paused=$(get_property "IsPaused")
+    elapsed=$(get_property "Elapsed")
+    duration=$(get_property "StateDuration")
+
+    # Convert seconds to minutes and seconds
+    remaining_time=$(awk "BEGIN {print $duration - $elapsed}")
+    minutes=$(awk "BEGIN {print int($remaining_time / 60)}")
+    seconds=$(awk "BEGIN {print int($remaining_time % 60)}")
+
+    # Display information
+    echo "State: $state"
+    echo "Paused: $([[ $is_paused == "true" ]] && echo "Yes" || echo "No")"
+    echo "Time Left: $minutes min $seconds sec"
+}
+
+# Function to start the Pomodoro timer
+start_pomodoro() {
+    check_running
+    gdbus call --session \
+        --dest "$SERVICE" \
+        --object-path "$OBJECT_PATH" \
+        --method org.gnome.Pomodoro.Start
+    echo "Pomodoro timer started!"
+}
+
+# Function to pause the Pomodoro timer
+pause_pomodoro() {
+    check_running
+    gdbus call --session \
+        --dest "$SERVICE" \
+        --object-path "$OBJECT_PATH" \
+        --method org.gnome.Pomodoro.Pause
+    echo "Pomodoro timer paused!"
+}
+
+# Function to resume the Pomodoro timer
+resume_pomodoro() {
+    check_running
+    gdbus call --session \
+        --dest "$SERVICE" \
+        --object-path "$OBJECT_PATH" \
+        --method org.gnome.Pomodoro.Resume
+    echo "Pomodoro timer resumed!"
+}
+
+# Function to stop the Pomodoro timer
+stop_pomodoro() {
+    check_running
+    gdbus call --session \
+        --dest "$SERVICE" \
+        --object-path "$OBJECT_PATH" \
+        --method org.gnome.Pomodoro.Stop
+    echo "Pomodoro timer stopped!"
+}
+
+# Function to print usage instructions
+show_usage() {
+    echo "Usage: $0 {status|start|pause|resume|stop}"
+}
+
+# Main command handling
+case "$1" in
+    status) show_status ;;
+    start) start_pomodoro ;;
+    pause) pause_pomodoro ;;
+    resume) resume_pomodoro ;;
+    stop) stop_pomodoro ;;
+    *) show_usage ;;
+esac

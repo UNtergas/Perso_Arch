@@ -80,11 +80,18 @@
         "blueman-manager": "<span foreground= '#558588'>󰂯</span> blueman",
         "pavucontrol": "<span foreground= '#689d6a'>󱀞</span> pavucontrol",
         "gnome-terminal-server":"<span foreground= '#d4be98'> </span> gnome-term",
+        "gnome-pomodoro":"<span foreground= '#cc241d'></span> gnome-pomodoro"
       }
     },
-  
+    "custom/pomodoro":{
+        "exec": "~/.config/waybar/scripts/pomodoro",
+        "format": "{}",
+        "tooltip": false,
+        "interval": 1,
+        "max-length": 30
+    },
     "tray": {
-      "icon-size": 15,
+      "icon-size": 16,
       "spacing": 8
     },
     "pulseaudio": {
@@ -282,7 +289,7 @@
     },
     "temperature": {
         // "thermal-zone": 2,
-        "hwmon-path": "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon5/temp1_input",
+        "hwmon-path": "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon4/temp1_input",
         "critical-threshold": 70,
         "format-critical": "{temperatureC}°C 󰈸",
         "format": "{temperatureC}°C "

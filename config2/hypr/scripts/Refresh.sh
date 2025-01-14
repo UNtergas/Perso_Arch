@@ -5,6 +5,9 @@
 SCRIPTSDIR=$HOME/.config/hypr/scripts
 UserScripts=$HOME/.config/hypr/UserScripts
 
+# Export DBus session to ensure it works for GUI applications
+export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/$(id -u)/bus}"
+
 # Define file_exists function
 file_exists() {
     if [ -e "$1" ]; then
@@ -15,26 +18,26 @@ file_exists() {
 }
 
 # Kill already running processes
-_ps=(waybar rofi swaync ags)
+_ps=(rofi swaync ags)
 for _prs in "${_ps[@]}"; do
     if pidof "${_prs}" >/dev/null; then
         pkill "${_prs}"
     fi
 done
 
-# quit ags
+# Quit ags
 ags -q
 
 sleep 0.3
-#Restart waybar
-waybar &
 
-# relaunch swaync
+# Restart Waybar with DBus session correctly passed
+pkill waybar && env DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS waybar &
+
+# Relaunch swaync
 sleep 0.5
 swaync > /dev/null 2>&1 &
 
-# relaunch ags
+# Relaunch ags
 ags &
-
 
 exit 0
