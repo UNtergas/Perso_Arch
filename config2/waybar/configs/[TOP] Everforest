@@ -15,8 +15,8 @@
         "custom/nightlight",
         "hyprland/window",
         "custom/paddc",
-        "custom/spotify",
-        "custom/cava_mviz"
+        "custom/spotify"
+        
     ],
   
     // "modules-center": ["hyprland/window","custom/paddc"],
@@ -24,6 +24,7 @@
     "modules-right": [
         "tray",
         "group/motherboard",
+        "custom/cava_mviz",
         "pulseaudio#microphone",
         "pulseaudio",
         "custom/backlight",
@@ -173,7 +174,7 @@
     },
     "custom/cava_mviz": {
       "exec": "~/.config/hypr/scripts/WaybarCava.sh",
-      "format": "{}"
+      "format": "󰓃 {}"
     },
     "custom/keyboard": {
         "exec": "~/.config/waybar/scripts/getCurrentLayout",
@@ -231,6 +232,7 @@
         "format": "<span color='#a9b665'> </span>{}",
         "tooltip": false,
         "on-click": "spotify --enable-features=UseOzonePlatform --ozone-platform=wayland",
+        "on-click-right": "playerctl --player=spotify play-pause",
         "interval": 1,
         "max-length": 30
     },
@@ -284,7 +286,7 @@
 
     "cpu": {
         "format": "{usage}% 󰍛",
-        "interval": 1,
+        "interval": 10,
         "min-length": 5
     },
     "temperature": {
@@ -295,7 +297,7 @@
         "format": "{temperatureC}°C "
     },
     "memory": {
-        "interval": 30,
+        "interval": 10,
         "format": "{}% ",
         "max-length": 7,
         "min-length":6
