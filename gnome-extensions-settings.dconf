@@ -1,38 +1,37 @@
+[appindicator]
+tray-pos='right'
+
 [arcmenu]
 arc-menu-icon=64
 arcmenu-hotkey=['<Super>d']
 button-padding=3
+category-icon-type='Symbolic'
 distro-icon=5
+hide-overview-on-startup=true
 menu-button-appearance='None'
 menu-button-icon='Menu_Icon'
 menu-layout='Runner'
 prefs-visible-page=0
-recently-installed-apps=['rofi-powermenu.desktop', 'rofi-theme-selector.desktop', 'rofi.desktop']
-runner-position='Centered'
+recently-installed-apps=['rofi-powermenu.desktop', 'rofi.desktop', 'kvantummanager.desktop', 'org.xfce.mousepad.desktop', 'mpv.desktop', 'nvtop.desktop', 'blueman-manager.desktop']
+runner-position='Top'
 runner-search-display-style='List'
 runner-show-frequent-apps=true
 search-entry-border-radius=(true, 25)
+search-provider-open-windows=false
+show-category-sub-menus=true
+show-update-notification-v64=false
 
 [auto-move-windows]
-application-list=['firefox.desktop:2', 'org.gnome.Nautilus.desktop:3', 'org.gnome.Terminal.desktop:1', 'jetbrains-idea-7a01b48a-3eda-4c1b-affc-085a9c6e5e8a.desktop:1', 'jetbrains-webstorm-b56eaada-afee-438d-8fba-554fef5eeeb5.desktop:1']
+application-list=['firefox.desktop:2', 'org.gnome.Nautilus.desktop:3', 'jetbrains-idea-7a01b48a-3eda-4c1b-affc-085a9c6e5e8a.desktop:1', 'jetbrains-webstorm-b56eaada-afee-438d-8fba-554fef5eeeb5.desktop:1']
 
 [blur-my-shell]
 settings-version=2
-
-[blur-my-shell/appfolder]
-brightness=0.59999999999999998
-sigma=30
 
 [blur-my-shell/coverflow-alt-tab]
 pipeline='pipeline_default'
 
 [blur-my-shell/dash-to-dock]
-blur=true
-brightness=0.59999999999999998
 pipeline='pipeline_default_rounded'
-sigma=30
-static-blur=true
-style-dash-to-dock=0
 
 [blur-my-shell/lockscreen]
 pipeline='pipeline_default'
@@ -41,16 +40,10 @@ pipeline='pipeline_default'
 pipeline='pipeline_default'
 
 [blur-my-shell/panel]
-brightness=0.59999999999999998
 pipeline='pipeline_default'
-sigma=30
 
 [blur-my-shell/screenshot]
 pipeline='pipeline_default'
-
-[blur-my-shell/window-list]
-brightness=0.59999999999999998
-sigma=30
 
 [dash-to-dock]
 background-opacity=0.80000000000000004
@@ -64,16 +57,18 @@ hot-keys=false
 isolate-monitors=false
 isolate-workspaces=false
 preferred-monitor=-2
-preferred-monitor-by-connector='DP-2'
+preferred-monitor-by-connector='primary'
 show-mounts=false
 show-mounts-network=false
 show-mounts-only-mounted=true
 
 [dash-to-panel]
+animate-app-switch=false
 animate-appicon-hover=false
 animate-appicon-hover-animation-extent={'RIPPLE': 4, 'PLANK': 4, 'SIMPLE': 1}
-appicon-margin=0
-appicon-padding=4
+animate-window-launch=false
+appicon-margin=1
+appicon-padding=3
 available-monitors=[0]
 dot-color-1='#a9b665'
 dot-color-2='#a9b665'
@@ -93,40 +88,58 @@ dot-style-unfocused='DOTS'
 group-apps=true
 hot-keys=false
 hotkeys-overlay-combo='TEMPORARILY'
-leftbox-padding=-1
+leftbox-padding=0
 leftbox-size=14
 multi-monitors=false
 panel-anchors='{"0":"MIDDLE","1":"MIDDLE"}'
-panel-element-positions='{"0":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedBR"},{"element":"centerBox","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}]}'
+panel-element-positions='{"0":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedBR"},{"element":"centerBox","visible":true,"position":"stackedTL"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":false,"position":"stackedBR"}]}'
 panel-lengths='{"0":100,"1":100}'
-panel-sizes='{"0":22,"1":24}'
+panel-positions='{"0":"TOP"}'
+panel-sizes='{"0":20,"1":24}'
 primary-monitor=0
 show-apps-icon-file=''
 show-apps-icon-side-padding=3
 status-icon-padding=1
 taskbar-locked=true
-tray-padding=6
-tray-size=14
+tray-padding=4
+tray-size=13
 window-preview-title-position='TOP'
 
 [date-menu-formatter]
-font-size=11
-formatter='03_swatch'
-pattern=' Notification'
+apply-all-panels=false
+font-size=9
+formatter='02_original'
+pattern='󰥔 H:mm  󰃭 EEE d MMM'
 text-align='center'
+update-level=1
 
 [ding]
 check-x11wayland=true
+icon-size='tiny'
+show-home=true
+start-corner='top-left'
+
+[focus]
+blur-sigma=uint32 3
+focus-opacity=uint32 100
+inactive-opacity=uint32 92
+is-background-blur=false
+special-focus-opacity=uint32 50
 
 [forge]
 css-last-update=uint32 37
 css-updated='1735679489774'
 dnd-center-layout='swap'
-quick-settings-enabled=false
+focus-border-toggle=false
+move-pointer-focus-enabled=false
+preview-hint-enabled=true
+quick-settings-enabled=true
+split-border-toggle=true
 stacked-tiling-mode-enabled=false
 tabbed-tiling-mode-enabled=false
 tiling-mode-enabled=true
-window-gap-size=uint32 5
+window-gap-size=uint32 3
+window-gap-size-increment=uint32 1
 
 [forge/keybindings]
 con-split-horizontal=['<Super>z']
@@ -144,33 +157,39 @@ window-focus-right=['<Super>Right']
 window-focus-up=['<Super>Up']
 window-gap-size-decrease=['<Control><Super>minus']
 window-gap-size-increase=['<Control><Super>plus']
-window-move-down=['<Shift><Super>j']
-window-move-left=['<Shift><Super>h']
-window-move-right=['<Shift><Super>l']
-window-move-up=['<Shift><Super>k']
-window-resize-bottom-decrease=['<Shift><Control><Alt><Super>1']
-window-resize-bottom-increase=['<Shift><Control><Alt><Super>2']
-window-resize-left-decrease=['<Shift><Control><Alt><Super>3']
-window-resize-left-increase=['<Shift><Control><Alt><Super>4']
-window-resize-right-decrease=['<Shift><Control><Alt><Super>4']
-window-resize-right-increase=['<Shift><Control><Alt><Super>3']
-window-resize-top-decrease=['<Shift><Control><Alt><Super>6']
-window-resize-top-increase=['<Shift><Control><Alt><Super>3']
+window-move-down=['<Control><Super>j']
+window-move-left=['<Control><Super>h']
+window-move-right=['<Control><Super>l']
+window-move-up=['<Control><Super>k']
+window-resize-bottom-decrease=['<Shift><Super>Up']
+window-resize-bottom-increase=['<Shift><Super>Down']
+window-resize-left-decrease=['<Shift><Super>Right']
+window-resize-left-increase=['<Shift><Super>Left']
+window-resize-right-decrease=['<Shift><Super>Left']
+window-resize-right-increase=['<Shift><Super>Right']
+window-resize-top-decrease=['<Shift><Super>Down']
+window-resize-top-increase=['<Shift><Super>Up']
 window-snap-center=['<Shift><Control><Alt><Super>1']
 window-snap-one-third-left=['<Shift><Control><Alt><Super>1']
 window-snap-one-third-right=['<Shift><Control><Alt><Super>1']
 window-snap-two-third-left=['<Shift><Control><Alt><Super>1']
 window-snap-two-third-right=['<Shift><Control><Alt><Super>1']
-window-swap-down=['<Shift><Super>Down']
+window-swap-down=['<Control><Super>Down']
 window-swap-last-active=['<Shift><Control><Alt><Super>1']
-window-swap-left=['<Shift><Super>Left']
-window-swap-right=['<Shift><Super>Right']
-window-swap-up=['<Shift><Super>Up']
+window-swap-left=['<Control><Super>Left']
+window-swap-right=['<Control><Super>Right']
+window-swap-up=['<Control><Super>Up']
 window-toggle-always-float=['<Shift><Super>c']
 window-toggle-float=['<Super>c']
 workspace-active-tile-toggle=['<Shift><Control><Alt><Super>1']
 
+[improved-workspace-indicator]
+change-on-click=true
+custom-css-path='/home/untergas/Tubab/outSourceBin/workspace.css'
+panel-position='left'
+
 [just-perfection]
+activities-button=false
 calendar=true
 clock-menu=true
 dash=false
@@ -179,28 +198,76 @@ panel=true
 panel-button-padding-size=6
 panel-notification-icon=true
 power-icon=true
+quick-settings=true
 startup-status=0
 theme=false
 window-picker-icon=true
 world-clock=true
 
+[mediacontrols]
+cache-art=false
+colored-player-icon=true
+extension-index=uint32 3
+extension-position='Left'
+fixed-label-width=true
+label-width=uint32 150
+show-control-icons-next=false
+show-control-icons-previous=false
+show-control-icons-seek-backward=false
+show-control-icons-seek-forward=false
+show-player-icon=true
+
+[paperwm]
+last-used-display-server='Wayland'
+restore-attach-modal-dialogs=''
+restore-edge-tiling=''
+restore-keybinds='{}'
+restore-workspaces-only-on-primary=''
+
+[paperwm/workspaces]
+list=['6b986401-f729-4832-9496-f4f7cd662e2b', '1dff50fd-553f-4206-bea9-f9886f610054', '6375ccea-ac60-4ae6-bb77-b37aa3bc16a6']
+
+[paperwm/workspaces/1dff50fd-553f-4206-bea9-f9886f610054]
+index=1
+
+[paperwm/workspaces/6375ccea-ac60-4ae6-bb77-b37aa3bc16a6]
+index=2
+
+[paperwm/workspaces/6b986401-f729-4832-9496-f4f7cd662e2b]
+index=0
+
 [pop-shell]
-active-hint=true
+active-hint=false
 active-hint-border-radius=uint32 5
 fullscreen-launcher=false
-gap-inner=uint32 3
-gap-outer=uint32 3
-hint-color-rgba='rgb(169,182,101)'
+gap-inner=uint32 2
+gap-outer=uint32 1
+hint-color-rgba='rgb(41,41,41)'
 log-level=uint32 0
-mouse-cursor-follows-active-window=true
-show-skip-taskbar=true
+mouse-cursor-focus-location=uint32 4
+mouse-cursor-follows-active-window=false
+show-skip-taskbar=false
 show-title=false
+snap-to-grid=false
+stacking-with-mouse=false
 tile-by-default=true
+
+[quick-settings-tweaks]
+datemenu-remove-media-control=true
+datemenu-remove-notifications=false
+input-always-show=false
+input-show-selected=false
+list-buttons='[{"name":"SystemItem","title":null,"visible":true},{"name":"OutputStreamSlider","title":null,"visible":true},{"name":"InputStreamSlider","title":null,"visible":false},{"name":"St_BoxLayout","title":null,"visible":true},{"name":"BrightnessItem","title":null,"visible":false},{"name":"NMWiredToggle","title":"Wired","visible":true},{"name":"NMWirelessToggle","title":"Wi-Fi","visible":true},{"name":"NMModemToggle","title":null,"visible":false},{"name":"NMBluetoothToggle","title":null,"visible":false},{"name":"NMVpnToggle","title":null,"visible":false},{"name":"BluetoothToggle","title":"Bluetooth","visible":true},{"name":"PowerProfilesToggle","title":"Power Mode","visible":true},{"name":"NightLightToggle","title":"Night Light","visible":true},{"name":"DarkModeToggle","title":"Dark Style","visible":true},{"name":"KeyboardBrightnessToggle","title":"Keyboard","visible":true},{"name":"RfkillToggle","title":"Airplane Mode","visible":true},{"name":"RotationToggle","title":"Auto Rotate","visible":false},{"name":"DndQuickToggle","title":"Do Not Disturb","visible":true},{"name":"BackgroundAppsToggle","title":"No Background Apps","visible":false},{"name":"MediaSection","title":null,"visible":false},{"name":"Notifications","title":null,"visible":false}]'
+media-control-compact-mode=false
+media-control-enabled=false
+notifications-enabled=false
+user-removed-buttons=@as []
+volume-mixer-enabled=false
 
 [rezmon]
 b-close=')'
 b-open='('
-delimiter='|'
+delimiter='-'
 
 [smart-auto-move]
 activate-workspace=false
@@ -219,18 +286,24 @@ sync-mode='RESTORE'
 [space-bar/appearance]
 active-workspace-font-weight='600'
 active-workspace-text-color='rgb(169,182,101)'
-application-styles='.space-bar {\n  -natural-hpadding: 0px;\n}\n\n.space-bar-workspace-label.active {\n  margin: 0 1px;\n  background-color: rgba(255,255,255,0.3);\n  color: rgb(169,182,101);\n  border-color: rgba(0,0,0,0);\n  font-weight: 600;\n  border-radius: 4px;\n  border-width: 0px;\n  padding: 3px 8px;\n}\n\n.space-bar-workspace-label.inactive {\n  margin: 0 1px;\n  background-color: rgba(0,0,0,0);\n  color: rgb(243,246,177);\n  border-color: rgba(0,0,0,0);\n  font-weight: 600;\n  border-radius: 4px;\n  border-width: 0px;\n  padding: 3px 8px;\n}\n\n.space-bar-workspace-label.inactive.empty {\n  margin: 0 1px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(255,255,255,0.5);\n  border-color: rgba(0,0,0,0);\n  font-weight: 600;\n  border-radius: 4px;\n  border-width: 0px;\n  padding: 3px 8px;\n}'
+application-styles='.space-bar {\n  -natural-hpadding: 4px;\n}\n\n.space-bar-workspace-label.active {\n  margin: 0 2px;\n  background-color: rgba(255,255,255,0.3);\n  color: rgb(169,182,101);\n  border-color: rgba(0,0,0,0);\n  font-weight: 600;\n  border-radius: 4px;\n  border-width: 0px;\n  padding: 3px 8px;\n}\n\n.space-bar-workspace-label.inactive {\n  margin: 0 2px;\n  background-color: rgba(0,0,0,0);\n  color: rgb(243,246,177);\n  border-color: rgba(0,0,0,0);\n  font-weight: 600;\n  border-radius: 4px;\n  border-width: 0px;\n  padding: 3px 8px;\n}\n\n.space-bar-workspace-label.inactive.empty {\n  margin: 0 2px;\n  background-color: rgba(0,0,0,0);\n  color: rgba(255,255,255,0.5);\n  border-color: rgba(0,0,0,0);\n  font-weight: 600;\n  border-radius: 4px;\n  border-width: 0px;\n  padding: 3px 8px;\n}'
 empty-workspace-font-weight='600'
 inactive-workspace-font-weight='600'
 inactive-workspace-text-color='rgb(243,246,177)'
-workspace-margin=1
-workspaces-bar-padding=0
+workspace-margin=2
+workspaces-bar-padding=4
+
+[space-bar/behavior]
+always-show-numbers=true
+indicator-style='workspaces-bar'
+position='left'
+position-index=20
 
 [space-bar/shortcuts]
 activate-empty-key=@as []
 activate-previous-key=@as []
-enable-activate-workspace-shortcuts=true
-enable-move-to-workspace-shortcuts=true
+enable-activate-workspace-shortcuts=false
+enable-move-to-workspace-shortcuts=false
 move-workspace-left=@as []
 move-workspace-right=@as []
 open-menu=@as []
@@ -239,11 +312,47 @@ open-menu=@as []
 version=32
 
 [tiling-assistant]
+activate-layout0=@as []
+activate-layout1=@as []
+activate-layout2=@as []
+activate-layout3=@as []
+active-window-hint=1
 active-window-hint-color='rgb(211,70,21)'
+auto-tile=@as []
+center-window=@as []
+debugging-free-rects=@as []
+debugging-show-tiled-rects=@as []
+default-move-mode=0
 disable-tile-groups=true
+dynamic-keybinding-behavior=0
 enable-tiling-popup=false
+import-layout-examples=false
 last-version-installed=46
+restore-window=['<Super>Down']
+search-popup-layout=@as []
+tile-bottom-half=['<Super>KP_2']
+tile-bottom-half-ignore-ta=@as []
+tile-bottomleft-quarter=['<Super>KP_1']
+tile-bottomleft-quarter-ignore-ta=@as []
+tile-bottomright-quarter=['<Super>KP_3']
+tile-bottomright-quarter-ignore-ta=@as []
+tile-edit-mode=@as []
+tile-left-half=['<Super>Left', '<Super>KP_4']
+tile-left-half-ignore-ta=@as []
+tile-maximize=['<Super>Up', '<Super>KP_5']
+tile-maximize-horizontally=@as []
+tile-maximize-vertically=@as []
+tile-right-half=['<Super>Right', '<Super>KP_6']
+tile-right-half-ignore-ta=@as []
+tile-top-half=['<Super>KP_8']
+tile-top-half-ignore-ta=@as []
+tile-topleft-quarter=['<Super>KP_7']
+tile-topleft-quarter-ignore-ta=@as []
+tile-topright-quarter=['<Super>KP_9']
+tile-topright-quarter-ignore-ta=@as []
 tiling-popup-all-workspace=true
+toggle-always-on-top=@as []
+toggle-tiling-popup=@as []
 
 [user-theme]
 name='GREEN-Gruvbox'
@@ -256,6 +365,7 @@ hide-zeros=true
 hot-sensors=['_memory_usage_', '__network-rx_max__', '_processor_usage_', '__temperature_avg__']
 icon-style=1
 menu-centered=false
+position-in-panel=4
 show-battery=false
 show-fan=false
 show-storage=false
@@ -263,8 +373,9 @@ show-voltage=false
 storage-measurement=0
 
 [window-title-is-back]
-icon-size=13
-indicator-width=50
+fixed-width=false
+icon-size=12
+indicator-width=30
 show-app=true
 show-icon=true
 show-title=false

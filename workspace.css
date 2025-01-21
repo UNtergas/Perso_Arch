@@ -1,0 +1,32 @@
+.panel-workspace-indicator {
+  padding: 0 6px;
+}
+
+.panel-workspace-indicator-box {
+  padding: 0 0px;
+}
+
+/* .panel-workspace-indicator-box .workspace {
+  width: 40px;
+  background-color:rgba(113, 111, 102, 0.5)
+} */
+
+.panel-workspace-indicator,
+.panel-workspace-indicator-box .workspace {
+  /* border: 1px solid #cccccc; */
+  background-color:transparent;
+}
+
+.panel-workspace-indicator-box .workspace {
+  background-color: transparent;
+  border-left-width: 0;
+}
+
+.panel-workspace-indicator-box .workspace:first-child {
+  border-left-width: 1px;
+}
+
+.workspace-indicator-active {
+  border-radius: 2px;
+  background-color: rgba(113, 111, 102, 0.5);
+}

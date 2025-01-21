@@ -87,17 +87,19 @@ Adding a script to refresh polybar scaling using dpi, replace with your monitor 
 ### Replicate the i3wm tiling look on gnome wayland
 extension needed:
 
-- [Just Perfection Desktop](https://extensions.gnome.org/extension/3843/just-perfection/)
 - [User Themes](https://extensions.gnome.org/extension/19/user-themes/)
 - [Dash to Panel](https://extensions.gnome.org/extension/1160/dash-to-panel/)
-- [Vitals](https://extensions.gnome.org/extension/1460/vitals/)
-- [Space Bar](https://extensions.gnome.org/extension/5338/space-bar/)
 - [Date Menu Formatter](https://extensions.gnome.org/extension/4655/date-menu-formatter/)
 - [Arc Menu](https://extensions.gnome.org/extension/3628/arcmenu/)
 - [Window Calls](https://extensions.gnome.org/extension/4724/window-calls/)
-- [Auto Move Windows](https://extensions.gnome.org/extension/16/auto-move-windows/)
 - [Pop Shell](https://github.com/pop-os/shell)
 - [Pomodoro Timer](https://extensions.gnome.org/extension/53/pomodoro/)
+- [Focus](https://extensions.gnome.org/extension/3924/focus/)
+- [Undecorate Windows](https://extensions.gnome.org/extension/1208/undecorate/)
+- [Improved workspace monitor](https://extensions.gnome.org/extension/3968/improved-workspace-indicator/)
+- [Mouse follow focus](https://extensions.gnome.org/extension/7656/mouse-follows-focus/)
+- [Media Controls](https://extensions.gnome.org/extension/4470/media-controls/)
+
 
 **extension setting loading**
 
