@@ -1,7 +1,8 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 24,
+    "output": "eDP-1",
+    "height": 20,
     "spacing": 4,
     "margin-top" :0,
     "margin-right" :0,
@@ -13,6 +14,7 @@
         "custom/paddc",
         "custom/cycle_wall",
         "custom/nightlight",
+        "bluetooth",
         "hyprland/window",
         "custom/paddc",
         "custom/spotify"
@@ -24,12 +26,11 @@
     "modules-right": [
         "tray",
         "group/motherboard",
-        "custom/cava_mviz",
         "pulseaudio#microphone",
         "pulseaudio",
+        "custom/cava_mviz",
         "custom/backlight",
-        "custom/keyboard", 
-        "bluetooth",        
+        "custom/keyboard",        
         "custom/powermode",
         "battery",
         "clock#time",
@@ -55,10 +56,14 @@
         "on-scroll-up": "hyprctl dispatch workspace e+1",
         "on-scroll-down": "hyprctl dispatch workspace e-1",
         "format": "{}",
-        "format-icons": {
-            "active": "<span color='#689d6a'>󰊠</span>"
+        "persistent-workspaces": {
+          "1": [],
+          "2": [],
+          "3": [],
+          "4": [],
+          "5": [],
+          "6": []
         }
-        
     },
   
     "hyprland/window": {
@@ -92,8 +97,8 @@
         "max-length": 30
     },
     "tray": {
-      "icon-size": 16,
-      "spacing": 8
+      "icon-size": 14,
+      "spacing": 5
     },
     "pulseaudio": {
       "format": "{icon} {volume}%",
@@ -149,7 +154,8 @@
     },
     "clock#date": {
       "format": "<span color='#8ec07c' >󰃭 </span>{:%a %d %b}",
-      "tooltip": false,
+      "tooltip": true,
+      "tooltip-format": "Standard Time: {:%a %d %b}",
     },
   
     "clock#time": {
@@ -174,12 +180,12 @@
     },
     "custom/cava_mviz": {
       "exec": "~/.config/hypr/scripts/WaybarCava.sh",
-      "format": "󰓃 {}"
+      "format": "{}"
     },
     "custom/keyboard": {
         "exec": "~/.config/waybar/scripts/getCurrentLayout",
         "interval": 1,
-        "format": " {}", 
+        "format": "{}", 
         "on-click": "~/.config/hypr/scripts/ibuskeyboard.sh"
     },
     "custom/nightlight":{
@@ -206,10 +212,10 @@
     },
   
     "bluetooth": {
-      "format": "<span color='#458588'>󰂰</span>",
-      "format-disabled": "<span color='#458588'>󰂲</span>",
-      "format-connected": "<span color='#458588'>󰂱</span>",
-      "format-connected-battery": "<span color='#458588'>󰂱</span>",
+      "format": "<span color='#7daea3'>󰂰</span>",
+      "format-disabled": "<span color='#7daea3'>󰂲</span>",
+      "format-connected": "<span color='#7daea3'>󰂱</span>",
+      "format-connected-battery": "<span color='#7daea3'>󰂱</span>",
   
       "tooltip-format": 
         "{num_connections} connected",
@@ -224,15 +230,15 @@
   
       "on-click": "blueman-manager",
       "interval": 1,
-      "min-length": 3,
-      "max-length": 3
+      "min-length": 2,
+      "max-length": 2
     },
     "custom/spotify":{
         "exec": "~/.config/waybar/scripts/media",
         "format": "<span color='#a9b665'> </span>{}",
         "tooltip": false,
-        "on-click": "spotify --enable-features=UseOzonePlatform --ozone-platform=wayland",
-        "on-click-right": "playerctl --player=spotify play-pause",
+        "on-click-right": "spotify --enable-features=UseOzonePlatform --ozone-platform=wayland",
+        "on-click": "playerctl --player=spotify play-pause",
         "interval": 1,
         "max-length": 30
     },
@@ -291,10 +297,11 @@
     },
     "temperature": {
         // "thermal-zone": 2,
-        "hwmon-path": "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon4/temp1_input",
+        // "hwmon-path": "/sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon4/temp1_input",
         "critical-threshold": 70,
         "format-critical": "{temperatureC}°C 󰈸",
-        "format": "{temperatureC}°C "
+        "format": "{temperatureC}°C ",
+        "interval": 10
     },
     "memory": {
         "interval": 10,
@@ -304,7 +311,7 @@
     },
     
     "disk": {
-        "interval": 30,
+        "interval": 60,
         "format": "{specific_free:0.1f}G 󰋊",
         "unit": "GB"
         // 0.25 GB out of 2000.00 GB available. Alternatively 241.3MiB out of 1.9TiB available.
