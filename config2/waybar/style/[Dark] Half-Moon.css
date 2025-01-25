@@ -99,31 +99,28 @@ margin: 5px 5px;
 
 #workspaces button {
 	font-size: 0px;
-	background: #716964;
+	background: #aaa187;
 	border-radius: 30px;
-	margin: 7px 2px;
+	margin: 8px 2px;
 	padding: 0;
-	min-width: 9px;
-	transition: all 0.1s ease;
+	min-width: 7px;
+	transition: all 0.12s ease;
 }
-
 #workspaces button.empty {
-	background: #202020;
+	background: #716964;
 }
-
 
   
 #workspaces button:hover {
-	background: #fbf1c7;
+	background: #aaa187;
 }
 
 #workspaces button.active{
-	background: #fbf1c7;
+	background: #aaa187;
 	border-radius: 5px;
 	font-weight: 900;
-	padding: 0 12px;
+	padding: 0 8px;
 	margin: 7px 2px;
-	transition: all 0.1s ease;
 }
 
 #workspaces button.urgent {
