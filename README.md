@@ -101,6 +101,10 @@ extension needed:
 - [Media Controls](https://extensions.gnome.org/extension/4470/media-controls/)
 
 
+### Apply flatpak theme 
+using flatseal + the script in GTK_theming
+![alt text](image-1.png)
+![alt text](image.png)
 **extension setting loading**
 
 dconf load /org/gnome/shell/extensions/ < gnome-extensions-settings.dconf
@@ -110,3 +114,5 @@ dconf load /org/gnome/shell/extensions/ < gnome-extensions-settings.dconf
 dconf load /org/gnome/settings-daemon/plugins/media-keys/ < gnome-keybindings.dconf
 
 ## Config2 folder is reserver for hyprland
+
+
