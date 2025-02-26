@@ -21,6 +21,7 @@
 #navigator-toolbox:hover #PersonalToolbar:not([customizing]) {
   margin-top: 0px !important;
   margin-bottom: var(--bm-height) !important;
+  background-color: rgba(26, 25, 25, 0.781) !important;
 }
 #PersonalToolbar:not([customizing]) {
   margin-top: var(--bm-height) !important;
