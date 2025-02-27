@@ -115,4 +115,7 @@ dconf load /org/gnome/settings-daemon/plugins/media-keys/ < gnome-keybindings.dc
 
 ## Config2 folder is reserver for hyprland
 
+### For nvim
+install ripgrep & fd-find 
+npm install -g typescript-language-server typescript
 
