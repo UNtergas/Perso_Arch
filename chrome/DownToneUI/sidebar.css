@@ -63,6 +63,32 @@
   }
 }
 
+/* scrollbox{
+  margin-top: 1vh !important;
+} */
+
+/* scrollbox::after,
+scrollbox::before {
+  content: "";
+  display: block;
+  border-top: 1px solid #ccc; 
+  margin: 10px 0;           
+} */
+
+/* .tab-icon-stack{
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  gap: 0px !important;
+} */
+
+.tab-icon-stack:is([soundplaying], [muted], [activemedia-blocked]) {
+  & .tab-icon-image{
+    position: absolute;
+    left: -22px;
+  }
+}
+
+
 slot{
   flex: 0 0 0 !important;
   margin: 0 !important;
