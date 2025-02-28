@@ -1,9 +1,9 @@
 :root {
   /* --uc-navbar-height: 40px;
   --uc-bookbar-height: 22px; */
-  --uc-vertical-collapsed-width: 50px;
+  --uc-vertical-collapsed-width: 36px;
   /* Cambiado a 180px para un ancho mayor en estado expandido */
-  --uc-vertical-height: 32px;
+  --uc-vertical-height: 30px;
   --uc-vertical-expanded-width: 250px;
   --chrome-content-separator-color: transparent;
   --uc-tab-margins-left: 3.5px 0 5px 0px;
@@ -14,6 +14,7 @@
 #sidebar-main {
   transition: width 200ms ease !important;
   width: var(--uc-vertical-collapsed-width) !important;
+  padding-left: 0 !important;
 }
 
 
@@ -25,18 +26,18 @@
 
 #sidebar-main:not(:hover):not([expanded]) .tabbrowser-tab {
   height: var(--uc-vertical-height) !important;
-  width: 50px !important;
+  width: 40px !important;
   min-width: 0 !important;
 }
 #sidebar-main:hover .tabbrowser-tab,
 #sidebar-main[expanded] .tabbrowser-tab {
-  width: calc(var(--uc-vertical-expanded-width) - 10px) !important;
+  width: calc(var(--uc-vertical-expanded-width) - 2px) !important;
   height: var(--uc-vertical-height) !important;
   min-width: 0 !important;
 }
 #sidebar-main:not(:hover):not([expanded]) .tabbrowser-tab[pinned] {
   height: var(--uc-vertical-height) !important;
-  width: 43px !important;
+  width: 40px !important;
   min-width: 0 !important;
 }
 
@@ -59,5 +60,25 @@
     /* width: 30px !important; */
     height: 40px !important;
     padding: 0 !important;
+  }
+}
+
+slot{
+  flex: 0 0 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.tab-content,
+.tab-content:hover
+.tab-content:active{
+  padding: 0 10px !important;
+}
+
+#tabbrowser-tabs[orient="vertical"]{
+  & .tab-background{
+    border-radius: 5px !important;
+    margin-inline: 3px !important;
+    /* outline: 0 !important; */
+    border: 0 !important;
   }
 }
