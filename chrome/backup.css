@@ -1,0 +1,110 @@
+:root {
+  /* --uc-navbar-height: 40px;
+  --uc-bookbar-height: 22px; */
+  --uc-vertical-collapsed-width: 36px;
+  /* Cambiado a 180px para un ancho mayor en estado expandido */
+  --uc-vertical-height: 38spx;
+  --uc-vertical-expanded-width: 250px;
+  --chrome-content-separator-color: transparent;
+  --uc-tab-margins-left: 3.5px 0 5px 0px;
+  --uc-tab-margins-right: 3.5px 0px 5px 0px;
+}
+
+
+#sidebar-main {
+  transition: width 200ms ease !important;
+  width: var(--uc-vertical-collapsed-width) !important;
+  padding-left: 0 !important;
+}
+
+
+#sidebar-main:hover,
+#sidebar-main[expanded] {
+  width: var(--uc-vertical-expanded-width) !important;
+}
+
+
+#sidebar-main:not(:hover):not([expanded]) .tabbrowser-tab {
+  height: var(--uc-vertical-height) !important;
+  width: 40px !important;
+  min-width: 0 !important;
+}
+#sidebar-main:hover .tabbrowser-tab,
+#sidebar-main[expanded] .tabbrowser-tab {
+  width: calc(var(--uc-vertical-expanded-width) - 2px) !important;
+  height: var(--uc-vertical-height) !important;
+  min-width: 0 !important;
+}
+#sidebar-main:not(:hover):not([expanded]) .tabbrowser-tab[pinned] {
+  height: var(--uc-vertical-height) !important;
+  width: 40px !important;
+  min-width: 0 !important;
+}
+
+#sidebar-main:not(:hover):not([expanded]) .tab-label-container,
+#sidebar-main:not(:hover):not([expanded]) .tab-close-button {
+  display: none !important;
+}
+
+
+#sidebar-main:hover .tab-label-container,
+#sidebar-main[expanded] .tab-label-container,
+#sidebar-main:hover .tab-close-button,
+#sidebar-main[expanded] .tab-close-button {
+  display: inline !important;
+}
+
+
+.tab-group-label-container {
+  #tabbrowser-tabs[orient="vertical"]:not([expanded]) & {
+    /* width: 30px !important; */
+    height: 40px !important;
+    padding: 0 !important;
+  }
+}
+
+/* scrollbox{
+  margin-top: 1vh !important;
+} */
+
+/* scrollbox::after,
+scrollbox::before {
+  content: "";
+  display: block;
+  border-top: 1px solid #ccc; 
+  margin: 10px 0;           
+} */
+
+/* .tab-icon-stack{
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  gap: 0px !important;
+} */
+
+.tab-icon-stack:is([soundplaying], [muted], [activemedia-blocked]) {
+  & .tab-icon-image{
+    position: absolute;
+    left: -22px;
+  }
+}
+
+
+slot{
+  flex: 0 0 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.tab-content,
+.tab-content:hover
+.tab-content:active{
+  padding: 0 10px !important;
+}
+
+#tabbrowser-tabs[orient="vertical"]{
+  & .tab-background{
+    border-radius: 5px !important;
+    margin-inline: 3px !important;
+    /* outline: 0 !important; */
+    /* border: 0 !important; */
+  }
+}

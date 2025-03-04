@@ -1,85 +1,123 @@
 :root {
-  /* --uc-navbar-height: 40px;
-  --uc-bookbar-height: 22px; */
-  --uc-vertical-collapsed-width: 36px;
-  /* Cambiado a 180px para un ancho mayor en estado expandido */
-  --uc-vertical-height: 30px;
-  --uc-vertical-expanded-width: 250px;
-  --chrome-content-separator-color: transparent;
-  --uc-tab-margins-left: 3.5px 0 5px 0px;
-  --uc-tab-margins-right: 3.5px 0px 5px 0px;
+	--tweaks-evtoh-collapsed-width: 40px;
+	--tweaks-evtoh-expanded-width: 250px;
+	--tweaks-evtoh-tab-padding: 10px;
+	--tweaks-evtoh-tab-margin: calc((var(--tweaks-evtoh-collapsed-width) - var(--tweaks-evtoh-tab-padding) * 2 - var(--icon-size-default)) / 2);
+	--tweaks-evtoh-animation-duration: 50ms;
+	--chrome-content-separator-color: transparent !important;
 }
 
-
+/* Either state (collapsed or expanded) */
 #sidebar-main {
-  transition: width 200ms ease !important;
-  width: var(--uc-vertical-collapsed-width) !important;
-  padding-left: 0 !important;
+	transition: width var(--tweaks-evtoh-animation-duration) ease, margin-inline-end var(--tweaks-evtoh-animation-duration) ease !important;
+
+	& #tabbrowser-tabs,
+	& .tabbrowser-tab {
+		width: 100% !important;
+	}
+
+	& #vertical-pinned-tabs-container,
+	& #tabbrowser-arrowscrollbox {
+		padding: 0 var(--tweaks-evtoh-tab-margin) !important;
+
+		& .tab-background,
+		& #tabs-newtab-button {
+			margin-inline: 0 !important;
+			width: 100% !important;
+		}
+
+		& .tab-content {
+			padding: 0 var(--tweaks-evtoh-tab-padding) !important;
+		}
+
+		& #tabs-newtab-button {
+			padding: 0 var(--tweaks-evtoh-tab-padding) !important;
+		}
+	}
+
+	/* Always show pinned tabs vertically */
+	& #vertical-pinned-tabs-container {
+		--tab-inline-padding: calc((var(--tab-collapsed-width) - var(--icon-size-default)) / 2) !important;
+
+		&:not(:empty) {
+			display: flex !important;
+			flex-direction: column !important;
+		}
+
+		/* Remove background for pinned tabs */
+		& .tab-background {
+			.tabbrowser-tab:not(:hover)>.tab-stack>&:not([selected], [multiselected]) {
+				background-color: transparent !important;
+			}
+		}
+
+		/* Show the separator between pinned and normal tabs, even when not expanded */
+		&:not(:empty)+#vertical-pinned-tabs-container-separator {
+			display: block !important;
+		}
+	}
+
+	/* Keep attention dot under icon, even when expanded */
+	& .tab-content[titlechanged]:not([selected]) {
+		background-position-x: calc(var(--tweaks-evtoh-tab-padding) + var(--icon-size-default) / 2 - 2px) !important;
+	}
+
+	/* Animate internal tab elements appearing and disappearing */
+	& .tab-label-container,
+	& .tab-close-button,
+	& .toolbarbutton-text {
+		transition: opacity var(--tweaks-evtoh-animation-duration) ease, width var(--tweaks-evtoh-animation-duration) ease !important;
+	}
 }
 
+/* Collapsed state */
+#sidebar-main:not(:hover) {
+	width: var(--tweaks-evtoh-collapsed-width) !important;
 
-#sidebar-main:hover,
-#sidebar-main[expanded] {
-  width: var(--uc-vertical-expanded-width) !important;
+	/* Hide internal elements in collapsed state */
+	& .tab-label-container,
+	& .tab-close-button,
+	& .toolbarbutton-text {
+		display: block !important;
+		width: 0 !important;
+		opacity: 0 !important;
+		padding: 0 !important;
+	}
 }
 
+/* Expanded state */
+#sidebar-main:hover {
+	/* Expanded state on hover or when forced with the expanded attribute */
+	width: var(--tweaks-evtoh-expanded-width) !important;
 
-#sidebar-main:not(:hover):not([expanded]) .tabbrowser-tab {
-  height: var(--uc-vertical-height) !important;
-  width: 40px !important;
-  min-width: 0 !important;
-}
-#sidebar-main:hover .tabbrowser-tab,
-#sidebar-main[expanded] .tabbrowser-tab {
-  width: calc(var(--uc-vertical-expanded-width) - 2px) !important;
-  height: var(--uc-vertical-height) !important;
-  min-width: 0 !important;
-}
-#sidebar-main:not(:hover):not([expanded]) .tabbrowser-tab[pinned] {
-  height: var(--uc-vertical-height) !important;
-  width: 40px !important;
-  min-width: 0 !important;
-}
+	/* Don't shrink website when sidebar is expanded */
+	margin-inline-end: calc(var(--tweaks-evtoh-collapsed-width) - var(--tweaks-evtoh-expanded-width)) !important;
 
-#sidebar-main:not(:hover):not([expanded]) .tab-label-container,
-#sidebar-main:not(:hover):not([expanded]) .tab-close-button {
-  display: none !important;
-}
+	/* Show over tab contents */
+	z-index: calc(var(--browser-area-z-index-tabbox) + 1) !important;
+	background-color: var(--toolbox-bgcolor-inactive) !important;
 
+	/* Show titles and buttons when expanded */
+	& .tab-label-container,
+	& .tab-close-button,
+	& .toolbarbutton-text {
+		display: inline !important;
+	}
 
-#sidebar-main:hover .tab-label-container,
-#sidebar-main[expanded] .tab-label-container,
-#sidebar-main:hover .tab-close-button,
-#sidebar-main[expanded] .tab-close-button {
-  display: inline !important;
+	& #vertical-pinned-tabs-container .tab-icon-image {
+		margin-inline-end: var(--tab-icon-end-margin) !important;
+	}
+
+	.tab-label-container[textoverflow] {
+		mask-image: linear-gradient(to left, transparent, black var(--tab-label-mask-size)) !important;
+	}
 }
 
-
-.tab-group-label-container {
-  #tabbrowser-tabs[orient="vertical"]:not([expanded]) & {
-    /* width: 30px !important; */
-    height: 40px !important;
-    padding: 0 !important;
-  }
+/* Hide the splitter between the sidebar and the content area */
+#sidebar-launcher-splitter {
+	display: none !important;
 }
 
-/* scrollbox{
-  margin-top: 1vh !important;
-} */
-
-/* scrollbox::after,
-scrollbox::before {
-  content: "";
-  display: block;
-  border-top: 1px solid #ccc; 
-  margin: 10px 0;           
-} */
-
-/* .tab-icon-stack{
-  display: flex !important;
-  flex-direction: column-reverse !important;
-  gap: 0px !important;
-} */
 
 .tab-icon-stack:is([soundplaying], [muted], [activemedia-blocked]) {
   & .tab-icon-image{
@@ -88,23 +126,11 @@ scrollbox::before {
   }
 }
 
-
-slot{
-  flex: 0 0 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-.tab-content,
-.tab-content:hover
-.tab-content:active{
-  padding: 0 10px !important;
-}
-
 #tabbrowser-tabs[orient="vertical"]{
   & .tab-background{
     border-radius: 5px !important;
     margin-inline: 3px !important;
     /* outline: 0 !important; */
-    border: 0 !important;
+    /* border: 0 !important; */
   }
 }
