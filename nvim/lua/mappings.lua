@@ -17,7 +17,11 @@ map("n", "<A-k>", "<cmd>resize +2<CR>", opts)   -- Increase height
 map("n", "<A-h>", "<cmd>vertical resize -2<CR>", opts)  -- Decrease width
 map("n", "<A-l>", "<cmd>vertical resize +2<CR>", opts)  -- Increase width
 
-
+for i = 1, 9, 1 do
+  vim.keymap.set("n", string.format("<A-%s>", i), function()
+    vim.api.nvim_set_current_buf(vim.t.bufs[i])
+  end)
+end
 -- 6. Move line(s) up/down with Alt+Up and Alt+Down
 map("n", "<A-Up>", "<cmd>m .-2<CR>==", opts)
 map("n", "<A-Down>", "<cmd>m .+1<CR>==", opts)
