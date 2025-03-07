@@ -4,7 +4,11 @@ return{
     priority = 1000,
     lazy = false,
     opts = {
-      indent = { enabled = true },
+      indent = { 
+        enable= true,
+        size =2,
+        use_tabs = true,
+      },
       input = { enabled = true },
       notifier = { enabled = true },
       scope = { enabled = true },
