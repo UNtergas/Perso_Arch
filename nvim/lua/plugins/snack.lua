@@ -28,5 +28,12 @@ return{
       end, desc = "Notification History" },
       { "<leader>un", function() Snacks.notifier.hide() end, desc = "Dismiss All Notifications" },
     },
+    -- config = function()
+    --   -- Ensure Neovim follows 2-space indent with tabs
+    --   vim.opt.shiftwidth = 2  -- Indentation width for << and >>
+    --   vim.opt.tabstop = 2      -- Number of spaces a tab counts for
+    --   vim.opt.softtabstop = 2  -- Number of spaces when pressing <Tab>
+    --   vim.opt.expandtab = false -- Use real tabs instead of spaces
+    -- end,
   }
 }

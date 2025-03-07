@@ -2,9 +2,39 @@ require "nvchad.mappings"
 
 -- add yours here
 
+
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
+local telescope = require("telescope.builtin")
 
+
+-- Unbind default Go to Tag mappings
+pcall(vim.keymap.del, "n", "<C-]>")
+pcall(vim.keymap.del, "n", "<C-[>")
+-- Indent in Visual Mode
+map("v", "<C-[>", "<gv", { desc = "Unindent (Visual Mode)" }) -- Shift left and reselect
+map("v", "<C-]>", ">gv", { desc = "Indent (Visual Mode)" })   -- Shift right and reselect
+
+-- Indent in Insert Mode
+map("i", "<C-[>", "<C-o><<", { desc = "Unindent (Insert Mode)" }) -- Shift left
+map("i", "<C-]>", "<C-o>>>", { desc = "Indent (Insert Mode)" })   -- Shift right
+
+-- Ensure Esc (`<C-[>`) still works to exit modes
+map("i", "<Esc>", "<Esc>", { desc = "Exit Insert Mode" })
+map("v", "<Esc>", "<Esc>", { desc = "Exit Visual Mode" })
+
+-- Quick bind for telescope find 
+map("n", "<C-p>", telescope.find_files, { desc = "Find Files (Telescope)" })
+-- Show diagnostics on the current line with Alt + d
+map("n", "<A-,>", function()
+  vim.diagnostic.open_float(nil, { focus = false })
+end, opts)
+-- Open the TODO list with Telescope
+map("n", "<leader>ft", "<cmd>TodoTelescope<CR>", opts)
+
+-- Jump between TODOs in the current file
+map("n", "]t", function() require("todo-comments").jump_next() end, opts)
+map("n", "[t", function() require("todo-comments").jump_prev() end, opts)
 
 map("n", "<Esc>", function()
   local api = require("nvim-tree.api")
