@@ -9,7 +9,7 @@ M.base46 = {
 	theme = "onedark",
   changed_themes = {
       onedark = {
-         base_00 = "#303030"
+         base_16 = { base00 = "#1c1c1c" },
       },
    },
 	-- hl_override = {
