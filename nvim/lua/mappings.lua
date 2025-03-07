@@ -12,6 +12,10 @@ map("n", "<Esc>", function()
     api.tree.close()
   end
 end, opts)
+vim.api.nvim_set_keymap("n", "<Esc>", ":nohlsearch<CR>", { noremap = true, silent = true })
+-- Code action keymap (Ctrl + .)
+map("n", "<A-.>", vim.lsp.buf.code_action, opts)
+map("v", "<A-.>", vim.lsp.buf.code_action, opts) -- Enable for visual mode too
 
 -- Command mode shortcut
 map("n", ";", ":", { desc = "CMD enter command mode" })
