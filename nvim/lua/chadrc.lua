@@ -31,7 +31,8 @@ M.ui = {
       },
 }
 
-M.nvdash = {
+if not vim.g.vscode then
+  M.nvdash = {
     load_on_startup = true,
 
     header = {
@@ -54,11 +55,11 @@ M.nvdash = {
       "                                                ",
     },
 
-
-     buttons = {
-       { txt = "  Find File", keys = "Spc f f", cmd = "Telescope find_files" },
-       { txt = "  Recent Files", keys = "Spc f o", cmd = "Telescope oldfiles" },
-       -- more... check nvconfig.lua file for full list of buttons
-     },
-   }
+    buttons = {
+      { txt = "  Find File", keys = "Spc f f", cmd = "Telescope find_files" },
+      { txt = "  Recent Files", keys = "Spc f o", cmd = "Telescope oldfiles" },
+      -- more... check nvconfig.lua file for full list of buttons
+    },
+  }
+end
 return M

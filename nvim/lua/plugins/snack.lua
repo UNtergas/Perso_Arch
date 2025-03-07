@@ -2,9 +2,10 @@ return{
   {
     "folke/snacks.nvim",
     priority = 1000,
+    enabled = not vim.g.vscode,
     lazy = false,
     opts = {
-      indent = { 
+      indent = {
         enable= true,
         size =2,
         use_tabs = true,
