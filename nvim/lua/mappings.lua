@@ -5,6 +5,14 @@ require "nvchad.mappings"
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
+-- Close NvimTree with Esc only if the cursor is inside the tree window
+map("n", "<Esc>", function()
+  local api = require("nvim-tree.api")
+  if vim.bo.filetype == "NvimTree" then
+    api.tree.close()
+  end
+end, opts)
+
 -- Command mode shortcut
 map("n", ";", ":", { desc = "CMD enter command mode" })
 
