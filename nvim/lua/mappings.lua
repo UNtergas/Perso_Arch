@@ -5,14 +5,16 @@ require "nvchad.mappings"
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
--- Close NvimTree with Esc only if the cursor is inside the tree window
+
 map("n", "<Esc>", function()
   local api = require("nvim-tree.api")
   if vim.bo.filetype == "NvimTree" then
-    api.tree.close()
+    api.tree.close()  -- Close NvimTree if inside
+  else
+    vim.cmd("nohlsearch") -- Otherwise, clear search highlights
   end
 end, opts)
-vim.api.nvim_set_keymap("n", "<Esc>", ":nohlsearch<CR>", { noremap = true, silent = true })
+
 -- Code action keymap (Ctrl + .)
 map("n", "<A-.>", vim.lsp.buf.code_action, opts)
 map("v", "<A-.>", vim.lsp.buf.code_action, opts) -- Enable for visual mode too
