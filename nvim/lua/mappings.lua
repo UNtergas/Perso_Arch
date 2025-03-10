@@ -7,7 +7,6 @@ local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
 
-
 -- Disable the default Ctrl+Z (suspend)
 map("n", "<C-z>", "<Nop>", { desc = "Disable Suspend" })
 
@@ -16,6 +15,10 @@ map("i", "<C-z>", "<C-o>u", { desc = "Undo in Insert Mode" })
 
 -- Remap Ctrl+Z to Undo in Normal Mode
 map("n", "<C-z>", "u", { desc = "Undo" })
+
+-- Move view up/down while keeping cursor position
+map("n", "<C-Up>", "<C-y>", opts)   -- Move view up
+map("n", "<C-Down>", "<C-e>", opts) -- Move view down
 
 -- Unbind default Alt-p and Alt-o
 pcall(vim.keymap.del, "n", "<A-p>")
