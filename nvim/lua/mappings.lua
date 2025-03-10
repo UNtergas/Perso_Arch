@@ -7,6 +7,7 @@ local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
 
+
 -- Select the current word with Ctrl+y
 map("n", "<C-y>", "viw", { desc = "Select Current Word" })
 
@@ -40,7 +41,9 @@ map("n", "<A-o>", "<<", { desc = "Unindent (Normal Mode)" }) -- Shift left
 map("n", "<A-p>", ">>", { desc = "Indent (Normal Mode)" })   -- Shift right
 
 -- Close the current buffer
-map("n", "<C-q>", ":bd<CR>", { desc = "Close Current Buffer" })
+map("n", "<C-q>", function()
+  require("nvchad.tabufline").close_buffer()
+end, { desc = "buffer close" })
 
 -- Quick bind for telescope find 
 map("n", "<C-p>", telescope.find_files, { desc = "Find Files (Telescope)" })
