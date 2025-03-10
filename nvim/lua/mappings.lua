@@ -91,8 +91,9 @@ map("n", "<A-Down>", "<cmd>m .+1<CR>==", opts)
 map("v", "<A-Up>", ":m '<-2<CR>gv=gv", opts)
 map("v", "<A-Down>", ":m '>+1<CR>gv=gv", opts)
 
--- === ADDED KEYMAPS ===
-
+-- Toggle Symbols Outline with both Ctrl + Space and Leader + so
+map("n", "<C-Space>", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
+map("n", "<leader>so", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
 -- Vertical split with Ctrl + \
 map("n", "<C-\\>", "<cmd>vsplit<CR>", opts)
 
