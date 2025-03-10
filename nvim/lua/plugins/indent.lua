@@ -1,8 +1,8 @@
 
-if vim.g.vscode then
   return {
     {
       "lukas-reineke/indent-blankline.nvim",
+      enabled = false,
       main = "ibl",
       config = function()
         require("ibl").setup({
@@ -34,6 +34,4 @@ if vim.g.vscode then
       end,
     },
   }
-else
-  return {}
-end
+

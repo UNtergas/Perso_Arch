@@ -9,19 +9,23 @@ local telescope = require("telescope.builtin")
 
 
 -- Unbind default Go to Tag mappings
-pcall(vim.keymap.del, "n", "<C-]>")
-pcall(vim.keymap.del, "n", "<C-[>")
--- Indent in Visual Mode
-map("v", "<C-[>", "<gv", { desc = "Unindent (Visual Mode)" }) -- Shift left and reselect
-map("v", "<C-]>", ">gv", { desc = "Indent (Visual Mode)" })   -- Shift right and reselect
+pcall(vim.keymap.del, "n", "<A-p>")
+pcall(vim.keymap.del, "n", "<A-o>")
 
--- Indent in Insert Mode
-map("i", "<C-[>", "<C-o><<", { desc = "Unindent (Insert Mode)" }) -- Shift left
-map("i", "<C-]>", "<C-o>>>", { desc = "Indent (Insert Mode)" })   -- Shift right
+-- ✅ Indent in Visual Mode (Fix: Keeps selection)
+map("v", "<A-o>", "<gv", { desc = "Unindent (Visual Mode)" }) -- Shift left and reselect
+map("v", "<A-p>", ">gv", { desc = "Indent (Visual Mode)" })   -- Shift right and reselect
 
--- Ensure Esc (`<C-[>`) still works to exit modes
-map("i", "<Esc>", "<Esc>", { desc = "Exit Insert Mode" })
-map("v", "<Esc>", "<Esc>", { desc = "Exit Visual Mode" })
+-- ✅ Indent in Insert Mode (Fix: Stays in insert mode)
+map("i", "<A-o>", "<Esc><<i", { desc = "Unindent (Insert Mode)" }) -- Shift left, return to insert mode
+map("i", "<A-p>", "<Esc>>i", { desc = "Indent (Insert Mode)" })    -- Shift right, return to insert mode
+
+-- ✅ Indent in Normal Mode (Optional: Also works in normal mode)
+map("n", "<A-o>", "<<", { desc = "Unindent (Normal Mode)" }) -- Shift left
+map("n", "<A-p>", ">>", { desc = "Indent (Normal Mode)" })   -- Shift right
+
+-- Close the current buffer
+map("n", "<C-q>", ":bd<CR>", { desc = "Close Current Buffer" })
 
 -- Quick bind for telescope find 
 map("n", "<C-p>", telescope.find_files, { desc = "Find Files (Telescope)" })
