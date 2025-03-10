@@ -7,7 +7,6 @@ local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
 
-
 -- Open the menu with default options using <C-t>
 vim.keymap.set("n", "<C-t>", function()
   require("menu").open("default")
