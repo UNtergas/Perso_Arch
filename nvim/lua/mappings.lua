@@ -8,7 +8,16 @@ local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
 
 
--- Unbind default Go to Tag mappings
+-- Disable the default Ctrl+Z (suspend)
+map("n", "<C-z>", "<Nop>", { desc = "Disable Suspend" })
+
+-- Remap Ctrl+Z to Undo in Insert Mode
+map("i", "<C-z>", "<C-o>u", { desc = "Undo in Insert Mode" })
+
+-- Remap Ctrl+Z to Undo in Normal Mode
+map("n", "<C-z>", "u", { desc = "Undo" })
+
+-- Unbind default Alt-p and Alt-o
 pcall(vim.keymap.del, "n", "<A-p>")
 pcall(vim.keymap.del, "n", "<A-o>")
 
