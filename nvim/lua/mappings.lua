@@ -8,6 +8,24 @@ local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
 
 
+-- Open the menu with default options using <C-t>
+vim.keymap.set("n", "<C-t>", function()
+  require("menu").open("default")
+end, { desc = "Open menu (default)" })
+
+-- Mouse support: Open menu on right-click
+vim.keymap.set({ "n", "v" }, "<RightMouse>", function()
+  require('menu.utils').delete_old_menus()
+
+  vim.cmd.exec '"normal! \\<RightMouse>"'
+
+  -- Determine the menu options based on buffer type
+  local buf = vim.api.nvim_win_get_buf(vim.fn.getmousepos().winid)
+  local options = vim.bo[buf].ft == "NvimTree" and "nvimtree" or "default"
+
+  require("menu").open(options, { mouse = true })
+end, { desc = "Open menu on right-click" })
+
 -- Select the current word with Ctrl+y
 map("n", "<C-y>", "viw", { desc = "Select Current Word" })
 
