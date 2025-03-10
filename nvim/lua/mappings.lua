@@ -7,6 +7,9 @@ local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
 
+-- Select the current word with Ctrl+y
+map("n", "<C-y>", "viw", { desc = "Select Current Word" })
+
 -- Disable the default Ctrl+Z (suspend)
 map("n", "<C-z>", "<Nop>", { desc = "Disable Suspend" })
 
