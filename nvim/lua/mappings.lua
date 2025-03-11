@@ -39,9 +39,11 @@ map("n", "<Esc>", function()
     vim.cmd("nohlsearch") -- Otherwise, clear search highlights
 end, opts)
 
---  Bind <C-f> to Telescope Live Grep
-map("n", "<C-f>", telescope.live_grep, { desc = "Live Grep (Telescope)" })
+--  Bind <C-g> to Telescope Live Grep
+map("n", "<C-g>", telescope.live_grep, { desc = "Live Grep (Telescope)" })
 
+-- Bind <C-f> to search within the current buffer
+map("n", "<C-f>", telescope.current_buffer_fuzzy_find, { desc = "Find in Current Buffer (Telescope)" })
 
 -- Mouse support: Open menu on right-click
 vim.keymap.set({ "n", "v" }, "<RightMouse>", function()
