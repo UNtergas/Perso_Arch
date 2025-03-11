@@ -9,11 +9,6 @@ return{
         }
       }
     },
-    lsp_references={
-      win = {
-        size =0.4,
-      }
-    }
   }, -- for default options, refer to the configuration section for custom setup.
   cmd = "Trouble",
   keys = {
@@ -34,7 +29,7 @@ return{
     },
     {
       "<leader>cl",
-      "<cmd>Trouble lsp toggle focus=true win.position=left<cr>",
+      "<cmd>Trouble lsp toggle focus=true win.position=left win.size=0.4<cr>",
       desc = "LSP Definitions / references / ... (Trouble)",
     },
     {
