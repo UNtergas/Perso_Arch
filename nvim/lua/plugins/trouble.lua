@@ -29,7 +29,7 @@ return{
     },
     {
       "<leader>cl",
-      "<cmd>Trouble lsp toggle focus=true win.position=left win.size=0.4<cr>",
+      "<cmd>Trouble lsp toggle focus=true win.position=bottom win.size=0.35<cr>",
       desc = "LSP Definitions / references / ... (Trouble)",
     },
     {
