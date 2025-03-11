@@ -7,10 +7,24 @@ local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
 
--- Open the menu with default options using <C-t>
-vim.keymap.set("n", "<C-t>", function()
-  require("menu").open("default")
-end, { desc = "Open menu (default)" })
+
+-- NEO tree selection
+--
+-- Toggle
+map("n", "<leader>e", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
+map("n", "<leader>o", "<cmd>Neotree focus<CR>", { desc = "Focus Neo-tree" })
+
+--  Toggle Neo-tree with C-n
+map("n", "<C-n>", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
+
+--  Escape Clear Search Highlights
+map("n", "<Esc>", function()
+    vim.cmd("nohlsearch") -- Otherwise, clear search highlights
+end, opts)
+
+--  Bind <C-t> to Telescope Live Grep
+map("n", "<C-t>", telescope.live_grep, { desc = "Live Grep (Telescope)" })
+
 
 -- Mouse support: Open menu on right-click
 vim.keymap.set({ "n", "v" }, "<RightMouse>", function()
@@ -75,14 +89,14 @@ map("n", "<leader>ft", "<cmd>TodoTelescope<CR>", opts)
 map("n", "]t", function() require("todo-comments").jump_next() end, opts)
 map("n", "[t", function() require("todo-comments").jump_prev() end, opts)
 
-map("n", "<Esc>", function()
-  local api = require("nvim-tree.api")
-  if vim.bo.filetype == "NvimTree" then
-    api.tree.close()  -- Close NvimTree if inside
-  else
-    vim.cmd("nohlsearch") -- Otherwise, clear search highlights
-  end
-end, opts)
+-- map("n", "<Esc>", function()
+--   local api = require("nvim-tree.api")
+--   if vim.bo.filetype == "NvimTree" then
+--     api.tree.close()  -- Close NvimTree if inside
+--   else
+--     vim.cmd("nohlsearch") -- Otherwise, clear search highlights
+--   end
+-- end, opts)
 
 -- Code action keymap (Ctrl + .)
 map("n", "<A-.>", vim.lsp.buf.code_action, opts)

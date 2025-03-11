@@ -22,8 +22,13 @@ require("lazy").setup({
     import = "nvchad.plugins",
   },
 
+{
+  "nvim-tree/nvim-tree.lua",
+  enabled = false, -- Disable NvimTree
+},
   { import = "plugins" },
 }, lazy_config)
+
 
 -- load theme
 dofile(vim.g.base46_cache .. "defaults")
@@ -31,6 +36,13 @@ dofile(vim.g.base46_cache .. "statusline")
 
 require "options"
 require "nvchad.autocmds"
+
+vim.cmd [[
+  highlight NeoTreeNormal guibg=#1d2021
+  highlight NeoTreeNormalNC guibg=#1d2021
+  highlight NeoTreeEndOfBuffer guibg=#1d2021 guifg=#1d2021
+]]
+
 
 vim.schedule(function()
   require "mappings"
