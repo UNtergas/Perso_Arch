@@ -3,9 +3,10 @@ return {
   {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
+    enable = not vim.g.vscode,
     config = function()
       require("ibl").setup({
-        indent = {char = "|" },
+        -- indent = {char = "|" },
         whitespace = {
             remove_blankline_trail = false,
         },

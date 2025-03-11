@@ -13,7 +13,7 @@ local telescope = require("telescope.builtin")
 map("n", "<C-Space>", "<cmd>Trouble symbols toggle focus=true<CR>", { desc = "Toggle Trouble Symbols" })
 
 -- 🚀 Bind Ctrl+M to Toggle Trouble LSP References
-map("n", "<C-m>", "<cmd>Trouble lsp toggle focus=true win.position=right <CR>", { desc = "Toggle Trouble LSP References" })
+map("n", "<C-m>", "<cmd>Trouble lsp toggle focus=true win.position=left <CR>", { desc = "Toggle Trouble LSP References" })
 
 -- 🚀 Bind Ctrl+V to open a new tab
 map("n", "<C-v>", "<cmd>tabnew<CR>", { desc = "Open a New Tab" })
