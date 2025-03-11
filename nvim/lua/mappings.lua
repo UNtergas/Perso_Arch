@@ -12,8 +12,8 @@ local telescope = require("telescope.builtin")
 -- 🚀 Bind Ctrl+Space to Toggle Trouble Document Symbols
 map("n", "<C-Space>", "<cmd>Trouble symbols toggle focus=true<CR>", { desc = "Toggle Trouble Symbols" })
 
--- 🚀 Bind Ctrl+M to Toggle Trouble LSP References
-map("n", "<C-m>", "<cmd>Trouble lsp toggle focus=true win.position=left win.size= 0.4 <CR>", { desc = "Toggle Trouble LSP References" })
+-- 🚀 Bind Ctrl+l to Toggle Trouble LSP References
+map("n", "<C-l>", "<cmd>Trouble lsp toggle focus=true win.position=left win.size= 0.4 <CR>", { desc = "Toggle Trouble LSP References" })
 
 -- 🚀 Bind Ctrl+V to open a new tab
 map("n", "<C-v>", "<cmd>tabnew<CR>", { desc = "Open a New Tab" })
@@ -117,6 +117,7 @@ map("n", "[t", function() require("todo-comments").jump_prev() end, opts)
 --   end
 -- end, opts)
 
+
 -- Code action keymap (Ctrl + .)
 map("n", "<A-.>", vim.lsp.buf.code_action, opts)
 map("v", "<A-.>", vim.lsp.buf.code_action, opts) -- Enable for visual mode too
@@ -153,6 +154,7 @@ map("v", "<A-Down>", ":m '>+1<CR>gv=gv", opts)
 -- -- Toggle Symbols Outline with both Ctrl + Space and Leader + so
 -- map("n", "<C-Space>", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
 -- map("n", "<leader>so", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
+
 -- Vertical split with Ctrl + \
 map("n", "<C-\\>", "<cmd>vsplit<CR>", opts)
 
