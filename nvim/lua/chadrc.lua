@@ -26,8 +26,8 @@ M.ui = {
          lazyload = false
       },
       statusline = {
-          theme = "vscode_colored",
-          separator_style = "block",
+          theme = "default",
+          separator_style = "arrow",
       },
 }
 
