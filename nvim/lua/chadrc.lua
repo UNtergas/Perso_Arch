@@ -5,7 +5,7 @@
 local M = {}
 
 M.base46 = {
-	theme = "doomchad",
+	theme = "onedark",
   changed_themes = {
       onedark = {
          base_16 = { base00 = "#202020" },
@@ -28,8 +28,6 @@ M.ui = {
       statusline = {
           theme = "vscode_colored",
           separator_style = "block",
-          order = nil,
-          modules = nil,
       },
 }
 

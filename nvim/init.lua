@@ -42,9 +42,9 @@ require "options"
 require "nvchad.autocmds"
 
 vim.cmd [[
-  highlight NeoTreeNormal guibg=#1d2021
-  highlight NeoTreeNormalNC guibg=#1d2021
-  highlight NeoTreeEndOfBuffer guibg=#1d2021 guifg=#1d2021
+  highlight NeoTreeNormal guibg=#2E3440
+  highlight NeoTreeNormalNC guibg=#2E3440
+  highlight NeoTreeEndOfBuffer guibg=#2E3440 guifg=#2E3440
 ]]
 
 
