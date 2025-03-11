@@ -22,10 +22,14 @@ require("lazy").setup({
     import = "nvchad.plugins",
   },
 
-{
-  "nvim-tree/nvim-tree.lua",
-  enabled = false, -- Disable NvimTree
-},
+  {
+    "nvim-tree/nvim-tree.lua",
+    enabled = false, -- Disable NvimTree
+  },
+  {
+    "neovim/nvim-lspconfig",
+    lazy = false, -- Ensure LSP loads immediately
+  },
   { import = "plugins" },
 }, lazy_config)
 

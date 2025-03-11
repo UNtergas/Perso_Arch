@@ -8,6 +8,23 @@ local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
 
 
+--- Section for Trouble
+-- 🚀 Bind Ctrl+Space to Toggle Trouble Document Symbols
+map("n", "<C-Space>", "<cmd>Trouble symbols toggle focus=true<CR>", { desc = "Toggle Trouble Symbols" })
+
+-- 🚀 Bind Ctrl+M to Toggle Trouble LSP References
+map("n", "<C-m>", "<cmd>Trouble lsp toggle focus=true win.position=right <CR>", { desc = "Toggle Trouble LSP References" })
+
+-- 🚀 Bind Ctrl+V to open a new tab
+map("n", "<C-v>", "<cmd>tabnew<CR>", { desc = "Open a New Tab" })
+
+-- end 
+
+
+-- 🚀 Search Symbols in the Entire Workspace
+map("n", "<leader>fs", telescope.lsp_workspace_symbols, { desc = "Find Symbols in Workspace" })
+map("n", "<C-t>", telescope.lsp_workspace_symbols, { desc = "Find Symbols in Workspace" })
+
 -- NEO tree selection
 --
 -- Toggle
@@ -22,8 +39,8 @@ map("n", "<Esc>", function()
     vim.cmd("nohlsearch") -- Otherwise, clear search highlights
 end, opts)
 
---  Bind <C-t> to Telescope Live Grep
-map("n", "<C-t>", telescope.live_grep, { desc = "Live Grep (Telescope)" })
+--  Bind <C-f> to Telescope Live Grep
+map("n", "<C-f>", telescope.live_grep, { desc = "Live Grep (Telescope)" })
 
 
 -- Mouse support: Open menu on right-click
@@ -131,9 +148,9 @@ map("n", "<A-Down>", "<cmd>m .+1<CR>==", opts)
 map("v", "<A-Up>", ":m '<-2<CR>gv=gv", opts)
 map("v", "<A-Down>", ":m '>+1<CR>gv=gv", opts)
 
--- Toggle Symbols Outline with both Ctrl + Space and Leader + so
-map("n", "<C-Space>", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
-map("n", "<leader>so", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
+-- -- Toggle Symbols Outline with both Ctrl + Space and Leader + so
+-- map("n", "<C-Space>", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
+-- map("n", "<leader>so", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
 -- Vertical split with Ctrl + \
 map("n", "<C-\\>", "<cmd>vsplit<CR>", opts)
 
