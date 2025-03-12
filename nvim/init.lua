@@ -27,6 +27,10 @@ require("lazy").setup({
     enabled = false, -- Disable NvimTree
   },
   {
+    "tpope/vim-fugitive",
+    lazy = false,
+  },
+  {
     "neovim/nvim-lspconfig",
     lazy = false, -- Ensure LSP loads immediately
   },

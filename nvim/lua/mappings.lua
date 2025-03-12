@@ -7,6 +7,24 @@ local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
 
+-- Git: Show file history in command line
+map("n", "<leader>gh", "<cmd>G log --follow %<CR>", { desc = "Git File History (Command Line)" })
+
+-- Git: Show file history in a popup and open with Gedit
+map("n", "<leader>gf", function()
+  telescope.git_bcommits({
+    attach_mappings = function(_, map)
+      map("i", "<CR>", function(prompt_bufnr)
+        local entry = require("telescope.actions.state").get_selected_entry()
+        require("telescope.actions").close(prompt_bufnr)
+        if entry and entry.value then
+          vim.cmd("Gedit " .. entry.value .. ":%")
+        end
+      end)
+      return true
+    end,
+  })
+end, { desc = "View File History and Open with Gedit" })
 
 --- Section for Trouble
 -- 🚀 Bind Ctrl+Space to Toggle Trouble Document Symbols

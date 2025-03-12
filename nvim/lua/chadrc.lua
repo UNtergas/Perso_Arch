@@ -5,7 +5,7 @@
 local M = {}
 
 M.base46 = {
-	theme = "onedark",
+	theme = "doomchad",
   changed_themes = {
       onedark = {
          base_16 = { base00 = "#202020" },
@@ -26,7 +26,7 @@ M.ui = {
          lazyload = false
       },
       statusline = {
-          theme = "default",
+          theme = "minimal",
           separator_style = "arrow",
       },
 }
