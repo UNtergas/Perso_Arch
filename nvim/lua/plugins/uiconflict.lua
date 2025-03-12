@@ -1,6 +1,8 @@
 return{
   {
     "akinsho/git-conflict.nvim",
+    enabled = true,
+    lazy = false,
     version = "*",
     config = function()
       require("git-conflict").setup({
@@ -17,8 +19,8 @@ return{
       })
 
       -- Define custom highlight groups for Gruvbox Material Dark
-      vim.cmd("highlight DiffAdd guibg = '#405d7e'")
-      vim.cmd("highlight DiffText guibg = '#314753'")
+      vim.api.nvim_set_hl(0, 'DiffText', { fg = "#ffffff", bg = "#1d3b40" })
+      vim.api.nvim_set_hl(0, 'DiffAdd', { fg = "#ffffff", bg = "#1d3450" })
 
       vim.api.nvim_create_autocmd('User', {
         pattern = 'GitConflictDetected',
