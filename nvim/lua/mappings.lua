@@ -63,18 +63,18 @@ map("n", "<C-g>", telescope.live_grep, { desc = "Live Grep (Telescope)" })
 -- Bind <C-f> to search within the current buffer
 map("n", "<C-f>", telescope.current_buffer_fuzzy_find, { desc = "Find in Current Buffer (Telescope)" })
 
--- Mouse support: Open menu on right-click
-vim.keymap.set({ "n", "v" }, "<RightMouse>", function()
-  require('menu.utils').delete_old_menus()
-
-  vim.cmd.exec '"normal! \\<RightMouse>"'
-
-  -- Determine the menu options based on buffer type
-  local buf = vim.api.nvim_win_get_buf(vim.fn.getmousepos().winid)
-  local options = vim.bo[buf].ft == "NvimTree" and "nvimtree" or "default"
-
-  require("menu").open(options, { mouse = true })
-end, { desc = "Open menu on right-click" })
+-- -- Mouse support: Open menu on right-click
+-- vim.keymap.set({ "n", "v" }, "<RightMouse>", function()
+--   require('menu.utils').delete_old_menus()
+--
+--   vim.cmd.exec '"normal! \\<RightMouse>"'
+--
+--   -- Determine the menu options based on buffer type
+--   local buf = vim.api.nvim_win_get_buf(vim.fn.getmousepos().winid)
+--   local options = vim.bo[buf].ft == "NvimTree" and "nvimtree" or "default"
+--
+--   require("menu").open(options, { mouse = true })
+-- end, { desc = "Open menu on right-click" })
 
 -- Select the current word with Ctrl+y
 map("n", "<C-y>", "viw", { desc = "Select Current Word" })

@@ -34,6 +34,9 @@ require("lazy").setup({
     "neovim/nvim-lspconfig",
     lazy = false, -- Ensure LSP loads immediately
   },
+  { "nvzone/minty", enabled = false, },
+  { "nvzone/volt" , enabled= false, },
+  { "nvzone/menu" , enabled= false, },
   { import = "plugins" },
 }, lazy_config)
 
