@@ -30,8 +30,8 @@ end, { desc = "View File History and Open with Gedit" })
 -- 🚀 Bind Ctrl+Space to Toggle Trouble Document Symbols
 map("n", "<C-Space>", "<cmd>Trouble symbols toggle focus=true<CR>", { desc = "Toggle Trouble Symbols" })
 
--- 🚀 Bind Ctrl+l to Toggle Trouble LSP References
-map("n", "<C-l>", "<cmd>Trouble lsp toggle focus=true win.position=bottom win.size= 0.35 <CR>", { desc = "Toggle Trouble LSP References" })
+-- 🚀 Bind Ctrl+/ to Toggle Trouble LSP References
+map("n", "<C-_>", "<cmd>Trouble lsp toggle focus=true win.position=bottom win.size= 0.35 <CR>", { desc = "Toggle Trouble LSP References" })
 
 -- 🚀 Bind Ctrl+V to open a new tab
 map("n", "<C-v>", "<cmd>tabnew<CR>", { desc = "Open a New Tab" })
