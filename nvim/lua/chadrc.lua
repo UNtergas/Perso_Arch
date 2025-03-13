@@ -26,7 +26,7 @@ M.ui = {
          lazyload = false
       },
       statusline = {
-          theme = "minimal",
+          theme = "default",
           separator_style = "arrow",
       },
 }

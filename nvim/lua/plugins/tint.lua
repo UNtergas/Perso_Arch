@@ -5,8 +5,8 @@ return {
     event = "VeryLazy", -- Load when UI is ready
     config = function()
       require("tint").setup({
-        tint = -20, -- Adjust darkness of inactive splits
-        saturation = 0.7, -- Keep colors slightly desaturated
+        tint = -5, -- Adjust darkness of inactive splits
+        saturation = 0.6, -- Keep colors slightly desaturated
         highlight_ignore_patterns = { "WinSeparator", "Status.*", "NeoTree.*" }, -- Ignore certain UI elements
         window_ignore_function = function(winid)
           local buf = vim.api.nvim_win_get_buf(winid)
