@@ -194,5 +194,5 @@ map("n", "<C-M-Right>", "<cmd>wincmd L<CR>", opts) -- Move to right window
 map("t", "<M-e>", "<C-\\><C-N>", { desc = "terminal escape terminal mode" })
 
 -- Map <Alt-left/right> in insert mode to jump word
-map("i", "<M-Left>", "<C-o>b", { desc = "Move backward one word in insert mode" })
-map("i", "<M-Right>", "<C-o>w", { desc = "Move forward one word in insert mode" })
+map("i", "<M-d>", "<Esc>ea", { desc = "Move forward one word in insert mode" })
+map("i", "<M-a>", "<Esc>bi", { desc = "Move backward one word in insert mode" })
