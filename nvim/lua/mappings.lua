@@ -169,6 +169,11 @@ map("n", "<A-Down>", "<cmd>m .+1<CR>==", opts)
 map("v", "<A-Up>", ":m '<-2<CR>gv=gv", opts)
 map("v", "<A-Down>", ":m '>+1<CR>gv=gv", opts)
 
+-- Move line(s) up/down with Ctrl+Alt+K and Ctrl+Alt+J
+map("n", "<C-A-k>", "<cmd>m .-2<CR>==", opts)
+map("n", "<C-A-j>", "<cmd>m .+1<CR>==", opts)
+map("v", "<C-A-k>", ":m '<-2<CR>gv=gv", opts)
+map("v", "<C-A-j>", ":m '>+1<CR>gv=gv", opts)
 -- -- Toggle Symbols Outline with both Ctrl + Space and Leader + so
 -- map("n", "<C-Space>", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
 -- map("n", "<leader>so", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
