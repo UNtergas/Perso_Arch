@@ -189,3 +189,6 @@ map("n", "<C-M-Up>", "<cmd>wincmd K<CR>", opts)    -- Move to top window
 map("n", "<C-M-Down>", "<cmd>wincmd J<CR>", opts)  -- Move to bottom window
 map("n", "<C-M-Left>", "<cmd>wincmd H<CR>", opts)  -- Move to left window
 map("n", "<C-M-Right>", "<cmd>wincmd L<CR>", opts) -- Move to right window
+
+-- Map <M-x> (Alt + X) to escape terminal mode
+map("t", "<M-x>", "<C-\\><C-N>", { desc = "terminal escape terminal mode" })
