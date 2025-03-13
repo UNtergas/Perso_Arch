@@ -76,8 +76,13 @@ map("n", "<C-f>", telescope.current_buffer_fuzzy_find, { desc = "Find in Current
 --   require("menu").open(options, { mouse = true })
 -- end, { desc = "Open menu on right-click" })
 
--- Select the current word with Ctrl+y
-map("n", "<C-y>", "viw", { desc = "Select Current Word" })
+-- Move view up/down while keeping cursor position
+map("n", "<C-Up>", "<C-y>", opts)   -- Move view up
+map("n", "<C-Down>", "<C-e>", opts) -- Move view down
+
+
+-- Select the current word with Alt+y
+map("n", "<M-y>", "viw", { desc = "Select Current Word" })
 
 -- Disable the default Ctrl+Z (suspend)
 map("n", "<C-z>", "<Nop>", { desc = "Disable Suspend" })
@@ -88,14 +93,9 @@ map("i", "<C-z>", "<C-o>u", { desc = "Undo in Insert Mode" })
 -- Remap Ctrl+Z to Undo in Normal Mode
 map("n", "<C-z>", "u", { desc = "Undo" })
 
--- Move view up/down while keeping cursor position
-map("n", "<C-Up>", "<C-y>", opts)   -- Move view up
-map("n", "<C-Down>", "<C-e>", opts) -- Move view down
-
 -- Unbind default Alt-p and Alt-o
 pcall(vim.keymap.del, "n", "<A-p>")
 pcall(vim.keymap.del, "n", "<A-o>")
-
 -- ✅ Indent in Visual Mode (Fix: Keeps selection)
 map("v", "<A-o>", "<gv", { desc = "Unindent (Visual Mode)" }) -- Shift left and reselect
 map("v", "<A-p>", ">gv", { desc = "Indent (Visual Mode)" })   -- Shift right and reselect
@@ -192,3 +192,7 @@ map("n", "<C-M-Right>", "<cmd>wincmd L<CR>", opts) -- Move to right window
 
 -- Map <M-e> (Alt + e) to escape terminal mode
 map("t", "<M-e>", "<C-\\><C-N>", { desc = "terminal escape terminal mode" })
+
+-- Map <Alt-left/right> in insert mode to jump word
+map("i", "<M-Left>", "<C-o>b", { desc = "Move backward one word in insert mode" })
+map("i", "<M-Right>", "<C-o>w", { desc = "Move forward one word in insert mode" })
