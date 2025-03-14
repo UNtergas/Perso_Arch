@@ -2,7 +2,6 @@ require "nvchad.mappings"
 
 -- add yours here
 
-
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
@@ -43,38 +42,30 @@ map("n", "<C-v>", "<cmd>tabnew<CR>", { desc = "Open a New Tab" })
 map("n", "<leader>fs", telescope.lsp_workspace_symbols, { desc = "Find Symbols in Workspace" })
 map("n", "<C-t>", telescope.lsp_workspace_symbols, { desc = "Find Symbols in Workspace" })
 
--- NEO tree selection
+-- -- NEO tree selection
+-- --
+-- -- Toggle
+-- map("n", "<leader>e", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
+-- map("n", "<leader>o", "<cmd>Neotree focus<CR>", { desc = "Focus Neo-tree" })
 --
--- Toggle
-map("n", "<leader>e", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
-map("n", "<leader>o", "<cmd>Neotree focus<CR>", { desc = "Focus Neo-tree" })
+-- --  Toggle Neo-tree with C-n
+-- map("n", "<C-n>", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
+--
+--- end NEO tree
 
---  Toggle Neo-tree with C-n
-map("n", "<C-n>", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
 
 --  Escape Clear Search Highlights
 map("n", "<Esc>", function()
     vim.cmd("nohlsearch") -- Otherwise, clear search highlights
 end, opts)
 
+
+
 --  Bind <C-g> to Telescope Live Grep
 map("n", "<C-g>", telescope.live_grep, { desc = "Live Grep (Telescope)" })
 
 -- Bind <C-f> to search within the current buffer
 map("n", "<C-f>", telescope.current_buffer_fuzzy_find, { desc = "Find in Current Buffer (Telescope)" })
-
--- -- Mouse support: Open menu on right-click
--- vim.keymap.set({ "n", "v" }, "<RightMouse>", function()
---   require('menu.utils').delete_old_menus()
---
---   vim.cmd.exec '"normal! \\<RightMouse>"'
---
---   -- Determine the menu options based on buffer type
---   local buf = vim.api.nvim_win_get_buf(vim.fn.getmousepos().winid)
---   local options = vim.bo[buf].ft == "NvimTree" and "nvimtree" or "default"
---
---   require("menu").open(options, { mouse = true })
--- end, { desc = "Open menu on right-click" })
 
 -- Move view up/down while keeping cursor position
 map("n", "<C-Up>", "<C-y>", opts)   -- Move view up
@@ -126,16 +117,6 @@ map("n", "<leader>ft", "<cmd>TodoTelescope<CR>", opts)
 map("n", "]t", function() require("todo-comments").jump_next() end, opts)
 map("n", "[t", function() require("todo-comments").jump_prev() end, opts)
 
--- map("n", "<Esc>", function()
---   local api = require("nvim-tree.api")
---   if vim.bo.filetype == "NvimTree" then
---     api.tree.close()  -- Close NvimTree if inside
---   else
---     vim.cmd("nohlsearch") -- Otherwise, clear search highlights
---   end
--- end, opts)
-
-
 -- Code action keymap (Ctrl + .)
 map("n", "<A-.>", vim.lsp.buf.code_action, opts)
 map("v", "<A-.>", vim.lsp.buf.code_action, opts) -- Enable for visual mode too
@@ -174,9 +155,6 @@ map("n", "<C-A-k>", "<cmd>m .-2<CR>==", opts)
 map("n", "<C-A-j>", "<cmd>m .+1<CR>==", opts)
 map("v", "<C-A-k>", ":m '<-2<CR>gv=gv", opts)
 map("v", "<C-A-j>", ":m '>+1<CR>gv=gv", opts)
--- -- Toggle Symbols Outline with both Ctrl + Space and Leader + so
--- map("n", "<C-Space>", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
--- map("n", "<leader>so", ":SymbolsOutline<CR>", { desc = "Toggle outline symbol" }, opts)
 
 -- Vertical split with Ctrl + \
 map("n", "<C-\\>", "<cmd>vsplit<CR>", opts)

@@ -21,11 +21,6 @@ require("lazy").setup({
     branch = "v2.5",
     import = "nvchad.plugins",
   },
-
-  {
-    "nvim-tree/nvim-tree.lua",
-    enabled = false, -- Disable NvimTree
-  },
   {
     "tpope/vim-fugitive",
     lazy = false,
@@ -34,9 +29,14 @@ require("lazy").setup({
     "neovim/nvim-lspconfig",
     lazy = false, -- Ensure LSP loads immediately
   },
-  { "nvzone/minty", enabled = false, },
-  { "nvzone/volt" , enabled= false, },
   { "nvzone/menu" , enabled= false, },
+  {
+    "nvchad/base46",
+    lazy = true,
+    build = function()
+      require("base46").load_all_highlights()
+    end,
+  },
   { import = "plugins" },
 }, lazy_config)
 
@@ -48,13 +48,14 @@ dofile(vim.g.base46_cache .. "statusline")
 require "options"
 require "nvchad.autocmds"
 
-vim.cmd [[
-  highlight NeoTreeNormal guibg=#181b21
-  highlight NeoTreeNormalNC guibg=#181b21
-  highlight NeoTreeEndOfBuffer guibg=#181b21 guifg=#181b21
-]]
+-- vim.cmd [[
+--   highlight NeoTreeNormal guibg=#181b21
+--   highlight NeoTreeNormalNC guibg=#181b21
+--   highlight NeoTreeEndOfBuffer guibg=#181b21 guifg=#181b21
+-- ]]
 
 
+      -- Set winbar globally
 vim.schedule(function()
   require "mappings"
 end)
