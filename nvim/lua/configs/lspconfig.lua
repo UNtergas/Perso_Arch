@@ -21,7 +21,23 @@ local function custom_on_attach(client, bufnr)
 end
 
 -- LSP servers with nvim-navic support
-local servers = { "html", "cssls", "ts_ls", "rust_analyzer", "pyright" }
+local servers = {
+  -- Web Development
+  "html", "cssls", "ts_ls", "eslint",
+
+  -- Backend Development
+  "pyright", "jdtls", "clangd", "rust_analyzer", "gopls",
+
+  -- Shell & Scripting
+  "bashls", "jsonls", "yamlls", "dockerls", "graphql",
+
+  -- System Programming
+  "clangd", "cmake",
+
+  -- Markdown & Docs
+  "marksman", "ltex",
+}
+
 
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
