@@ -13,13 +13,13 @@ return{
   cmd = "Trouble",
   keys = {
     {
-      "<leader>dx",
-      "<cmd>Trouble diagnostics toggle<cr>",
+      "<leader>dd",
+      "<cmd>Trouble diagnostics toggle focus=true<cr>",
       desc = "Diagnostics (Trouble)",
     },
     {
-      "<leader>dX",
-      "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+      "<leader>dD",
+      "<cmd>Trouble diagnostics toggle focus=true filter.buf=0<cr>",
       desc = "Buffer Diagnostics (Trouble)",
     },
     {
