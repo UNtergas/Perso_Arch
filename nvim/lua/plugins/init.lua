@@ -13,25 +13,13 @@ return {
     end,
   },
 
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        -- Core Languages
-        "vim", "lua", "vimdoc",
-
-        -- Web Development
-        "html", "css", "javascript", "typescript", "tsx", "json",
-
-        -- Backend Languages
-        "python", "java", "c", "cpp", "rust", "go", "php",
-
-        -- Shell & Scripting
-        "bash", "fish", "yaml", "toml", "dockerfile", "graphql",
-
-        -- Markdown & Docs
-        "markdown", "markdown_inline",
-      },
-    },
-  }
+  -- {
+  -- 	"nvim-treesitter/nvim-treesitter",
+  -- 	opts = {
+  -- 		ensure_installed = {
+  -- 			"vim", "lua", "vimdoc",
+  --      "html", "css"
+  -- 		},
+  -- 	},
+  -- },
 }

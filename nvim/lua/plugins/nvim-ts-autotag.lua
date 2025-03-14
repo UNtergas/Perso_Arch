@@ -1,4 +1,3 @@
-
 return {
   {
     "windwp/nvim-ts-autotag",
@@ -23,3 +22,5 @@ return {
     end,
   },
 }
+
+

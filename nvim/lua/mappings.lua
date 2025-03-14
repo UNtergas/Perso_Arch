@@ -34,31 +34,18 @@ map("n", "<C-_>", "<cmd>Trouble lsp toggle focus=true win.position=bottom win.si
 
 -- 🚀 Bind Ctrl+V to open a new tab
 map("n", "<C-v>", "<cmd>tabnew<CR>", { desc = "Open a New Tab" })
-
 -- end 
+
 
 
 -- 🚀 Search Symbols in the Entire Workspace
 map("n", "<leader>fs", telescope.lsp_workspace_symbols, { desc = "Find Symbols in Workspace" })
 map("n", "<C-t>", telescope.lsp_workspace_symbols, { desc = "Find Symbols in Workspace" })
 
--- -- NEO tree selection
--- --
--- -- Toggle
--- map("n", "<leader>e", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
--- map("n", "<leader>o", "<cmd>Neotree focus<CR>", { desc = "Focus Neo-tree" })
---
--- --  Toggle Neo-tree with C-n
--- map("n", "<C-n>", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
---
---- end NEO tree
-
-
 --  Escape Clear Search Highlights
 map("n", "<Esc>", function()
     vim.cmd("nohlsearch") -- Otherwise, clear search highlights
 end, opts)
-
 
 
 --  Bind <C-g> to Telescope Live Grep
@@ -174,3 +161,4 @@ map("t", "<M-e>", "<C-\\><C-N>", { desc = "terminal escape terminal mode" })
 -- Map <Alt-left/right> in insert mode to jump word
 map("i", "<M-d>", "<Esc>ea", { desc = "Move forward one word in insert mode" })
 map("i", "<M-a>", "<Esc>bi", { desc = "Move backward one word in insert mode" })
+

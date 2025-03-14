@@ -26,20 +26,12 @@ require("lazy").setup({
     lazy = false,
   },
   {
-    "neovim/nvim-lspconfig",
-    lazy = false, -- Ensure LSP loads immediately
-  },
-  { "nvzone/menu" , enabled= false, },
-  {
-    "nvchad/base46",
-    lazy = true,
-    build = function()
-      require("base46").load_all_highlights()
-    end,
+    "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
+    enabled = false,
   },
   { import = "plugins" },
 }, lazy_config)
-
 
 -- load theme
 dofile(vim.g.base46_cache .. "defaults")
@@ -48,14 +40,6 @@ dofile(vim.g.base46_cache .. "statusline")
 require "options"
 require "nvchad.autocmds"
 
--- vim.cmd [[
---   highlight NeoTreeNormal guibg=#181b21
---   highlight NeoTreeNormalNC guibg=#181b21
---   highlight NeoTreeEndOfBuffer guibg=#181b21 guifg=#181b21
--- ]]
-
-
-      -- Set winbar globally
 vim.schedule(function()
   require "mappings"
 end)

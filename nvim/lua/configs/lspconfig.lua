@@ -23,7 +23,7 @@ end
 -- LSP servers with nvim-navic support
 local servers = {
   -- Web Development
-  "html", "cssls", "ts_ls", "eslint",
+  "html", "cssls", "ts_ls",
 
   -- Backend Development
   "pyright", "jdtls", "clangd", "rust_analyzer", "gopls",
@@ -35,9 +35,8 @@ local servers = {
   "clangd", "cmake",
 
   -- Markdown & Docs
-  "marksman", "ltex",
+  "marksman",
 }
-
 
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
@@ -53,3 +52,4 @@ end
 --   on_init = nvlsp.on_init,
 --   capabilities = nvlsp.capabilities,
 -- }
+
