@@ -36,15 +36,13 @@ end, { desc = "View File History and Open with Gedit" })
 -- 🚀 Bind Ctrl+Space to Toggle Trouble Document Symbols
 map("n", "<C-Space>", "<cmd>Trouble symbols toggle focus=true<CR>", { desc = "Toggle Trouble Symbols" })
 
-map("n", "M-/","<cmd>Trouble diagnostics toggle focus=true filter.buf=0<cr>", {desc ="Toggle Buffer Diagnostics"})
+map("n", "<A-/>","<cmd>Trouble diagnostics toggle focus=true filter.buf=0<cr>", {desc ="Toggle Buffer Diagnostics"})
 -- 🚀 Bind Ctrl+/ to Toggle Trouble LSP References
 map("n", "<C-_>", "<cmd>Trouble lsp toggle focus=true win.position=bottom win.size= 0.35 <CR>", { desc = "Toggle Trouble LSP References" })
 
 -- 🚀 Bind Ctrl+V to open a new tab
 map("n", "<C-v>", "<cmd>tabnew<CR>", { desc = "Open a New Tab" })
 -- end 
-
-
 
 -- 🚀 Search Symbols in the Entire Workspace
 map("n", "<leader>fs", telescope.lsp_workspace_symbols, { desc = "Find Symbols in Workspace" })
