@@ -22,6 +22,10 @@ require("lazy").setup({
     import = "nvchad.plugins",
   },
   {
+    "nvim-tree/nvim-tree.lua",
+    enabled = false,
+  },
+  {
     "tpope/vim-fugitive",
     lazy = false,
   },
