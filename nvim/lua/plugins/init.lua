@@ -18,7 +18,8 @@ return {
   	opts = {
     ensure_installed = {
         "lua", "javascript", "typescript", "python", "go", "rust",
-        "bash", "json", "yaml", "html", "css", "scss", "tsx", "c", "cpp"
+        "bash", "json", "yaml", "html", "css", "scss", "tsx", "c", "cpp",
+        "markdown", "markdown_inline",
         }, -- Add more languages as needed
   	},
   },

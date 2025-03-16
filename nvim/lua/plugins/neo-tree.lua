@@ -1,4 +1,3 @@
-
 return {
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -19,6 +18,12 @@ return {
           auto_expand_width = false, -- 🔄 Disable auto-expanding width
         },
         filesystem = {
+          filtered_items = {
+            visible = false, -- Show hidden files
+            show_hidden_count = true,
+            hide_dotfiles = false, -- Do not hide dotfiles (e.g., .gitignore)
+            hide_gitignored = true, -- Show files ignored by .gitignore
+          },
           bind_to_cwd = true,           -- 🗂 Keep bound to current working directory
           follow_current_file = {
             enabled = false,           -- 🚫 Don't auto-focus opened file in tree
