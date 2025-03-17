@@ -26,6 +26,10 @@ require("lazy").setup({
     enabled = false,
   },
   {
+    "sindrets/diffview.nvim",
+    lazy = false,
+  },
+  {
     "tpope/vim-fugitive",
     lazy = false,
   },
