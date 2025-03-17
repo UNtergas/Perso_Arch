@@ -14,7 +14,7 @@ map("n", "<C-n>", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
 
 
 -- Git: Show file history in command line
-map("n", "<leader>gh", "<cmd>G log --follow %<CR>", { desc = "Git File History (Command Line)" })
+map("n", "<leader>gh", "<cmd>DiffviewFileHistory %<CR>", { desc = "Git File History (Diffview)" })
 
 -- Git: Show file history in a popup and open with Gedit
 map("n", "<leader>gf", function()
