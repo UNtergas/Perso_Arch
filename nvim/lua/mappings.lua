@@ -5,6 +5,9 @@ require "nvchad.mappings"
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
+
+
+
 ------- NEO tree selection
 -- Toggle
 map("n", "<leader>e", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })

@@ -45,12 +45,18 @@ require("lazy").setup({
 dofile(vim.g.base46_cache .. "defaults")
 dofile(vim.g.base46_cache .. "statusline")
 
+
 require "options"
 require "nvchad.autocmds"
+
 
 vim.schedule(function()
   require "mappings"
 end)
+
+-- relative line number by default
+vim.opt.number = true
+vim.opt.relativenumber = true
 
 
 
