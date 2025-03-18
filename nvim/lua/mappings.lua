@@ -39,10 +39,13 @@ map("n", "<C-Space>", "<cmd>Trouble symbols toggle focus=true<CR>", { desc = "To
 map("n", "<A-/>","<cmd>Trouble diagnostics toggle focus=true filter.buf=0<cr>", {desc ="Toggle Buffer Diagnostics"})
 -- 🚀 Bind Ctrl+/ to Toggle Trouble LSP References
 map("n", "<C-_>", "<cmd>Trouble lsp toggle focus=true win.position=bottom win.size= 0.35 <CR>", { desc = "Toggle Trouble LSP References" })
-
--- 🚀 Bind Ctrl+V to open a new tab
-map("n", "<C-v>", "<cmd>tabnew<CR>", { desc = "Open a New Tab" })
 -- end 
+
+
+-- 🚀 Bind shift-alt-t to open a new terminal in new tab
+map("n", "<S-A-t>", "<cmd>tabnew | terminal<CR>", { desc = "Open Terminal in a New Tab" })
+-- 🚀 Bind alt-t to open a new tab
+map("n", "<A-v>", "<cmd>tabnew<CR>", { desc = "Open a New Tab" })
 
 -- 🚀 Search Symbols in the Entire Workspace
 map("n", "<leader>fs", telescope.lsp_workspace_symbols, { desc = "Find Symbols in Workspace" })

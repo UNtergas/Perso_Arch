@@ -8,7 +8,7 @@ return{
       require'treesitter-context'.setup{
         enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
         line_numbers = true,
-        max_lines = 3,
+        max_lines = 5,
         trim_scope ='inner'
       }
       vim.keymap.set("n", "[c", function()
