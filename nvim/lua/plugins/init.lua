@@ -23,4 +23,17 @@ return {
         }, -- Add more languages as needed
   	},
   },
+
+  {
+    'williamboman/mason.nvim',
+    opts = {
+      ensure_installed = {
+        'lua-language-server',
+        'ast-grep',
+        'eslint-lsp',
+        'prettier',
+        'typescript-language-server',
+      },
+    },
+  },
 }

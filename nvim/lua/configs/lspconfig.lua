@@ -22,6 +22,8 @@ end
 
 -- LSP servers with nvim-navic support
 local servers = {
+  -- Linting
+  "eslint",
   -- Web Development
   "html", "cssls", "ts_ls",
 
