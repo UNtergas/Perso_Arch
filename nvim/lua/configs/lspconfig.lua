@@ -15,8 +15,6 @@ local function custom_on_attach(client, bufnr)
   if client.server_capabilities.documentSymbolProvider then
     navic.attach(client, bufnr)
     print("nvim-navic attached!") -- Debugging output
-  else
-    print("nvim-navic not available for this LSP")
   end
 end
 
