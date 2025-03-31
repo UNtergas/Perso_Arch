@@ -8,14 +8,14 @@ local M = {}
 M.base46 = {
 	theme = "doomchad",
 
-  changed_themes = {
-      onedark = {
-         base_16 = { base00 = "#202020" },
-      },
-      doomchad = {
-         base_16 = { base00 = "#202020" },
-      },
-   },
+  -- changed_themes = {
+  --     onedark = {
+  --        base_16 = { base00 = "#202020" },
+  --     },
+  --     doomchad = {
+  --        base_16 = { base00 = "#202020" },
+  --     },
+  --  },
 	-- hl_override = {
 	-- 	Comment = { italic = true },
 	-- 	["@comment"] = { italic = true },
@@ -39,5 +39,9 @@ M.ui = {
 --}
 M.colorify ={
   enabled = not vim.g.vscode,
+}
+
+M.lsp = {
+   signature = false,
 }
 return M

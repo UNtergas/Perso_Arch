@@ -2,6 +2,7 @@ return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     lazy = false,
+    enabled =  false,
     branch = "v3.x",
     dependencies = {
       "nvim-lua/plenary.nvim",
@@ -28,7 +29,6 @@ return {
           follow_current_file = {
             enabled = false,           -- 🚫 Don't auto-focus opened file in tree
           },
-          hijack_netrw_behavior = "open_default", -- 📂 Optional: open in place of netrw
           use_libuv_file_watcher = true,
         },
         event_handlers = {

@@ -22,12 +22,32 @@ require("lazy").setup({
     import = "nvchad.plugins",
   },
   {
-    "nvim-tree/nvim-tree.lua",
-    enabled = false,
+    "artemave/workspace-diagnostics.nvim",
+    event = "LspAttach",
+    config = function()
+      require("workspace-diagnostics").setup()
+    end,
   },
   {
     "sindrets/diffview.nvim",
     lazy = false,
+    config = function()
+      require("diffview").setup({
+        view = {
+          merge_tool = {
+            layout = "diff3_mixed",
+          },
+        },
+      })
+
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'GitConflictDetected',
+        callback = function()
+          vim.notify('Conflict detected in file '..vim.api.nvim_buf_get_name(0))
+          vim.cmd('LspStop')
+        end
+      })
+    end,
   },
   {
     "tpope/vim-fugitive",

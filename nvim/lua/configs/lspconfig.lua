@@ -14,7 +14,6 @@ local function custom_on_attach(client, bufnr)
   -- Attach nvim-navic if the server supports document symbols
   if client.server_capabilities.documentSymbolProvider then
     navic.attach(client, bufnr)
-    print("nvim-navic attached!") -- Debugging output
   end
 end
 

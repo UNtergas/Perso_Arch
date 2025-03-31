@@ -7,13 +7,14 @@ local opts = { noremap = true, silent = true }
 local telescope = require("telescope.builtin")
 
 
-
-------- NEO tree selection
--- Toggle
-map("n", "<leader>e", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
-map("n", "<leader>o", "<cmd>Neotree focus<CR>", { desc = "Focus Neo-tree" })
---  Toggle Neo-tree with C-n
-map("n", "<C-n>", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
+-- Disable Ctrl+x in terminal mode
+map("t", "<C-x>", "<Nop>", { desc = "Disable Ctrl+x in terminal" })
+-- ------- NEO tree selection
+-- -- Toggle
+-- map("n", "<leader>e", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
+-- map("n", "<leader>o", "<cmd>Neotree focus<CR>", { desc = "Focus Neo-tree" })
+-- --  Toggle Neo-tree with C-n
+-- map("n", "<C-n>", "<cmd>Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
 
 
 -- Git: Show file history in command line
