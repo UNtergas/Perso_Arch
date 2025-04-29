@@ -1,7 +1,7 @@
 return{
   {
     "akinsho/git-conflict.nvim",
-    enabled = false,
+    enabled = not vim.g.vscode,
     lazy = false,
     version = "*",
     config = function()

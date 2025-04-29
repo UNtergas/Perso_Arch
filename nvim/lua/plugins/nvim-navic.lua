@@ -2,6 +2,7 @@ return{
   {
     "SmiteshP/nvim-navic",
     dependencies = "neovim/nvim-lspconfig",
+    enabled = true,
     config = function()
       local navic = require("nvim-navic")
       navic.setup {

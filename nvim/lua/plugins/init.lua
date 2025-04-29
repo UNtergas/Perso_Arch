@@ -15,6 +15,7 @@ return {
 
   {
   	"nvim-treesitter/nvim-treesitter",
+    enabled= true,
   	opts = {
     ensure_installed = {
         "lua", "javascript", "typescript", "python", "go", "rust",

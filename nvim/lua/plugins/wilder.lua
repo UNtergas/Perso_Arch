@@ -1,6 +1,7 @@
 return{
   {
   "gelguy/wilder.nvim",
+  enabled = not vim.g.vscode,
   event = "CmdlineEnter",
   dependencies = { "romgrk/fzy-lua-native" },
   config = function()
