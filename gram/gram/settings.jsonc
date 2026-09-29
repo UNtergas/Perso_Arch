@@ -7,6 +7,15 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "smooth_scroll": {
+    "enabled": true
+  },
+  "status_bar": {
+    "active_file": false,
+    "icon_size": "large",
+    "position": "top",
+    "show": true
+  },
   "sticky_scroll": {
     "enabled": true
   },
@@ -17,6 +26,48 @@
     "allow_npm_install": true,
   },
   "lsp": {
+    "dockerfile-language-server": {
+      "binary": {
+        "enable_auto_updates": true,
+        "allow_binary_download": true
+      },
+      "enable_lsp_tasks": true
+    },
+    "bash-language-server": {
+      "binary": {
+        "enable_auto_updates": true,
+        "allow_binary_download": true
+      },
+      "enable_lsp_tasks": true
+    },
+    "docker-language-server": {
+      "binary": {
+        "enable_auto_updates": true,
+        "allow_binary_download": true
+      },
+      "enable_lsp_tasks": true
+    },
+    "yaml-language-server": {
+      "binary": {
+        "enable_auto_updates": true,
+        "allow_binary_download": true
+      },
+      "enable_lsp_tasks": true
+    },
+    "prettier (CONSO-side-sdk)": {
+      "binary": {
+        "enable_auto_updates": true,
+        "allow_binary_download": true
+      },
+      "enable_lsp_tasks": true
+    },
+    "package-version-server": {
+      "binary": {
+        "enable_auto_updates": true,
+        "allow_binary_download": true
+      },
+      "enable_lsp_tasks": true
+    },
     "prettier (default)": {
       "binary": {
         "enable_auto_updates": true,
@@ -128,9 +179,10 @@
     "file_icons": true,
   },
   "title_bar": {
+    "show_branch_icon": true,
     "show": false,
     "show_menus": false,
-    "show_project_items": false,
+    "show_project_items": true,
     "show_onboarding_banner": false,
     "show_user_picture": false,
     "show_branch_name": true,
@@ -138,7 +190,7 @@
   "proxy": "",
   "icon_theme": {
     "mode": "light",
-    "light": "VSCode Icons for Zed (Light Official Icons)",
+    "light": "VSCode Icons for Zed (Light)",
     "dark": "VSCode Icons for Zed (Dark)",
   },
   "project_panel": {
