@@ -1,0 +1,137 @@
+// Gram keymap
+// Docs: https://gram-editor.com/docs/key-bindings/
+// Open: gram::OpenKeymapFile
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      // "shift shift": "file_finder::Toggle"
+    },
+  },
+  {
+    "context": "Editor && vim_mode == insert",
+    "bindings": {
+      // "j k": "vim::NormalBefore"
+    },
+  },
+
+  // --- nulls first (order matters: later binding wins at same node) ---
+  {
+    "bindings": {
+      "ctrl-q": null, // also kills vim ctrl-q visual block
+    },
+  },
+  {
+    "context": "Pane",
+    "bindings": {
+      "ctrl-w": null, // frees ctrl-w ctrl-w chord, no 1s wait
+      "ctrl-f4": null,
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-w": null,
+    },
+  },
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "ctrl-d": null,
+    },
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-alt-shift-right": null,
+      "ctrl-alt-shift-left": null,
+    },
+  },
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      "g w": null,
+    },
+  },
+
+  // --- new file / project panel ---
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-alt-shift-n": "workspace::NewFile",
+    },
+  },
+  {
+    "context": "Welcome",
+    "bindings": {
+      "ctrl-alt-shift-n": "workspace::NewFile",
+    },
+  },
+  {
+    // no context = wins everywhere, old ctrl-n unbinds not needed
+    "bindings": {
+      "ctrl-n": "project_panel::Toggle",
+    },
+  },
+
+  // --- pane nav (no context beats Editor subword defaults) ---
+  {
+    "bindings": {
+      "ctrl-alt-up": "workspace::ActivatePaneUp",
+    },
+  },
+  {
+    "bindings": {
+      "ctrl-alt-down": "workspace::ActivatePaneDown",
+    },
+  },
+  {
+    "bindings": {
+      "ctrl-alt-left": "workspace::ActivatePaneLeft",
+    },
+  },
+  {
+    "bindings": {
+      "ctrl-alt-right": "workspace::ActivatePaneRight",
+    },
+  },
+
+  // --- close item chord ---
+  {
+    "context": "Pane",
+    "bindings": {
+      "ctrl-w ctrl-w": ["pane::CloseActiveItem", { "close_pinned": false }],
+    },
+  },
+  {
+    // vim editor node deeper than Pane → needs own binding, null would block
+    "context": "VimControl && !menu",
+    "bindings": {
+      "ctrl-w ctrl-w": ["pane::CloseActiveItem", { "close_pinned": false }],
+      "ctrl-t": "project_symbols::Toggle", // fall-through for old GoToOlderTag unbind
+      "ctrl-f": "buffer_search::Deploy", // fall-through for old vim PageDown unbind
+    },
+  },
+
+  // --- insert / visual / replace clipboard ---
+  {
+    "context": "vim_mode == insert",
+    "bindings": {
+      "ctrl-v": "editor::Paste",
+      "ctrl-c": "vim::Yank",
+    },
+  },
+  {
+    // old unbind let Copy fall through; rebind to mimic
+    "context": "vim_mode == visual || vim_mode == helix_select",
+    "bindings": {
+      "ctrl-c": "editor::Copy",
+    },
+  },
+  {
+    "context": "vim_mode == replace",
+    "bindings": {
+      "ctrl-c": "editor::Copy",
+    },
+  },
+]
