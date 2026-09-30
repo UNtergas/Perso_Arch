@@ -134,4 +134,37 @@
       "ctrl-c": "editor::Copy",
     },
   },
+  {
+    "context": "(showing_completions || showing_code_actions)",
+    "bindings": {
+      "ctrl-d": null,
+    },
+  },
+  {
+    "context": "(VimControl && !menu)",
+    "bindings": {
+      "ctrl-d": null,
+    },
+  },
+  {
+    "bindings": {
+      "alt-p": "editor::Indent",
+    },
+  },
+  {
+    "bindings": {
+      "alt-o": "editor::Outdent",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-b": null,
+    },
+  },
+  {
+    "bindings": {
+      "ctrl-b": "workspace::ToggleRightDock",
+    },
+  },
 ]
