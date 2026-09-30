@@ -1,0 +1,282 @@
+{
+  "extensions": {
+    "dockerfile": {
+      "path": "/home/toaster/.local/share/gram/extensions/installed/dockerfile",
+      "manifest": {
+        "id": "dockerfile",
+        "name": "Dockerfile",
+        "version": "0.3.0",
+        "schema_version": 1,
+        "description": "Dockerfile and Docker Compose support.",
+        "repository": "https://github.com/zed-extensions/dockerfile",
+        "authors": [
+          "d1y <chenhonzho@gmail.com>",
+          "joshmeads <github@joshmeads.com>"
+        ],
+        "lib": {
+          "kind": "Rust",
+          "version": null
+        },
+        "themes": [],
+        "icon_themes": [],
+        "languages": [
+          "languages/dockerfile",
+          "languages/docker-compose"
+        ],
+        "grammars": {
+          "dockerfile": {
+            "repository": "https://github.com/camdencheek/tree-sitter-dockerfile",
+            "rev": "868e44ce378deb68aac902a9db68ff82d2299dd0",
+            "path": null
+          },
+          "yaml": {
+            "repository": "https://github.com/zed-industries/tree-sitter-yaml",
+            "rev": "baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a",
+            "path": null
+          }
+        },
+        "language_servers": {
+          "docker-language-server": {
+            "language": "Dockerfile",
+            "languages": [
+              "Dockerfile",
+              "Docker Compose"
+            ],
+            "language_ids": {
+              "Docker Compose": "dockercompose",
+              "Dockerfile": "dockerfile"
+            },
+            "code_action_kinds": null
+          },
+          "dockerfile-language-server": {
+            "language": "Dockerfile",
+            "languages": [],
+            "language_ids": {},
+            "code_action_kinds": null
+          }
+        },
+        "snippets": null,
+        "capabilities": [],
+        "debug_adapters": {
+          "buildx-dockerfile": {
+            "schema_path": "./debug_adapter_schemas/buildx-dockerfile.json"
+          }
+        }
+      },
+      "dev": false
+    },
+    "github-actions": {
+      "path": "/home/toaster/.local/share/gram/extensions/installed/github-actions",
+      "manifest": {
+        "id": "github-actions",
+        "name": "GitHub Actions",
+        "version": "0.0.1",
+        "schema_version": 1,
+        "description": "GitHub Actions LSP support for Zed.",
+        "repository": "https://github.com/neoncitylights/zed-github-actions",
+        "authors": [
+          "Samantha Nguyen <contact@samanthanguyen.me>"
+        ],
+        "lib": {
+          "kind": "Rust",
+          "version": null
+        },
+        "themes": [],
+        "icon_themes": [],
+        "languages": [
+          "languages/github_actions"
+        ],
+        "grammars": {
+          "yaml": {
+            "repository": "https://github.com/zed-industries/tree-sitter-yaml",
+            "rev": "baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a",
+            "path": null
+          }
+        },
+        "language_servers": {
+          "gh-actions-language-server": {
+            "language": null,
+            "languages": [
+              "GitHub Actions"
+            ],
+            "language_ids": {},
+            "code_action_kinds": null
+          }
+        },
+        "snippets": null,
+        "capabilities": []
+      },
+      "dev": false
+    },
+    "github-theme": {
+      "path": "/home/toaster/.local/share/gram/extensions/installed/github-theme",
+      "manifest": {
+        "id": "github-theme",
+        "name": "Github Theme",
+        "version": "0.1.9",
+        "schema_version": 1,
+        "description": "GitHub themes for Zed",
+        "repository": "https://github.com/PyaeSoneAungRgn/github-zed-theme",
+        "authors": [
+          "Pyae Sone Aung <pyaesoneaungrgn@gmail.com>",
+          "Clay Tercek"
+        ],
+        "lib": {
+          "kind": null,
+          "version": null
+        },
+        "themes": [
+          "themes/github_theme.json"
+        ],
+        "icon_themes": [],
+        "languages": [],
+        "grammars": {},
+        "language_servers": {},
+        "snippets": null,
+        "capabilities": []
+      },
+      "dev": false
+    },
+    "vscode-icons": {
+      "path": "/home/toaster/.local/share/gram/extensions/installed/vscode-icons",
+      "manifest": {
+        "id": "vscode-icons",
+        "name": "VSCode Icons",
+        "version": "12.19.0",
+        "schema_version": 1,
+        "description": "Original vscode-icons, reimagined for Zed",
+        "repository": "https://github.com/vscode-icons/vscode-icons-zed",
+        "authors": [
+          "Roberto Huertas <roberto.huertas@outlook.com>"
+        ],
+        "lib": {
+          "kind": null,
+          "version": null
+        },
+        "themes": [],
+        "icon_themes": [
+          "icon_themes/vsicons-icon-theme-zed.json"
+        ],
+        "languages": [],
+        "grammars": {},
+        "language_servers": {},
+        "snippets": null,
+        "capabilities": []
+      },
+      "dev": false
+    }
+  },
+  "themes": {
+    "GitHub Dark": {
+      "extension": "github-theme",
+      "path": "themes/github_theme.json"
+    },
+    "GitHub Dark Colorblind": {
+      "extension": "github-theme",
+      "path": "themes/github_theme.json"
+    },
+    "GitHub Dark Dimmed": {
+      "extension": "github-theme",
+      "path": "themes/github_theme.json"
+    },
+    "GitHub Dark High Contrast": {
+      "extension": "github-theme",
+      "path": "themes/github_theme.json"
+    },
+    "GitHub Dark Tritanopia": {
+      "extension": "github-theme",
+      "path": "themes/github_theme.json"
+    },
+    "GitHub Light": {
+      "extension": "github-theme",
+      "path": "themes/github_theme.json"
+    },
+    "GitHub Light Colorblind": {
+      "extension": "github-theme",
+      "path": "themes/github_theme.json"
+    },
+    "GitHub Light High Contrast": {
+      "extension": "github-theme",
+      "path": "themes/github_theme.json"
+    },
+    "GitHub Light Tritanopia": {
+      "extension": "github-theme",
+      "path": "themes/github_theme.json"
+    }
+  },
+  "icon_themes": {
+    "VSCode Icons for Zed (Dark Angular)": {
+      "extension": "vscode-icons",
+      "path": "icon_themes/vsicons-icon-theme-zed.json"
+    },
+    "VSCode Icons for Zed (Dark NestJS)": {
+      "extension": "vscode-icons",
+      "path": "icon_themes/vsicons-icon-theme-zed.json"
+    },
+    "VSCode Icons for Zed (Dark Official Icons)": {
+      "extension": "vscode-icons",
+      "path": "icon_themes/vsicons-icon-theme-zed.json"
+    },
+    "VSCode Icons for Zed (Dark)": {
+      "extension": "vscode-icons",
+      "path": "icon_themes/vsicons-icon-theme-zed.json"
+    },
+    "VSCode Icons for Zed (Light Angular)": {
+      "extension": "vscode-icons",
+      "path": "icon_themes/vsicons-icon-theme-zed.json"
+    },
+    "VSCode Icons for Zed (Light NestJS)": {
+      "extension": "vscode-icons",
+      "path": "icon_themes/vsicons-icon-theme-zed.json"
+    },
+    "VSCode Icons for Zed (Light Official Icons)": {
+      "extension": "vscode-icons",
+      "path": "icon_themes/vsicons-icon-theme-zed.json"
+    },
+    "VSCode Icons for Zed (Light)": {
+      "extension": "vscode-icons",
+      "path": "icon_themes/vsicons-icon-theme-zed.json"
+    }
+  },
+  "languages": {
+    "Docker Compose": {
+      "extension": "dockerfile",
+      "path": "languages/docker-compose",
+      "matcher": {
+        "path_suffixes": [
+          "docker-compose.yml",
+          "docker-compose.yaml",
+          "compose.yaml",
+          "compose.yml"
+        ],
+        "first_line_pattern": null
+      },
+      "hidden": false,
+      "grammar": "yaml"
+    },
+    "Dockerfile": {
+      "extension": "dockerfile",
+      "path": "languages/dockerfile",
+      "matcher": {
+        "path_suffixes": [
+          "Dockerfile",
+          "Containerfile",
+          "dockerfile"
+        ],
+        "first_line_pattern": null
+      },
+      "hidden": false,
+      "grammar": "dockerfile"
+    },
+    "GitHub Actions": {
+      "extension": "github-actions",
+      "path": "languages/github_actions",
+      "matcher": {
+        "path_suffixes": [],
+        "first_line_pattern": null
+      },
+      "hidden": false,
+      "grammar": "yaml"
+    }
+  }
+}

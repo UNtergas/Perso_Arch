@@ -8,16 +8,16 @@
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
   "smooth_scroll": {
-    "enabled": true
+    "enabled": true,
   },
   "status_bar": {
     "active_file": false,
     "icon_size": "large",
     "position": "top",
-    "show": true
+    "show": true,
   },
   "sticky_scroll": {
-    "enabled": true
+    "enabled": true,
   },
   "soft_wrap": "editor_width",
   "node": {
@@ -26,47 +26,48 @@
     "allow_npm_install": true,
   },
   "lsp": {
-    "dockerfile-language-server": {
+    "vscode-css-language-server": {
       "binary": {
+        "ignore_system_version": false,
         "enable_auto_updates": true,
         "allow_binary_download": true
       },
       "enable_lsp_tasks": true
+    },
+    "dockerfile-language-server": {
+      "binary": {
+        "enable_auto_updates": true,
+        "allow_binary_download": true,
+      },
+      "enable_lsp_tasks": true,
     },
     "bash-language-server": {
       "binary": {
         "enable_auto_updates": true,
-        "allow_binary_download": true
+        "allow_binary_download": true,
       },
-      "enable_lsp_tasks": true
+      "enable_lsp_tasks": true,
     },
     "docker-language-server": {
       "binary": {
         "enable_auto_updates": true,
-        "allow_binary_download": true
+        "allow_binary_download": true,
       },
-      "enable_lsp_tasks": true
+      "enable_lsp_tasks": true,
     },
     "yaml-language-server": {
       "binary": {
         "enable_auto_updates": true,
-        "allow_binary_download": true
+        "allow_binary_download": true,
       },
-      "enable_lsp_tasks": true
-    },
-    "prettier (CONSO-side-sdk)": {
-      "binary": {
-        "enable_auto_updates": true,
-        "allow_binary_download": true
-      },
-      "enable_lsp_tasks": true
+      "enable_lsp_tasks": true,
     },
     "package-version-server": {
       "binary": {
         "enable_auto_updates": true,
-        "allow_binary_download": true
+        "allow_binary_download": true,
       },
-      "enable_lsp_tasks": true
+      "enable_lsp_tasks": true,
     },
     "prettier (default)": {
       "binary": {
@@ -151,9 +152,9 @@
       "breadcrumbs": true,
     },
     "scroll_multiplier": 2.0,
-    "font_size": 14.0,
+    "font_size": 13.5,
     "default_height": 700.0,
-    "default_width": 2000.0,
+    "default_width": 1200.0,
     "dock": "right",
   },
   "diagnostics": {
@@ -167,7 +168,7 @@
   },
   "tab_bar": {
     "show_nav_history_buttons": false,
-    "show_tab_bar_buttons": false,
+    "show_tab_bar_buttons": true,
     "show": true,
   },
   "use_system_window_tabs": false,
@@ -190,7 +191,7 @@
   "proxy": "",
   "icon_theme": {
     "mode": "light",
-    "light": "VSCode Icons for Zed (Light)",
+    "light": "Gram (Default)",
     "dark": "VSCode Icons for Zed (Dark)",
   },
   "project_panel": {
@@ -216,7 +217,7 @@
   "buffer_font_size": 14.0,
   "theme": {
     "mode": "light",
-    "light": "GitHub Light",
+    "light": "One Light",
     "dark": "Zedokai Darker (Filter Machine)",
   },
 }
