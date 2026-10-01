@@ -1,0 +1,124 @@
+{
+  "window.menuBarVisibility": "toggle",
+  "workbench.layoutControl.enabled": false,
+  "workbench.browser.showInTitleBar": false,
+  "chat.titleBar.openInAgentsWindow.enabled": false,
+  "chat.titleBar.signIn.enabled": false,
+  "editor.tabSize": 2,
+  "editor.lineNumbers": "relative",
+  "window.titleBarStyle": "native",
+  "window.menuStyle": "custom",
+  "workbench.notifications.showInTitleBar": false,
+  "workbench.navigationControl.enabled": false,
+  "window.commandCenter": false,
+  "update.titleBar": false,
+
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "workbench.activityBar.compact": true,
+  "editor.minimap.enabled": false,
+  "editor.stickyScroll.enabled": true,
+  "editor.scrollbar.vertical": "visible",
+  "workbench.editor.highlightModifiedTabs": true,
+  "workbench.editor.tabSizingFixedMaxWidth": 80,
+  "breadcrumbs.filePath": "off",
+  "editor.fontFamily": "FiraCode Nerd Font Mono",
+  "editor.codeLensFontFamily": "FiraCode Nerd Font",
+  "editor.inlayHints.fontFamily": "FiraCode Nerd Font",
+  "editor.inlineSuggest.fontFamily": "FiraCode Nerd Font",
+  "debug.console.fontFamily": "FiraCode Nerd Font Mono",
+  "scm.inputFontFamily": "FiraCode Nerd Font",
+  "notebook.output.fontFamily": "FiraCode Nerd Font",
+  "chat.editor.fontFamily": "FiraCode Nerd Font",
+  "errorLens.statusBarIconsEnabled": true,
+  "breadcrumbs.enabled": false,
+  "editor.fontLigatures": true,
+  "workbench.tree.indent": 12,
+  "workbench.tree.renderIndentGuides": "always",
+  "workbench.commandPalette.history": 20,
+  "workbench.editor.tabActionCloseVisibility": false,
+  "workbench.editor.pinnedTabsOnSeparateRow": true,
+  "workbench.editor.editorActionsLocation": "hidden",
+  "workbench.editor.showTabIndex": true,
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1
+  },
+  "workbench.startupEditor": "none",
+  "workbench.editor.wrapTabs": true,
+  
+  "editor.glyphMargin": false,
+  "editor.showFoldingControls": "always",
+  "workbench.editor.doubleClickTabToToggleEditorGroupSizes": "off",
+  "workbench.sideBar.location": "right",
+  "workbench.editor.empty.hint": "hidden",
+  "workbench.colorTheme": "Alabaster",
+  "workbench.enableExperiments": false,
+  "telemetry.telemetryLevel": "off",
+  "workbench.activityBar.location": "hidden",
+  "markdown-preview-enhanced.previewTheme": "github-light.css",
+  "markdown-preview-enhanced.enablePreviewZenMode": false,
+  "tinymist.exportPdf": "onSave",
+  "workbench.browser.searchEngine": "duckduckgo",
+  "workbench.browser.openLocalhostLinks": true,
+  //Add following lines of code to exclude the files & folders which aren't important for watchers to look for changes...
+  //exludes fies & folders in search indexing
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+  },
+  //exludes fies & folders for watcher service
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/env/**": true,
+    "**/venv/**": true,
+    "env-*": true
+  },
+  "explorer.confirmPasteNative": false,
+  "python.analysis.typeCheckingMode": "basic",
+  "window.customTitleBarVisibility": "never",
+  "terminal.integrated.fontFamily": "FiraCode Nerd Font",
+  "editor.guides.highlightActiveIndentation": "always",
+  "editor.tokenColorCustomizations": {},
+  "editor.fontWeight": "450",
+  "editor.fontSize": 13.5,
+  "markdown-preview-enhanced.revealjsTheme": "vscode.css",
+  "workbench.editor.tabSizing": "shrink",
+  "terminal.integrated.fontSize": 13,
+  "python.analysis.autoImportCompletions": true,   // ← the key one; often defaults off
+  "python.analysis.indexing": true,                 // must be on for it to know your symbols
+  "python.terminal.useEnvFile": true,
+  "explorer.confirmDragAndDrop": false,
+  "markdown-preview-enhanced.plantumlJarPath": "/usr/share/plantuml/plantuml.jar",
+  "vim.easymotion": true,
+  "vim.useSystemClipboard": true,
+  "vim.leader": "<space>",
+
+  // flash-like look: dim backdrop, bright labels
+  "vim.easymotionDimBackground": true,
+  "vim.easymotionMarkerFontWeight": "bold",
+  "vim.easymotionIncSearchForegroundColor": "#c53b53",
+  // home-row labels, flash order
+  "vim.easymotionKeys": "asdfghjklqwertyuiopzxcvbnm",
+
+  // s / S -> n-char incremental search w/ labels (closest to flash)
+  "vim.normalModeKeyBindingsNonRecursive": [
+    { "before": ["s"], "after": ["<leader>", "<leader>", "/"] },
+    {
+      "before": ["]", "d"],
+      "commands": ["editor.action.marker.next"]
+    },
+    {
+      "before": ["[", "d"],
+      "commands": ["editor.action.marker.prev"]
+    }
+  ],
+  "vim.visualModeKeyBindingsNonRecursive": [
+    { "before": ["s"], "after": ["<leader>", "<leader>", "/"] }
+  ],
+  "workbench.productIconTheme": "material-product-icons",
+  "window.density.editorTabHeight": "compact",
+  "workbench.settings.showAISearchToggle": false,
+  "chat.disableAIFeatures": true,
+  "workbench.iconTheme": "vscode-icons",
+}
