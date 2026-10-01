@@ -1,6 +1,7 @@
 aaron-bond.better-comments
 bbenoist.nix
 dbaeumer.vscode-eslint
+detachhead.basedpyright
 jebbs.plantuml
 mhutchie.git-graph
 miguelsolorio.symbols

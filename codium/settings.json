@@ -75,7 +75,6 @@
     "env-*": true
   },
   "explorer.confirmPasteNative": false,
-  "python.analysis.typeCheckingMode": "basic",
   "window.customTitleBarVisibility": "never",
   "terminal.integrated.fontFamily": "FiraCode Nerd Font",
   "editor.guides.highlightActiveIndentation": "always",
@@ -85,8 +84,8 @@
   "markdown-preview-enhanced.revealjsTheme": "vscode.css",
   "workbench.editor.tabSizing": "shrink",
   "terminal.integrated.fontSize": 13,
-  "python.analysis.autoImportCompletions": true,   // ← the key one; often defaults off
-  "python.analysis.indexing": true,                 // must be on for it to know your symbols
+  "basedpyright.analysis.typeCheckingMode": "basic",
+  "basedpyright.analysis.autoImportCompletions": true,
   "python.terminal.useEnvFile": true,
   "explorer.confirmDragAndDrop": false,
   "markdown-preview-enhanced.plantumlJarPath": "/usr/share/plantuml/plantuml.jar",
