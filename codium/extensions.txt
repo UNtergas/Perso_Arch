@@ -1,5 +1,7 @@
 aaron-bond.better-comments
+ardonplay.vscode-jetbrains-icon-theme
 artlaman.chalice-color-theme
+artlaman.chalice-icon-theme
 bbenoist.nix
 dbaeumer.vscode-eslint
 detachhead.basedpyright
@@ -15,6 +17,7 @@ naumovs.color-highlight
 pkief.material-product-icons
 rastikerdar.vscode-seedling-icon-theme
 shd101wyy.markdown-preview-enhanced
+thenestruo.fantasticons-icons-theme
 timonwong.shellcheck
 tomoki1207.pdf
 tonsky.theme-alabaster
