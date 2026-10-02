@@ -88,7 +88,7 @@
     "command": "-workbench.action.closeActiveEditor"
   },
   {
-    "key": "ctrl+n",
+    "key": "ctrl+b",
     "command": "workbench.action.toggleSidebarVisibility"
   },
   {
@@ -295,28 +295,12 @@
     "command": "-workbench.action.splitEditorDown"
   },
   {
-    "key": "ctrl+k k",
-    "command": "workbench.action.moveActiveEditorGroupDown"
-  },
-  {
-    "key": "ctrl+k down",
-    "command": "-workbench.action.moveActiveEditorGroupDown"
-  },
-  {
     "key": "ctrl+k up",
     "command": "workbench.action.splitEditorUp"
   },
   {
     "key": "ctrl+k ctrl+\\",
     "command": "-workbench.action.splitEditorUp"
-  },
-  {
-    "key": "ctrl+k j",
-    "command": "workbench.action.moveActiveEditorGroupUp"
-  },
-  {
-    "key": "ctrl+k up",
-    "command": "-workbench.action.moveActiveEditorGroupUp"
   },
   {
     "key": "ctrl+k up",
@@ -337,14 +321,6 @@
     "command": "-workbench.action.splitEditorLeft"
   },
   {
-    "key": "ctrl+k h",
-    "command": "workbench.action.moveActiveEditorGroupLeft"
-  },
-  {
-    "key": "ctrl+k left",
-    "command": "-workbench.action.moveActiveEditorGroupLeft"
-  },
-  {
     "key": "ctrl+k right",
     "command": "workbench.action.splitEditorRight"
   },
@@ -353,15 +329,7 @@
     "command": "-workbench.action.splitEditorRight"
   },
   {
-    "key": "ctrl+k l",
-    "command": "workbench.action.moveActiveEditorGroupRight"
-  },
-  {
-    "key": "ctrl+k right",
-    "command": "-workbench.action.moveActiveEditorGroupRight"
-  },
-  {
-    "key": "ctrl+b",
+    "key": "ctrl+n",
     "command": "workbench.files.action.focusFilesExplorer"
   },
   {
@@ -371,5 +339,21 @@
   {
     "key": "ctrl+k shift+a",
     "command": "explorer.newFolder"
+  },
+  {
+    "key": "ctrl+k h",
+    "command": "workbench.action.moveEditorToLeftGroup"
+  },
+  {
+    "key": "ctrl+k l",
+    "command": "workbench.action.moveEditorToRightGroup"
+  },
+  {
+    "key": "ctrl+k k",
+    "command": "workbench.action.moveEditorToAboveGroup"
+  },
+  {
+    "key": "ctrl+k j",
+    "command": "workbench.action.moveEditorToBelowGroup"
   }
 ]

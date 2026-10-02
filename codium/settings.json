@@ -15,7 +15,6 @@
 
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
-  "workbench.activityBar.compact": true,
   "editor.minimap.enabled": false,
   "editor.stickyScroll.enabled": true,
   "editor.scrollbar.vertical": "visible",
@@ -49,9 +48,8 @@
   "editor.glyphMargin": false,
   "editor.showFoldingControls": "always",
   "workbench.editor.doubleClickTabToToggleEditorGroupSizes": "off",
-  "workbench.sideBar.location": "right",
   "workbench.editor.empty.hint": "hidden",
-  "workbench.colorTheme": "Alabaster",
+  "workbench.colorTheme": "chalice-color-theme-light",
   "workbench.enableExperiments": false,
   "telemetry.telemetryLevel": "off",
   "workbench.activityBar.location": "hidden",
@@ -116,8 +114,9 @@
     { "before": ["s"], "after": ["<leader>", "<leader>", "/"] }
   ],
   "workbench.productIconTheme": "material-product-icons",
-  "window.density.editorTabHeight": "compact",
   "workbench.settings.showAISearchToggle": false,
   "chat.disableAIFeatures": true,
-  "workbench.iconTheme": "vscode-icons",
+  "workbench.activityBar.compact": true,
+  "window.density.editorTabHeight": "compact",
+  "editor.wordWrap": "on",
 }

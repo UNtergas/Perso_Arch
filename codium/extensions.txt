@@ -1,4 +1,5 @@
 aaron-bond.better-comments
+artlaman.chalice-color-theme
 bbenoist.nix
 dbaeumer.vscode-eslint
 detachhead.basedpyright
