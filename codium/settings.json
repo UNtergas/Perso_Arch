@@ -78,7 +78,6 @@
   "editor.guides.highlightActiveIndentation": "always",
   "editor.tokenColorCustomizations": {},
   "editor.fontWeight": "450",
-  "editor.fontSize": 13.5,
   "markdown-preview-enhanced.revealjsTheme": "vscode.css",
   "workbench.editor.tabSizing": "shrink",
   "terminal.integrated.fontSize": 13,
@@ -119,4 +118,5 @@
   "workbench.activityBar.compact": true,
   "window.density.editorTabHeight": "compact",
   "editor.wordWrap": "on",
+  "workbench.iconTheme": "vscode-seedling-icon-theme-plus",
 }
