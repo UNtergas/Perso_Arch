@@ -119,4 +119,5 @@
   "window.density.editorTabHeight": "compact",
   "editor.wordWrap": "on",
   "workbench.iconTheme": "chalice-icon-theme",
+  "workbench.editor.showTabs": "single",
 }
