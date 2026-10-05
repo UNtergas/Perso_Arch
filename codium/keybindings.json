@@ -355,5 +355,15 @@
   {
     "key": "ctrl+k j",
     "command": "workbench.action.moveEditorToBelowGroup"
+  },
+  {
+    "key": "escape",
+    "command": "extension.vim_escape",
+    "when": "editorTextFocus && vim.active && !inDebugRepl && !parameterHintsVisible && !suggestWidgetVisible   "
+  },
+  {
+    "key": "escape",
+    "command": "-extension.vim_escape",
+    "when": "editorTextFocus && vim.active && !inDebugRepl"
   }
 ]

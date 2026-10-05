@@ -128,5 +128,8 @@
       "comments": false,
       "strings": false
   },
-  "editor.suggestOnTriggerCharacters": false   
+  "editor.suggestOnTriggerCharacters": false,
+
+  // Stop auto enter function helper popup
+  "editor.parameterHints.enabled": false   
 }
