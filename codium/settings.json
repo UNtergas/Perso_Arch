@@ -21,13 +21,13 @@
   "workbench.editor.highlightModifiedTabs": true,
   "workbench.editor.tabSizingFixedMaxWidth": 80,
   "breadcrumbs.filePath": "off",
-  "editor.fontFamily": "FiraCode Nerd Font Mono",
-  "editor.codeLensFontFamily": "FiraCode Nerd Font",
-  "editor.inlayHints.fontFamily": "FiraCode Nerd Font",
+  "editor.fontFamily": "Jetbrain Nerd Font Mono",
+  "editor.codeLensFontFamily": "Jetbrain Nerd Font",
+  "editor.inlayHints.fontFamily": "Jetbrain Nerd Font",
   "editor.inlineSuggest.fontFamily": "FiraCode Nerd Font",
   "debug.console.fontFamily": "FiraCode Nerd Font Mono",
-  "scm.inputFontFamily": "FiraCode Nerd Font",
-  "notebook.output.fontFamily": "FiraCode Nerd Font",
+  "scm.inputFontFamily": "Jetbrain Nerd Font",
+  "notebook.output.fontFamily": "Jetbrain Nerd Font",
   "chat.editor.fontFamily": "FiraCode Nerd Font",
   "errorLens.statusBarIconsEnabled": true,
   "breadcrumbs.enabled": false,
@@ -131,5 +131,13 @@
   "editor.suggestOnTriggerCharacters": false,
 
   // Stop auto enter function helper popup
-  "editor.parameterHints.enabled": false   
+  "editor.parameterHints.enabled": false,
+  "js/ts.updateImportsOnFileMove.enabled": "always",
+  "editor.fontSize": 15,
+  "workbench.bottomPane.experimental.fontSize": 14,
+  "workbench.experimental.fontSize": 14,
+  "workbench.tabs.experimental.fontSize": 14,
+  "workbench.sideBar.experimental.fontSize": 14,
+  "workbench.statusBar.experimental.fontSize": 13,
+  "chat.fontSize": 14
 }
