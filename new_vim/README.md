@@ -30,7 +30,7 @@ jdtls, rust_analyzer, html, cssls. Formatters: `black`, `rustfmt` on `PATH`.
 Plugins (lazy.nvim): alabaster (theme), treesitter + context (sticky scroll),
 blink.cmp (completion), mason + lspconfig, telescope, oil, nvim-tree, flash,
 indent-blankline, snacks (file rename with LSP import updates, buffer close),
-which-key, gitsigns, neogit, rainbow-delimiters, nvim-surround, undotree,
+which-key, gitsigns, git-conflict, diffview, rainbow-delimiters, nvim-surround, undotree,
 conform (manual format), multicursor.
 
 Sections of the file: options, theme, plugins, then the keymaps block at the

@@ -60,6 +60,8 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `C-M-<arrows>` | n | Focus window in that direction |
 | `C-w q` | n | Close buffer |
 | `C-w C-w` | n | Close buffer |
+| `M-1` … `M-9` | n | Go to the nth buffer tab (bufferline, shown when 2+ buffers are open) |
+| `M-,` / `M-.` | n | Previous / next buffer tab |
 | `C-w a` | n | Close all buffers |
 | `C-w v` / `C-w s` | n | Vertical / horizontal split (Vim default) |
 
@@ -110,7 +112,10 @@ unfolded.
 
 | Key | Mode | Does |
 |---|---|---|
-| `SPC g g` | n | Neogit (Magit-like) |
+| `SPC g m` | n | Merge tool: ours / merged / theirs (middle is the result you edit) |
+| `SPC g q` | n | Close the merge tool |
+| `]x` / `[x` | n | Next / previous conflict block |
+| `SPC g o` / `g t` / `g b` / `g 0` | n | Conflict under cursor: keep ours / theirs / both / none |
 | `SPC g r` | n | Revert hunk |
 | `]g` / `[g` | n | Next / previous hunk |
 
@@ -119,7 +124,7 @@ unfolded.
 | Key | Mode | Does |
 |---|---|---|
 | ``C-` `` | n i t | Toggle bottom terminal (VSCode) |
-| `C-@` | n i t | Same (many terminals send Ctrl+` as this) |
+| `C-@` | n i t | Same (many terminals send Ctrl+` as this). Opens at half the screen height |
 | `SPC o t` | n | Same, from the leader |
 | `C-\ C-n` | t | Leave terminal mode, back to normal |
 
@@ -165,6 +170,12 @@ first. In nvim-tree: `C-]` makes the folder the root, `-` goes up. In Oil:
 | `grr`, `gra`, `grn`, `gri`, `grt` | Neovim 0.11 LSP defaults | Removed so `gr` has no delay |
 
 Scrolling down is gone with `C-d` and `C-f`. Use `}`, `G` or `C-e`.
+
+## Gutter marks
+
+Left to right: fold arrow, one sign column, line number.
+- Git (gitsigns): green `┃` added, orange `┃` changed, red `▁` deleted.
+- Diagnostics: the line number turns red (error) or yellow (warning). Info and hints are not marked.
 
 ## Sticky function header
 

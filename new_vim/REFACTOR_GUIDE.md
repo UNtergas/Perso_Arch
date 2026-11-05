@@ -97,8 +97,8 @@ Same recipe: `SPC s p` the old name, `C-q`, then
 
 ### Git as a safety net
 
-Commit or stash before a big manual replace. Review with `SPC g g` (Neogit)
-or `git diff`. Undo a bad replace with `u`, or `SPC s u` for the undo tree.
+Commit or stash before a big manual replace. Review with `git diff` in the terminal
+or `SPC g m`. Undo a bad replace with `u`, or `SPC s u` for the undo tree.
 
 ---
 

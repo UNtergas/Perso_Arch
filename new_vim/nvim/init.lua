@@ -8,7 +8,7 @@ vim.opt.mouse = "a"
 vim.opt.termguicolors = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-vim.opt.signcolumn = "yes"
+vim.opt.signcolumn = "yes:1"
 vim.opt.updatetime = 25
 vim.opt.clipboard = "unnamedplus"
 
@@ -257,11 +257,10 @@ require("lazy").setup({
       vim.diagnostic.config({
         virtual_text = true,
         signs = {
-          text = {
-            [vim.diagnostic.severity.ERROR] = "●",
-            [vim.diagnostic.severity.WARN] = "●",
-            [vim.diagnostic.severity.INFO] = "●",
-            [vim.diagnostic.severity.HINT] = "●",
+          severity = { min = vim.diagnostic.severity.WARN }, -- errors and warnings only
+          numhl = { -- color the line number instead of using a second sign column
+            [vim.diagnostic.severity.ERROR] = "DiagnosticError",
+            [vim.diagnostic.severity.WARN] = "DiagnosticWarn",
           },
         },
         underline = true,
@@ -438,8 +437,74 @@ require("lazy").setup({
   ---------------------------------------------------------------------------
   { "folke/snacks.nvim", lazy = false, priority = 900, opts = {} }, -- bufdelete + rename with LSP import updates
   { "folke/which-key.nvim", event = "VeryLazy", opts = {} },
-  { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = {} },
-  { "NeogitOrg/neogit", cmd = "Neogit", dependencies = { "nvim-lua/plenary.nvim" }, opts = {} },
+  {
+    "akinsho/bufferline.nvim", -- VS Code style buffer tabs
+    event = "VeryLazy",
+    opts = {
+      options = {
+        mode = "buffers",
+        always_show_bufferline = false,
+        close_command = function(n) Snacks.bufdelete(n) end,
+        diagnostics = "nvim_lsp",
+        offsets = { { filetype = "NvimTree", text = "Files", separator = true } },
+      },
+    },
+  },
+  { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = { sign_priority = 20 } }, -- above diagnostics so git marks always show
+  { -- colors conflict blocks (ours / theirs) in the file
+    "akinsho/git-conflict.nvim",
+    event = "BufReadPost",
+    config = function()
+      require("git-conflict").setup({ default_mappings = false, disable_diagnostics = false })
+      -- ours = light green, theirs = light blue (set after the plugin so ours wins on colorscheme change)
+      local function conflict_colors()
+        vim.api.nvim_set_hl(0, "GitConflictCurrent", { bg = "#c9efc9" })
+        vim.api.nvim_set_hl(0, "GitConflictCurrentLabel", { bg = "#9fdc9f", bold = true })
+        vim.api.nvim_set_hl(0, "GitConflictIncoming", { bg = "#cfe5fa" })
+        vim.api.nvim_set_hl(0, "GitConflictIncomingLabel", { bg = "#9cc8f0", bold = true })
+        vim.api.nvim_set_hl(0, "GitConflictAncestor", { bg = "#eeeeee" })
+        vim.api.nvim_set_hl(0, "GitConflictAncestorLabel", { bg = "#d4d4d4", bold = true })
+      end
+      conflict_colors()
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = conflict_colors })
+    end,
+  },
+  { -- 3-way merge tool: ours | merged (edit here) | theirs
+    "sindrets/diffview.nvim",
+    cmd = { "DiffviewOpen", "DiffviewClose" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      local function merge_colors()
+        local hl = vim.api.nvim_set_hl
+        hl(0, "MergeOurs", { bg = "#c9efc9" })
+        hl(0, "MergeOursText", { bg = "#9fdc9f" })
+        hl(0, "MergeTheirs", { bg = "#cfe5fa" })
+        hl(0, "MergeTheirsText", { bg = "#9cc8f0" })
+        -- middle window: no diff background, so only the conflict colors show there
+        hl(0, "MergeLocal", { bg = "NONE" })
+        hl(0, "MergeLocalText", { bg = "NONE" })
+        hl(0, "MergeFiller", { fg = "#cccccc", bg = "#f7f7f7" })
+      end
+      merge_colors()
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = merge_colors })
+      -- diff3_horizontal: a = ours (left), b = merged file (middle), c = theirs (right)
+      local winhl = {
+        a = "DiffAdd:MergeOurs,DiffChange:MergeOurs,DiffText:MergeOursText,DiffDelete:MergeFiller",
+        b = "DiffAdd:MergeLocal,DiffChange:MergeLocal,DiffText:MergeLocalText,DiffDelete:MergeFiller",
+        c = "DiffAdd:MergeTheirs,DiffChange:MergeTheirs,DiffText:MergeTheirsText,DiffDelete:MergeFiller",
+      }
+      require("diffview").setup({
+        view = { merge_tool = { layout = "diff3_horizontal", disable_diagnostics = true } },
+        hooks = {
+          diff_buf_win_enter = function(_, winid, ctx)
+            if winhl[ctx.symbol] and ctx.layout_name:match("^diff3") then
+              vim.wo[winid].winhighlight = winhl[ctx.symbol]
+            end
+          end,
+        },
+      })
+    end,
+  },
   { "HiPhish/rainbow-delimiters.nvim", event = "BufReadPost" },
   { "nvim-treesitter/nvim-treesitter-context", event = "BufReadPost", opts = { max_lines = 3 } },
   {
@@ -533,6 +598,13 @@ map("n", "<C-w>q", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
 
+-- alt+1..9: go to the nth buffer tab, alt+, / alt+.: previous / next
+for i = 1, 9 do
+  map("n", "<M-" .. i .. ">", "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", { desc = "Go to tab " .. i })
+end
+map("n", "<M-,>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev tab" })
+map("n", "<M-.>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next tab" })
+
 -- ctrl+k chords
 local function mk_parent(p)
   local dir = vim.fn.fnamemodify(p, ":h")
@@ -573,7 +645,15 @@ map({ "n", "v" }, "<leader>cf", function()
   require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "Format (manual)" })
 map("n", "<leader>cx", tb("diagnostics"), { desc = "Diagnostics list" })
-map("n", "<leader>gg", "<cmd>Neogit<cr>", { desc = "Magit (Neogit)" })
+-- merge conflicts
+map("n", "<leader>gm", "<cmd>DiffviewOpen<cr>", { desc = "Merge tool (3-way)" })
+map("n", "<leader>gq", "<cmd>DiffviewClose<cr>", { desc = "Close merge tool" })
+map("n", "]x", "<cmd>GitConflictNextConflict<cr>", { desc = "Next conflict" })
+map("n", "[x", "<cmd>GitConflictPrevConflict<cr>", { desc = "Prev conflict" })
+map("n", "<leader>go", "<cmd>GitConflictChooseOurs<cr>", { desc = "Conflict: keep ours" })
+map("n", "<leader>gt", "<cmd>GitConflictChooseTheirs<cr>", { desc = "Conflict: keep theirs" })
+map("n", "<leader>gb", "<cmd>GitConflictChooseBoth<cr>", { desc = "Conflict: keep both" })
+map("n", "<leader>g0", "<cmd>GitConflictChooseNone<cr>", { desc = "Conflict: keep none" })
 map("n", "<leader>gr", function() require("gitsigns").reset_hunk() end, { desc = "Revert hunk" })
 
 -- terminal: toggle a bottom terminal (keeps its shell alive when hidden)
@@ -584,7 +664,8 @@ local function toggle_term()
     term.win = nil
     return
   end
-  vim.cmd("botright 15split")
+  vim.cmd("botright split")
+  vim.api.nvim_win_set_height(0, math.floor(vim.o.lines / 2))
   term.win = vim.api.nvim_get_current_win()
   if term.buf and vim.api.nvim_buf_is_valid(term.buf) then
     vim.api.nvim_win_set_buf(term.win, term.buf)
