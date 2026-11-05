@@ -97,6 +97,17 @@ unfolded.
 | `C-d` | v | Add cursor on next match of the selection |
 | `Esc` | with cursors | Disable cursors, `Esc` again clears them |
 
+### Harpoon (jump list)
+
+| Key | Mode | Does |
+|---|---|---|
+| `SPC h a` | n | Add the current file to the harpoon list |
+| `SPC 1` … `SPC 4` | n | Jump to the file in slot 1 to 4 |
+| `SPC h d` | n | Remove the current file from the list |
+| `SPC h h` | n | Open the list. `dd` deletes a line, `dd` then `p` moves one, Enter jumps. Close the menu with `q` or `Esc` to save |
+
+The bottom statusline shows error (`E2`, red), warning (`W1`, yellow), info (`I1`) and hint (`H1`, e.g. "declared but never read") counts after the file name. The harpoon slots have their own row at the top, e.g. ` 1:a.ts  2:b.ts `, with the current file highlighted.
+
 ## 7. Code intelligence (LSP)
 
 | Key | Mode | Does |

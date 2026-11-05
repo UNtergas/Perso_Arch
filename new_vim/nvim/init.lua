@@ -449,6 +449,30 @@ require("lazy").setup({
     },
   },
 
+  -- Harpoon: a short per-project list of files to jump between
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = (function()
+      local function h() return require("harpoon") end
+      local keys = {
+        { "<leader>ha", function() h():list():add(); vim.cmd.redrawstatus() end, desc = "Harpoon: add file" },
+        { "<leader>hd", function() h():list():remove(); vim.cmd.redrawstatus() end, desc = "Harpoon: remove current file" },
+        { "<leader>hh", function() h().ui:toggle_quick_menu(h():list()) end, desc = "Harpoon: list" },
+      }
+      for i = 1, 4 do
+        table.insert(keys, { "<leader>" .. i, function() h():list():select(i) end, desc = "Harpoon: file " .. i })
+      end
+      return keys
+    end)(),
+    config = function()
+      require("harpoon"):setup()
+      -- refresh the statusline when the list is edited in the menu
+      require("harpoon"):extend({ LIST_CHANGE = function() vim.cmd.redrawstatus() end })
+    end,
+  },
+
   -- Indent guides: one colour per indent level
   {
     "lukas-reineke/indent-blankline.nvim",
@@ -740,3 +764,32 @@ vim.api.nvim_create_autocmd("User", {
     end
   end,
 })
+
+-- bottom statusline: file, flags, error/warning counts, position
+function _G.diag_status()
+  local c = vim.diagnostic.count(0)
+  local e, w = c[vim.diagnostic.severity.ERROR] or 0, c[vim.diagnostic.severity.WARN] or 0
+  local out = ""
+  if e > 0 then out = out .. "%#DiagnosticError# E" .. e .. "%* " end
+  if w > 0 then out = out .. "%#DiagnosticWarn# W" .. w .. "%* " end
+  local i, h = c[vim.diagnostic.severity.INFO] or 0, c[vim.diagnostic.severity.HINT] or 0
+  if i > 0 then out = out .. "%#DiagnosticInfo# I" .. i .. "%* " end
+  if h > 0 then out = out .. "%#DiagnosticHint# H" .. h .. "%* " end -- e.g. "declared but never read"
+  return out
+end
+vim.opt.statusline = "%f %m%r%h%w %{%v:lua.diag_status()%}%=%l:%c %P"
+
+-- top line (own row): the harpoon slots, current file highlighted
+function _G.harpoon_tabline()
+  local ok, harpoon = pcall(require, "harpoon")
+  if not ok then return "" end
+  local current = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
+  local parts = {}
+  for i, item in ipairs(harpoon:list().items) do
+    local label = " " .. i .. ":" .. vim.fn.fnamemodify(item.value, ":t") .. " "
+    table.insert(parts, (item.value == current and "%#TabLineSel#" or "%#TabLine#") .. label)
+  end
+  return table.concat(parts, "%#TabLine# ") .. "%#TabLineFill#"
+end
+vim.opt.showtabline = 2
+vim.opt.tabline = "%{%v:lua.harpoon_tabline()%}"
