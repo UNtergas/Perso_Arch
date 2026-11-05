@@ -310,32 +310,6 @@ require("lazy").setup({
     end,
   },
 
-  -- Oil
-  {
-    "stevearc/oil.nvim",
-    enabled = not vim.g.vscode,
-
-    dependencies = {
-      "nvim-tree/nvim-web-devicons",
-    },
-
-    keys = {
-      {
-        "<leader>e",
-        "<cmd>Oil<cr>",
-        desc = "File browser",
-      },
-    },
-
-    opts = {
-      default_file_explorer = true,
-
-      view_options = {
-        show_hidden = true,
-      },
-    },
-  },
-
   -- Telescope
   {
     "nvim-telescope/telescope.nvim",
@@ -499,7 +473,27 @@ require("lazy").setup({
   ---------------------------------------------------------------------------
   -- Emacs-parity plugins
   ---------------------------------------------------------------------------
-  { "folke/snacks.nvim", lazy = false, priority = 900, opts = {} }, -- bufdelete + rename with LSP import updates
+  { -- bufdelete + rename with LSP import updates, and the start screen (just a cat)
+    "folke/snacks.nvim",
+    lazy = false,
+    priority = 900,
+    opts = {
+      dashboard = {
+        enabled = true,
+        preset = {
+          header = table.concat({
+            [[  /\_/\  ]],
+            [[ ( o.o ) ]],
+            [[  > ^ <  ]],
+            [[ /|   |\ ]],
+            [[(_|   |_)]],
+          }, "\n"),
+          keys = {},
+        },
+        sections = { { section = "header" } },
+      },
+    },
+  },
   { "folke/which-key.nvim", event = "VeryLazy", opts = {} },
   { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = { sign_priority = 20 } }, -- above diagnostics so git marks always show
   { -- colors conflict blocks (ours / theirs) in the file
@@ -594,14 +588,69 @@ require("lazy").setup({
       end)
     end,
   },
+  -- Oil
+  {
+    "stevearc/oil.nvim",
+    enabled = not vim.g.vscode,
+    lazy = false, -- load at startup so `nvim .` / `:e .` open Oil instead of netrw
+
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+
+    keys = {
+      {
+        "<leader>e",
+        "<cmd>Oil<cr>",
+        desc = "File browser",
+      },
+    },
+
+    opts = {
+      default_file_explorer = true,
+
+      view_options = {
+        show_hidden = true,
+      },
+    },
+  },
+
   {
     "nvim-tree/nvim-tree.lua",
     cmd = { "NvimTreeToggle", "NvimTreeFocus" },
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       view = { width = 32 },
-      renderer = { indent_markers = { enable = true } },
+      renderer = { root_folder_label = false, indent_markers = { enable = true } }, -- no root title line (Enter on it went up a dir)
       update_focused_file = { enable = true }, -- treemacs-follow-mode
+      -- only the everyday keys; no live filter / search (it hung) and none of the other defaults
+      on_attach = function(bufnr)
+        local api = require("nvim-tree.api")
+        local function m(key, fn, desc)
+          vim.keymap.set("n", key, fn, { buffer = bufnr, noremap = true, silent = true, nowait = true, desc = "Tree: " .. desc })
+        end
+        m("<CR>", api.node.open.edit, "Open")
+        m("o", api.node.open.edit, "Open")
+        m("<2-LeftMouse>", api.node.open.edit, "Open")
+        m("<C-v>", api.node.open.vertical, "Open in vertical split")
+        m("<C-x>", api.node.open.horizontal, "Open in horizontal split")
+        m("a", api.fs.create, "Create file (end the name with / for a folder)")
+        m("r", api.fs.rename, "Rename")
+        m("d", api.fs.remove, "Delete")
+        m("x", api.fs.cut, "Cut (move)")
+        m("c", api.fs.copy.node, "Copy")
+        m("p", api.fs.paste, "Paste")
+        m("y", api.fs.copy.filename, "Copy file name")
+        m("Y", api.fs.copy.relative_path, "Copy relative path")
+        m("gy", api.fs.copy.absolute_path, "Copy absolute path")
+        m("R", api.tree.reload, "Refresh")
+        m("H", api.tree.toggle_hidden_filter, "Toggle dotfiles")
+        m("E", api.tree.expand_all, "Expand all")
+        m("W", api.tree.collapse_all, "Collapse all")
+        m("q", api.tree.close, "Close")
+        m("g?", api.tree.toggle_help, "Help")
+      end,
+      sync_root_with_cwd = true, -- the tree root follows :cd (including Oil's ` and ~)
     },
     config = function(_, opts)
       require("nvim-tree").setup(opts)
@@ -636,7 +685,7 @@ map("v", "<M-o>", "<gv", { desc = "Outdent" })
 
 -- sidebar: ctrl+b toggle, ctrl+n focus
 map({ "n", "v" }, "<C-n>", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle sidebar" })
-map({ "n", "v" }, "<C-b>", "<cmd>Telescope buffers<cr>", { desc = "Switch buffer" })
+map({ "n", "v" }, "<C-b>", tb("buffers"), { desc = "Switch buffer" })
 
 -- diagnostics / hunks: ]d [d ]g [g
 map("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "Next diagnostic" })
@@ -777,14 +826,19 @@ function _G.diag_status()
   if h > 0 then out = out .. "%#DiagnosticHint# H" .. h .. "%* " end -- e.g. "declared but never read"
   return out
 end
-vim.opt.statusline = "%f %m%r%h%w %{%v:lua.diag_status()%}%=%l:%c %P"
+-- current project: the working directory (follows :cd, so also Oil's ` and ~)
+function _G.project_name()
+  return "[" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t") .. "] "
+end
+vim.api.nvim_create_autocmd("DirChanged", { callback = function() vim.cmd.redrawstatus() end })
+vim.opt.statusline = "%{v:lua.project_name()}%f %m%r%h%w %{%v:lua.diag_status()%}%=%l:%c %P"
 
 -- top line (own row): the harpoon slots, current file highlighted
 function _G.harpoon_tabline()
   local ok, harpoon = pcall(require, "harpoon")
   if not ok then return "" end
   local current = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
-  local parts = {}
+  local parts = { "%#TabLineFill# [Harpoon] " }
   for i, item in ipairs(harpoon:list().items) do
     local label = " " .. i .. ":" .. vim.fn.fnamemodify(item.value, ":t") .. " "
     table.insert(parts, (item.value == current and "%#TabLineSel#" or "%#TabLine#") .. label)

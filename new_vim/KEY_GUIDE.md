@@ -18,8 +18,8 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `SPC .` | n | Find any file (includes hidden) |
 | `SPC ,` / `SPC b b` | n | Switch buffer |
 | `SPC :` | n | Command palette |
-| `SPC e` | n | Oil file browser (edit files as text) |
 | `C-n` | n v | Toggle nvim-tree sidebar |
+| `SPC e` | n | Oil file browser (edit files as text). It also opens for `nvim .` and `:e .` instead of netrw |
 | `C-b` | n v | List all buffers (same as `SPC b b`) |
 | `C-k a` | n v | New file (creates parent folders) |
 | `C-k A` | n v | New folder |
@@ -106,7 +106,31 @@ unfolded.
 | `SPC h d` | n | Remove the current file from the list |
 | `SPC h h` | n | Open the list. `dd` deletes a line, `dd` then `p` moves one, Enter jumps. Close the menu with `q` or `Esc` to save |
 
-The bottom statusline shows error (`E2`, red), warning (`W1`, yellow), info (`I1`) and hint (`H1`, e.g. "declared but never read") counts after the file name. The harpoon slots have their own row at the top, e.g. ` 1:a.ts  2:b.ts `, with the current file highlighted.
+The bottom statusline starts with the current directory name in brackets (e.g. `[snowpack-android]`, follows `:cd`), then shows error (`E2`, red), warning (`W1`, yellow), info (`I1`) and hint (`H1`, e.g. "declared but never read") counts after the file name. The harpoon slots have their own row at the top, e.g. ` 1:a.ts  2:b.ts `, with the current file highlighted.
+
+## Start screen
+
+`nvim` with no file shows a start screen with just an ASCII cat. Open anything
+(`SPC SPC`, `C-n`) to leave it.
+
+### nvim-tree keys (inside the sidebar)
+
+Only these exist; the defaults (live filter, search, etc.) are removed.
+
+| Key | Does |
+|---|---|
+| `Enter` / `o` / double-click | Open file or fold/unfold folder |
+| `C-v` / `C-x` | Open in vertical / horizontal split |
+| `a` | New file (end the name with `/` for a folder) |
+| `r` | Rename |
+| `d` | Delete |
+| `x`, `c`, `p` | Cut, copy, paste (move or copy a file) |
+| `y` / `Y` / `gy` | Copy name / relative path / absolute path |
+| `R` | Refresh |
+| `H` | Toggle dotfiles |
+| `E` / `W` | Expand all / collapse all |
+| `q` | Close the sidebar |
+| `g?` | Show these keys |
 
 ## 7. Code intelligence (LSP)
 
@@ -152,7 +176,7 @@ Alacritty may not send Ctrl+` distinctly. If it does nothing, use `C-@`
 | `:pwd` | cmd | Show the current directory |
 
 Telescope (`SPC SPC`, `SPC s p`) searches from the current directory, so set it
-first. In nvim-tree: `C-]` makes the folder the root, `-` goes up. In Oil:
+first. The tree follows `:cd`; change the directory from Oil:
 `` ` `` runs `:cd` to the shown folder, `~` runs `:tcd`, `-` goes to parent.
 
 ## 11. Help
