@@ -98,6 +98,14 @@ require("lazy").setup({
         for _, k in ipairs({ "class", "interface", "type", "enum" }) do
           hl(0, "@lsp.typemod." .. k .. ".defaultLibrary", { fg = "#325cc0" })
         end
+        -- LSP sets a black fg on these tokens, which hides the treesitter blue: make all type names blue
+        for _, k in ipairs({ "class", "interface", "type", "enum" }) do
+          hl(0, "@lsp.type." .. k, { fg = "#325cc0" })
+          hl(0, "@lsp.typemod." .. k .. ".declaration", { fg = "#325cc0" }) -- beats @lsp.mod.declaration (black)
+        end
+        -- type parameters: blue where declared (<P extends X>), black where used
+        hl(0, "@lsp.type.typeParameter", { fg = "#000000" })
+        hl(0, "@lsp.typemod.typeParameter.declaration", { fg = "#325cc0" })
         hl(0, "Folded", { fg = "#6a6a6a", bg = "#e4e4e4" })
         -- diagnostic marks: red = error, yellow = warning
         hl(0, "DiagnosticSignError", { fg = "#d32f2f", bold = true })
