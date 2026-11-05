@@ -47,6 +47,7 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `/`, `n`, `N` | n | Search, next, previous |
 | `SPC s s` | n | Fuzzy search lines in buffer |
 | `SPC s p` | n | Search project (live grep) |
+| `SPC s w` | n | Search the word under the cursor in the project, whole word only |
 | `SPC f g` | n | Search project (live grep, old bind) |
 | `Esc` | n | Clear search highlight |
 | `:%s/a/b/g` | n | Replace in buffer (`/gc` asks each) |
@@ -92,7 +93,7 @@ unfolded.
 
 | Key | Mode | Does |
 |---|---|---|
-| `C-d` | n | Add cursor on next match of the word under cursor |
+| `C-d` | n | Select the word under the cursor and add a cursor on its next match (press again for each further match) |
 | `C-d` | v | Add cursor on next match of the selection |
 | `Esc` | with cursors | Disable cursors, `Esc` again clears them |
 
