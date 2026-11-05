@@ -119,4 +119,4 @@ Python workaround after moving a module: `SPC s p` old path → `C-c C-e` →
 ## Not ported from VSCode
 
 - Shift-Shift quick open (Emacs can't detect a double Shift tap) → `SPC SPC`.
-- Sticky scroll, error lens, typst/tinymist.
+- Sticky scroll, typst/tinymist. (Error lens is ported via `flyover`.)

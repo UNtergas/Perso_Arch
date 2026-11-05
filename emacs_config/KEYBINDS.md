@@ -13,6 +13,8 @@ every state.
 | `s` | N V | Jump: type chars, then press the label (`avy-goto-char-timer`) | `evil-snipe` 2-char find (package disabled) | VSCodeVim easymotion `s` |
 | `]d` / `[d` | M | Next / previous diagnostic (`next-error`) | Next / previous git hunk | VSCode `]d` / `[d` |
 | `]g` / `[g` | M | Next / previous git hunk | *(unbound)* | Keeps Doom's hunk nav after `]d` was taken |
+| `C-s` | N V I E | Save buffer (`save-buffer`) | Incremental search (isearch) | VSCode `ctrl+s` |
+| `gr` | N M | Show references (`+lookup/references`) | *(unbound)* | Show references |
 | `M-p` | N I | Indent line | *(unbound)* | VSCode `alt+p` |
 | `M-p` | V | Indent selection (keeps selection) | *(unbound)* | VSCode `alt+p` |
 | `M-o` | N I | Outdent line | *(unbound)* | VSCode `alt+o` |
