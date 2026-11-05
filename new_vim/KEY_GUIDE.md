@@ -19,8 +19,8 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `SPC ,` / `SPC b b` | n | Switch buffer |
 | `SPC :` | n | Command palette |
 | `SPC e` | n | Oil file browser (edit files as text) |
-| `C-b` | n v | Toggle nvim-tree sidebar |
-| `C-n` | n v | Focus nvim-tree |
+| `C-n` | n v | Toggle nvim-tree sidebar |
+| `C-b` | n v | List all buffers (same as `SPC b b`) |
 | `C-k a` | n v | New file (creates parent folders) |
 | `C-k A` | n v | New folder |
 | `C-s` | n v i | Save |
@@ -60,8 +60,6 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `C-M-<arrows>` | n | Focus window in that direction |
 | `C-w q` | n | Close buffer |
 | `C-w C-w` | n | Close buffer |
-| `M-1` … `M-9` | n | Go to the nth buffer tab (bufferline, shown when 2+ buffers are open) |
-| `M-,` / `M-.` | n | Previous / next buffer tab |
 | `C-w a` | n | Close all buffers |
 | `C-w v` / `C-w s` | n | Vertical / horizontal split (Vim default) |
 
@@ -166,7 +164,7 @@ first. In nvim-tree: `C-]` makes the folder the root, `-` goes up. In Oil:
 | `C-p` | Previous line | Find file |
 | `C-t` | Tag stack pop | Find symbol |
 | `C-w q`, `C-w C-w` | Close window, next window | Close buffer |
-| `C-b` / `C-n` | Scroll back, next line | Sidebar |
+| `C-b` / `C-n` | Scroll back, next line | List buffers, toggle sidebar |
 | `grr`, `gra`, `grn`, `gri`, `grt` | Neovim 0.11 LSP defaults | Removed so `gr` has no delay |
 
 Scrolling down is gone with `C-d` and `C-f`. Use `}`, `G` or `C-e`.

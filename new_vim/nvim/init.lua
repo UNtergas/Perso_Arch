@@ -94,6 +94,10 @@ require("lazy").setup({
         hl(0, "LineNr", { fg = "#8a8a8a", bg = bg })
         hl(0, "EndOfBuffer", { fg = bg, bg = bg })
         hl(0, "CursorLine", { bg = line })
+        -- VS Code Chalice: standard-library classes/types (Promise, Set, Map...) are blue too
+        for _, k in ipairs({ "class", "interface", "type", "enum" }) do
+          hl(0, "@lsp.typemod." .. k .. ".defaultLibrary", { fg = "#325cc0" })
+        end
         hl(0, "Folded", { fg = "#6a6a6a", bg = "#e4e4e4" })
         -- diagnostic marks: red = error, yellow = warning
         hl(0, "DiagnosticSignError", { fg = "#d32f2f", bold = true })
@@ -101,6 +105,25 @@ require("lazy").setup({
         hl(0, "DiagnosticSignInfo", { fg = "#1e88e5" })
       end
       vim.api.nvim_create_autocmd("ColorScheme", { pattern = "alabaster", callback = tweak })
+      -- Chalice/Alabaster in VS Code: only entity.name is blue (function-valued keys, calls, types); `string` etc. stay black
+      local blue_rules = [[
+; extends
+(pair key: (property_identifier) @AlabasterDefinition value: [(arrow_function) (function_expression)] (#set! priority 130))
+(call_expression function: (identifier) @AlabasterDefinition (#set! priority 130))
+(call_expression function: (member_expression property: (property_identifier) @AlabasterDefinition (#set! priority 130)))
+(type_identifier) @AlabasterDefinition (#set! priority 130)
+(new_expression constructor: (identifier) @AlabasterDefinition (#set! priority 130))
+(method_definition name: (property_identifier) @AlabasterDefinition (#set! priority 130))
+(function_declaration name: (identifier) @AlabasterDefinition (#set! priority 130))
+]]
+      for _, lang in ipairs({ "typescript", "tsx", "javascript" }) do
+        pcall(vim.treesitter.query.set, lang, "highlights", blue_rules)
+      end
+      -- treesitter highlighting is not on by default; the blue rules above need it (TS/JS only)
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+        callback = function(ev) pcall(vim.treesitter.start, ev.buf) end,
+      })
       vim.cmd.colorscheme("alabaster")
       tweak()
     end,
@@ -437,19 +460,6 @@ require("lazy").setup({
   ---------------------------------------------------------------------------
   { "folke/snacks.nvim", lazy = false, priority = 900, opts = {} }, -- bufdelete + rename with LSP import updates
   { "folke/which-key.nvim", event = "VeryLazy", opts = {} },
-  {
-    "akinsho/bufferline.nvim", -- VS Code style buffer tabs
-    event = "VeryLazy",
-    opts = {
-      options = {
-        mode = "buffers",
-        always_show_bufferline = false,
-        close_command = function(n) Snacks.bufdelete(n) end,
-        diagnostics = "nvim_lsp",
-        offsets = { { filetype = "NvimTree", text = "Files", separator = true } },
-      },
-    },
-  },
   { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = { sign_priority = 20 } }, -- above diagnostics so git marks always show
   { -- colors conflict blocks (ours / theirs) in the file
     "akinsho/git-conflict.nvim",
@@ -579,8 +589,8 @@ map("v", "<M-p>", ">gv", { desc = "Indent" })
 map("v", "<M-o>", "<gv", { desc = "Outdent" })
 
 -- sidebar: ctrl+b toggle, ctrl+n focus
-map({ "n", "v" }, "<C-b>", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle sidebar" })
-map({ "n", "v" }, "<C-n>", "<cmd>NvimTreeFocus<cr>", { desc = "Focus sidebar" })
+map({ "n", "v" }, "<C-n>", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle sidebar" })
+map({ "n", "v" }, "<C-b>", "<cmd>Telescope buffers<cr>", { desc = "Switch buffer" })
 
 -- diagnostics / hunks: ]d [d ]g [g
 map("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "Next diagnostic" })
@@ -597,13 +607,6 @@ end
 map("n", "<C-w>q", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
-
--- alt+1..9: go to the nth buffer tab, alt+, / alt+.: previous / next
-for i = 1, 9 do
-  map("n", "<M-" .. i .. ">", "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", { desc = "Go to tab " .. i })
-end
-map("n", "<M-,>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev tab" })
-map("n", "<M-.>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next tab" })
 
 -- ctrl+k chords
 local function mk_parent(p)
