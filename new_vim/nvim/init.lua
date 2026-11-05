@@ -828,17 +828,22 @@ function _G.diag_status()
 end
 -- current project: the working directory (follows :cd, so also Oil's ` and ~)
 function _G.project_name()
-  return "[" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t") .. "] "
+  return "[ " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t") .. "] "
 end
 vim.api.nvim_create_autocmd("DirChanged", { callback = function() vim.cmd.redrawstatus() end })
-vim.opt.statusline = "%{v:lua.project_name()}%f %m%r%h%w %{%v:lua.diag_status()%}%=%l:%c %P"
+-- file language, e.g. [Markdown]; empty when no filetype
+function _G.lang_status()
+  local ft = vim.bo.filetype
+  return ft == "" and "" or " [" .. ft:sub(1, 1):upper() .. ft:sub(2) .. "]"
+end
+vim.opt.statusline = "%{v:lua.project_name()}%f %m%r%h%w %{%v:lua.diag_status()%}%=%l:%c %P%{v:lua.lang_status()}"
 
 -- top line (own row): the harpoon slots, current file highlighted
 function _G.harpoon_tabline()
   local ok, harpoon = pcall(require, "harpoon")
   if not ok then return "" end
   local current = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
-  local parts = { "%#TabLineFill# [Harpoon] " }
+  local parts = { "%#TabLineFill# [󰀱 Harpoon] " }
   for i, item in ipairs(harpoon:list().items) do
     local label = " " .. i .. ":" .. vim.fn.fnamemodify(item.value, ":t") .. " "
     table.insert(parts, (item.value == current and "%#TabLineSel#" or "%#TabLine#") .. label)
