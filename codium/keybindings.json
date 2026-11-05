@@ -89,7 +89,7 @@
   },
   {
     "key": "ctrl+b",
-    "command": "workbench.action.toggleSidebarVisibility"
+    "command": "workbench.action.showAllEditors"
   },
   {
     "key": "ctrl+b",
@@ -330,7 +330,7 @@
   },
   {
     "key": "ctrl+n",
-    "command": "workbench.files.action.focusFilesExplorer"
+    "command": "workbench.action.toggleSidebarVisibility"
   },
   {
     "key": "ctrl+k a",

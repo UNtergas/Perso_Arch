@@ -1,4 +1,5 @@
 {
+  "workbench.editor.showTabs": "single",
   "window.menuBarVisibility": "toggle",
   "workbench.layoutControl.enabled": false,
   "workbench.browser.showInTitleBar": false,

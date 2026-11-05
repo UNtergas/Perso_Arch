@@ -7,7 +7,10 @@ import sys, json
 try: d = json.load(sys.stdin)
 except Exception: d = {}
 def s(x): return "" if x is None else str(x)
-g = lambda o,*k: (o if isinstance(o,dict) else {})
+# Percentages may be floats; the shell compares them as integers.
+def pct(x):
+    try: return str(int(round(float(x))))
+    except (TypeError, ValueError): return ""
 cwd     = (d.get("workspace") or {}).get("current_dir") or d.get("cwd") or ""
 model   = (d.get("model") or {}).get("display_name") or ""
 effort  = (d.get("effort") or {}).get("level") or ""
@@ -20,7 +23,7 @@ seven   = ((d.get("rate_limits") or {}).get("seven_day") or {}).get("used_percen
 print(cwd); print(model); print(effort)
 print("" if cost is None else "%.2f" % cost)
 print(s(added)); print(s(removed))
-print(s(ctx)); print(s(five)); print(s(seven))
+print(pct(ctx)); print(pct(five)); print(pct(seven))
 ' 2>/dev/null)
 
 { read -r cwd; read -r model; read -r effort; read -r cost; read -r added; read -r removed; read -r ctx; read -r five; read -r seven; } <<EOF2
