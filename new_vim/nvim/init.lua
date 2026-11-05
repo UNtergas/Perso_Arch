@@ -106,6 +106,11 @@ require("lazy").setup({
         -- type parameters: blue where declared (<P extends X>), black where used
         hl(0, "@lsp.type.typeParameter", { fg = "#000000" })
         hl(0, "@lsp.typemod.typeParameter.declaration", { fg = "#325cc0" })
+        -- flash: grey out all text, red on the letters being jumped to
+        hl(0, "FlashBackdrop", { fg = "#b4b4b4" })
+        hl(0, "FlashLabel", { fg = "#ffffff", bg = "#d32f2f", bold = true })
+        hl(0, "FlashMatch", { fg = "#d32f2f", bold = true })
+        hl(0, "FlashCurrent", { fg = "#d32f2f", bold = true, underline = true })
         hl(0, "Folded", { fg = "#6a6a6a", bg = "#e4e4e4" })
         -- diagnostic marks: red = error, yellow = warning
         hl(0, "DiagnosticSignError", { fg = "#d32f2f", bold = true })
