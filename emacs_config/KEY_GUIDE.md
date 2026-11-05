@@ -54,6 +54,7 @@ If a key does nothing, look it up: `SPC h k` then the key. Search every bind:
 | `C-c C-c` | in results | Apply edited results | Doom default |
 | `C-c C-k` | in results | Abort edited results | Doom default |
 | `:%s/a/b/g` | N | Replace in buffer (`/gc` asks each) | Doom default |
+| `C-f` | N V M | Search in buffer (same as `/`) | Custom |
 | `/` , `n` , `N` | N | Search in buffer, next, previous | Doom default |
 
 ## 4. Windows and splits
@@ -136,13 +137,14 @@ If a key does nothing, look it up: `SPC h k` then the key. Search every bind:
 |---|---|---|
 | `C-s` | Incremental search | Save |
 | `C-d` | Scroll half page down | Multi-cursor |
+| `C-f` | Scroll page down | Search in buffer |
 | `M-d` / `M-D` | Multi-cursor | Emacs default (`kill-word`) |
 | `]d` / `[d` | Git hunk | Diagnostic (hunk moved to `]g` / `[g`) |
 | `s` | evil-snipe | Jump (easymotion) |
 | `C-b` | Scroll page up | Toggle treemacs |
 | `C-n` | Next paste | Focus treemacs |
 
-Half-page scroll down is gone with `C-d`. Use `C-f` (page) or `}`.
+Half-page scroll down is gone with `C-d`. Use `}` or `G` to move down.
 
 ## Not verified
 

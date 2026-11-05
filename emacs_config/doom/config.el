@@ -66,6 +66,9 @@
  ;; ctrl+s -> save
  :nvieg "C-s" #'save-buffer
 
+ ;; ctrl+f -> search in buffer (same as /), replaces page-down scroll
+ :nmv "C-f" #'evil-search-forward
+
  ;; gr / gR: drop quickrun/eval operators, gr -> show references
  :nm  "gR" nil
  :v   "gR" nil
@@ -116,6 +119,7 @@
 ;; ErrorLens-style: show every diagnostic at the end of its line, not only
 ;; where the cursor is.
 (use-package! flyover
+  :disabled t   ; TEMP: disabled, was laggy. Remove this line to re-enable.
   :hook ((flycheck-mode flymake-mode) . flyover-mode)
   :config
   (setq flyover-checkers '(flycheck flymake)
@@ -127,9 +131,28 @@
 
 ;; avoid showing the current line's diagnostic twice
 (after! lsp-ui
-  (setq lsp-ui-sideline-show-diagnostics nil))
+  ;; TEMP: re-enable alongside flyover (was off to avoid duplicates)
+  ;; (setq lsp-ui-sideline-show-diagnostics nil)
+  )
 
 ;; readable on the light Alabaster theme: dark text on a pale tinted background
 (custom-set-faces!
   '(flyover-error   :foreground "#a40000" :background "#fbe3e3")
   '(flyover-warning :foreground "#7a4b00" :background "#fdf0d0"))
+
+;; Diagnostics as a coloured mark at the start of the line (cheap, no text):
+;; red = error, yellow = warning
+(after! flycheck
+  (setq flycheck-indication-mode 'right-fringe))
+(custom-set-faces!
+  '(flycheck-fringe-error   :foreground "#d32f2f")
+  '(flycheck-fringe-warning :foreground "#e6a700")
+  '(flycheck-fringe-info    :foreground "#1e88e5"))
+
+;; tsserver was growing to ~2 GB in a pnpm monorepo: trim its work
+(after! lsp-mode
+  (setq lsp-clients-typescript-disable-automatic-typing-acquisition t ; no @types downloads/scans
+        lsp-idle-delay 1.0                                            ; wait longer before re-querying LSP
+        lsp-clients-typescript-max-ts-server-memory 3072)             ; MB, same cap as VSCode
+  (dolist (re '("[/\\\\]\\.pnpm\\'" "[/\\\\]dist\\'" "[/\\\\]\\.turbo\\'"))
+    (add-to-list 'lsp-file-watch-ignored-directories re)))

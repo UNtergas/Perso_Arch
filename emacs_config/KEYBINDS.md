@@ -13,6 +13,7 @@ every state.
 | `s` | N V | Jump: type chars, then press the label (`avy-goto-char-timer`) | `evil-snipe` 2-char find (package disabled) | VSCodeVim easymotion `s` |
 | `]d` / `[d` | M | Next / previous diagnostic (`next-error`) | Next / previous git hunk | VSCode `]d` / `[d` |
 | `]g` / `[g` | M | Next / previous git hunk | *(unbound)* | Keeps Doom's hunk nav after `]d` was taken |
+| `C-f` | N V M | Search in buffer (`evil-search-forward`, same as `/`) | Scroll page down | VSCode `ctrl+f` |
 | `C-s` | N V I E | Save buffer (`save-buffer`) | Incremental search (isearch) | VSCode `ctrl+s` |
 | `gr` | N M | Show references (`+lookup/references`) | *(unbound)* | Show references |
 | `M-p` | N I | Indent line | *(unbound)* | VSCode `alt+p` |
@@ -37,7 +38,7 @@ Notes:
 - With multiple selections active, `c` / `i` / `a` edit all of them; `Esc`
   exits. Doom's other multi-cursor keys still work: `R` in visual selects all
   matches, `gz…` = evil-mc cursors.
-- To half-page scroll now: `C-u` up still works; for down use `C-f` (page) or `}`.
+- Scrolling down: `C-d` and `C-f` are taken. `C-u` (half page up) still works; move down with `}` (paragraph), `G` (end) or `C-e` (one line).
 - Insert mode `C-k` (digraph) untouched: `C-k` binds are N/V only.
 
 ## Not changed but useful (Doom defaults)
