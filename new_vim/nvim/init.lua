@@ -119,18 +119,22 @@ require("lazy").setup({
       end
       vim.api.nvim_create_autocmd("ColorScheme", { pattern = "alabaster", callback = tweak })
       -- Chalice/Alabaster in VS Code: only entity.name is blue (function-valued keys, calls, types); `string` etc. stay black
-      local blue_rules = [[
-; extends
-(pair key: (property_identifier) @AlabasterDefinition value: [(arrow_function) (function_expression)] (#set! priority 130))
-(call_expression function: (identifier) @AlabasterDefinition (#set! priority 130))
-(call_expression function: (member_expression property: (property_identifier) @AlabasterDefinition (#set! priority 130)))
-(type_identifier) @AlabasterDefinition (#set! priority 130)
-(new_expression constructor: (identifier) @AlabasterDefinition (#set! priority 130))
-(method_definition name: (property_identifier) @AlabasterDefinition (#set! priority 130))
-(function_declaration name: (identifier) @AlabasterDefinition (#set! priority 130))
-]]
+      local blue_rules = {
+        "(pair key: (property_identifier) @AlabasterDefinition value: [(arrow_function) (function_expression)] (#set! priority 130))",
+        "(call_expression function: (identifier) @AlabasterDefinition (#set! priority 130))",
+        "(call_expression function: (member_expression property: (property_identifier) @AlabasterDefinition (#set! priority 130)))",
+        "(type_identifier) @AlabasterDefinition (#set! priority 130)", -- TS only
+        "(new_expression constructor: (identifier) @AlabasterDefinition (#set! priority 130))",
+        "(method_definition name: (property_identifier) @AlabasterDefinition (#set! priority 130))",
+        "(function_declaration name: (identifier) @AlabasterDefinition (#set! priority 130))",
+      }
       for _, lang in ipairs({ "typescript", "tsx", "javascript" }) do
-        pcall(vim.treesitter.query.set, lang, "highlights", blue_rules)
+        -- keep only the rules this grammar understands (e.g. JavaScript has no type_identifier)
+        local ok_rules = {}
+        for _, rule in ipairs(blue_rules) do
+          if pcall(vim.treesitter.query.parse, lang, rule) then table.insert(ok_rules, rule) end
+        end
+        pcall(vim.treesitter.query.set, lang, "highlights", "; extends\n" .. table.concat(ok_rules, "\n"))
       end
       -- treesitter highlighting is not on by default; the blue rules above need it (TS/JS only)
       vim.api.nvim_create_autocmd("FileType", {
