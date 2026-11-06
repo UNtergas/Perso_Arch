@@ -56,6 +56,12 @@ vim.opt.scrolloff = 5
 
 -- Light theme
 vim.opt.background = "light"
+vim.g.health = { style = "float" } -- :checkhealth in a float, not a new tab (one tab per nvim)
+-- the float's own q deletes the buffer and leaves an empty float behind; close the window instead
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "checkhealth",
+  callback = function(ev) vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = ev.buf, nowait = true }) end,
+})
 
 -- lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -516,9 +522,34 @@ require("lazy").setup({
             [[ /|   |\ ]],
             [[(_|   |_)]],
           }, "\n"),
-          keys = {},
+          keys = {
+            {
+              icon = "\u{f07b} ",
+              key = "p",
+              desc = "Open old project",
+              action = function()
+                -- pick a recent project, cd into it, browse it in Oil
+                Snacks.picker.projects({
+                  confirm = function(picker, item)
+                    picker:close()
+                    if not item then return end
+                    vim.cmd.cd(vim.fn.fnameescape(item.file))
+                    require("oil").open(item.file)
+                  end,
+                  win = { input = { keys = { ["<c-t>"] = false } } }, -- one tab per nvim
+                })
+              end,
+            },
+            { icon = "\u{f07c} ", key = "e", desc = "File explorer", action = function() require("oil").open(vim.fn.getcwd()) end },
+            { icon = "\u{f15b} ", key = "n", desc = "Empty buffer", action = ":enew" },
+            { icon = "\u{f1e6} ", key = "l", desc = "Update plugins (Lazy, then U)", action = ":Lazy" },
+            { icon = "\u{f0ad} ", key = "m", desc = "Mason (LSP servers and tools)", action = ":Mason" },
+            { icon = "\u{f0f1} ", key = "h", desc = "Plugin health check", action = ":checkhealth lazy" },
+            { icon = "\u{f085} ", key = "s", desc = "LSP health check", action = ":checkhealth vim.lsp" },
+            { icon = "\u{f011} ", key = "q", desc = "Exit", action = ":qa" },
+          },
         },
-        sections = { { section = "header" } },
+        sections = { { section = "header" }, { section = "keys", gap = 1, padding = 1 } },
       },
     },
   },

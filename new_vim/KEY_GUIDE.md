@@ -110,8 +110,19 @@ The bottom statusline starts with the current directory name in brackets (e.g. `
 
 ## Start screen
 
-`nvim` with no file shows a start screen with just an ASCII cat. Open anything
-(`SPC SPC`, `C-n`) to leave it.
+`nvim` with no file shows a start screen: an ASCII cat and a menu. Press the key
+shown, or open anything (`SPC SPC`, `C-n`) to leave it.
+
+| Key | Does |
+|---|---|
+| `p` | Open old project: pick one, `cd` into it, browse it in Oil |
+| `e` | File explorer: Oil on the folder nvim started in |
+| `n` | Empty buffer |
+| `l` | Lazy plugin manager, then `U` to update |
+| `m` | Mason: install and update LSP servers and tools (`q` closes) |
+| `h` | Plugin health check (`q` closes) |
+| `s` | LSP health check (`q` closes) |
+| `q` | Exit |
 
 ### Oil keys (inside the file browser)
 
