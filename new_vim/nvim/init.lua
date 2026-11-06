@@ -727,6 +727,8 @@ map("n", "<C-w>q", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
 map("n", "<C-w>T", "<Nop>", { desc = "Disabled: one tab per nvim" })
+-- ; is : (this also makes flash leave ; alone in every mode); f/t repeat: press f/t again, , goes back
+map({ "n", "x" }, ";", ":", { desc = "Command line" })
 
 -- ctrl+k chords
 local function mk_parent(p)

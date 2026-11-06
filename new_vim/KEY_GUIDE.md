@@ -220,6 +220,7 @@ Deleting in Oil sends files to the trash. To get one back: `g\` in the folder it
 | `C-p` | Previous line | Find file |
 | `C-t` | Tag stack pop | Find symbol |
 | `C-w T` | Move window to a new tab | Disabled |
+| `;` | Repeat `f`/`t` | Same as `:` (normal and visual). To repeat, press `f`/`t` again; `,` goes back |
 | `C-w q`, `C-w C-w` | Close window, next window | Close buffer |
 | `C-b` / `C-n` | Scroll back, next line | List buffers, toggle Oil |
 | `grr`, `gra`, `grn`, `gri`, `grt` | Neovim 0.11 LSP defaults | Removed so `gr` has no delay |
