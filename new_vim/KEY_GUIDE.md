@@ -106,7 +106,7 @@ unfolded.
 | `SPC h d` | n | Remove the current file from the list |
 | `SPC h h` | n | Open the list. `dd` deletes a line, `dd` then `p` moves one, Enter jumps. Close the menu with `q` or `Esc` to save |
 
-The bottom statusline starts with the current directory name in brackets (e.g. `[snowpack-android]`, follows `:cd`), then shows error (`E2`, red), warning (`W1`, yellow), info (`I1`) and hint (`H1`, e.g. "declared but never read") counts after the file name. The harpoon slots have their own row at the top, e.g. ` 1:a.ts  2:b.ts `, with the current file highlighted.
+The bottom statusline starts with the current directory name in brackets (e.g. `[snowpack-android]`, follows `:cd`), then the git branch when inside a repo (e.g. `[main]`, updates on its own after a checkout, short commit when detached), then shows error (`E2`, red), warning (`W1`, yellow), info (`I1`) and hint (`H1`, e.g. "declared but never read") counts after the file name. The harpoon slots have their own row at the top, e.g. ` 1:a.ts  2:b.ts `, with the current file highlighted.
 
 ## Start screen
 

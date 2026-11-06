@@ -85,7 +85,7 @@ require("lazy").setup({
       local function tweak()
         local hl = vim.api.nvim_set_hl
         -- slightly grey background (Alabaster's own is near white)
-        local bg, float, line = "#f0f0f0", "#e8e8e8", "#e6e6e6"
+        local bg, float, line = "#f5f5f5", "#ededed", "#ebebeb"
         hl(0, "Normal", { fg = vim.api.nvim_get_hl(0, { name = "Normal" }).fg, bg = bg })
         hl(0, "NormalNC", { bg = bg })
         hl(0, "NormalFloat", { bg = float })
@@ -149,11 +149,14 @@ require("lazy").setup({
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
+    branch = "main", -- rewrite: needs nvim 0.12+ and tree-sitter-cli 0.26.1+ (cargo install tree-sitter-cli --locked)
+    lazy = false, -- main does not support lazy-loading
     enabled = not vim.g.vscode,
     build = ":TSUpdate",
 
-    opts = {
-      ensure_installed = {
+    config = function()
+      -- no-op for parsers already installed; runs async
+      require("nvim-treesitter").install({
         "lua",
         "c",
         "cpp",
@@ -166,8 +169,23 @@ require("lazy").setup({
         "json",
         "html",
         "css",
-      },
-    },
+        "bash",
+        "dockerfile",
+        "fish",
+        "go",
+        "graphql",
+        "luadoc",
+        "markdown",
+        "markdown_inline",
+        "php",
+        "printf",
+        "scss",
+        "toml",
+        "vim",
+        "vimdoc",
+        "yaml",
+      })
+    end,
   },
 
   -- Completion
@@ -828,15 +846,55 @@ function _G.diag_status()
 end
 -- current project: the working directory (follows :cd, so also Oil's ` and ~)
 function _G.project_name()
-  return "[ " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t") .. "] "
+  return "[ " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t") .. "]"
 end
+-- git branch of the working directory, e.g. [ main]; empty outside a repo.
+-- Watches the git dir (git replaces HEAD by rename, so a watch on the file itself would go stale),
+-- so a checkout from any terminal shows up right away. Detached HEAD shows the short commit.
+local git_branch, git_dir, git_watcher = "", "", nil
+local git_refresh
+local function git_watch(dir)
+  if dir == git_dir then return end
+  git_dir = dir
+  if git_watcher then git_watcher:close() git_watcher = nil end
+  if dir == "" then return end
+  git_watcher = vim.uv.new_fs_event()
+  git_watcher:start(dir, {}, vim.schedule_wrap(function(_, file)
+    if file == "HEAD" then git_refresh() end
+  end))
+end
+git_refresh = function()
+  local cwd = vim.fn.getcwd()
+  local function git(args, cb)
+    vim.system(vim.list_extend({ "git", "-C", cwd }, args), { text = true }, vim.schedule_wrap(function(r)
+      if cwd == vim.fn.getcwd() then cb(r.code == 0 and vim.trim(r.stdout) or "") end -- drop results from before a :cd
+    end))
+  end
+  local function show(name)
+    git_branch = name
+    vim.cmd.redrawstatus()
+  end
+  git({ "rev-parse", "--absolute-git-dir" }, function(dir)
+    git_watch(dir)
+    if dir == "" then return show("") end
+    git({ "branch", "--show-current" }, function(name)
+      if name ~= "" then return show(name) end
+      git({ "rev-parse", "--short", "HEAD" }, show)
+    end)
+  end)
+end
+function _G.git_status()
+  return git_branch == "" and "" or "[\u{f418} " .. git_branch .. "]"
+end
+vim.api.nvim_create_autocmd({ "DirChanged", "FocusGained" }, { callback = git_refresh }) -- FocusGained: catches a `git init`
 vim.api.nvim_create_autocmd("DirChanged", { callback = function() vim.cmd.redrawstatus() end })
+git_refresh()
 -- file language, e.g. [Markdown]; empty when no filetype
 function _G.lang_status()
   local ft = vim.bo.filetype
   return ft == "" and "" or " [" .. ft:sub(1, 1):upper() .. ft:sub(2) .. "]"
 end
-vim.opt.statusline = "%{v:lua.project_name()}%f %m%r%h%w %{%v:lua.diag_status()%}%=%l:%c %P%{v:lua.lang_status()}"
+vim.opt.statusline = "%{v:lua.project_name()}%{v:lua.git_status()} %f %m%r%h%w %{%v:lua.diag_status()%}%=%l:%c %P%{v:lua.lang_status()}"
 
 -- top line (own row): the harpoon slots, current file highlighted
 function _G.harpoon_tabline()
