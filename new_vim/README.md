@@ -28,7 +28,7 @@ jdtls, rust_analyzer, html, cssls. Formatters: `black`, `rustfmt` on `PATH`.
 ## What is in `init.lua`
 
 Plugins (lazy.nvim): alabaster (theme), treesitter + context (sticky scroll),
-blink.cmp (completion), mason + lspconfig, telescope, oil, nvim-tree, flash,
+blink.cmp (completion), mason + lspconfig, telescope, oil, flash,
 indent-blankline, snacks (file rename with LSP import updates, buffer close),
 which-key, gitsigns, git-conflict, diffview, rainbow-delimiters, nvim-surround, undotree,
 conform (manual format), multicursor.

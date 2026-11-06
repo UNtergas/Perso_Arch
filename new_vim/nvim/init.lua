@@ -626,57 +626,12 @@ require("lazy").setup({
 
     opts = {
       default_file_explorer = true,
+      delete_to_trash = true, -- restore: g\ shows the trash, dd the file, go to the folder, p, :w
 
       view_options = {
         show_hidden = true,
       },
     },
-  },
-
-  {
-    "nvim-tree/nvim-tree.lua",
-    cmd = { "NvimTreeToggle", "NvimTreeFocus" },
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = {
-      view = { width = 32 },
-      renderer = { root_folder_label = false, indent_markers = { enable = true } }, -- no root title line (Enter on it went up a dir)
-      update_focused_file = { enable = true }, -- treemacs-follow-mode
-      -- only the everyday keys; no live filter / search (it hung) and none of the other defaults
-      on_attach = function(bufnr)
-        local api = require("nvim-tree.api")
-        local function m(key, fn, desc)
-          vim.keymap.set("n", key, fn, { buffer = bufnr, noremap = true, silent = true, nowait = true, desc = "Tree: " .. desc })
-        end
-        m("<CR>", api.node.open.edit, "Open")
-        m("o", api.node.open.edit, "Open")
-        m("<2-LeftMouse>", api.node.open.edit, "Open")
-        m("<C-v>", api.node.open.vertical, "Open in vertical split")
-        m("<C-x>", api.node.open.horizontal, "Open in horizontal split")
-        m("a", api.fs.create, "Create file (end the name with / for a folder)")
-        m("r", api.fs.rename, "Rename")
-        m("d", api.fs.remove, "Delete")
-        m("x", api.fs.cut, "Cut (move)")
-        m("c", api.fs.copy.node, "Copy")
-        m("p", api.fs.paste, "Paste")
-        m("y", api.fs.copy.filename, "Copy file name")
-        m("Y", api.fs.copy.relative_path, "Copy relative path")
-        m("gy", api.fs.copy.absolute_path, "Copy absolute path")
-        m("R", api.tree.reload, "Refresh")
-        m("H", api.tree.toggle_hidden_filter, "Toggle dotfiles")
-        m("E", api.tree.expand_all, "Expand all")
-        m("W", api.tree.collapse_all, "Collapse all")
-        m("q", api.tree.close, "Close")
-        m("g?", api.tree.toggle_help, "Help")
-      end,
-      sync_root_with_cwd = true, -- the tree root follows :cd (including Oil's ` and ~)
-    },
-    config = function(_, opts)
-      require("nvim-tree").setup(opts)
-      local api = require("nvim-tree.api")
-      api.events.subscribe(api.events.Event.NodeRenamed, function(d)
-        Snacks.rename.on_rename_file(d.old_name, d.new_name)
-      end)
-    end,
   },
 })
 
@@ -701,8 +656,12 @@ map("i", "<M-o>", "<C-d>", { desc = "Outdent" })
 map("v", "<M-p>", ">gv", { desc = "Indent" })
 map("v", "<M-o>", "<gv", { desc = "Outdent" })
 
--- sidebar: ctrl+b toggle, ctrl+n focus
-map({ "n", "v" }, "<C-n>", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle sidebar" })
+-- ctrl+n toggles Oil: opens at the current file's folder, again goes back to where you were
+map({ "n", "v" }, "<C-n>", function()
+  if vim.bo.filetype ~= "oil" then return require("oil").open() end
+  if vim.bo.modified then return vim.notify("Oil has unsaved changes: :w to apply, u to undo", vim.log.levels.WARN) end
+  require("oil").close()
+end, { desc = "Toggle Oil" })
 map({ "n", "v" }, "<C-b>", tb("buffers"), { desc = "Switch buffer" })
 
 -- diagnostics / hunks: ]d [d ]g [g
@@ -871,7 +830,7 @@ function _G.diag_status()
   if h > 0 then out = out .. "%#DiagnosticHint# H" .. h .. "%* " end -- e.g. "declared but never read"
   return out
 end
--- current project: the working directory (follows :cd, so also Oil's ` and ~)
+-- current project: the working directory (follows :cd, so also Oil's ` and g~)
 function _G.project_name()
   return "[ " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t") .. "]"
 end

@@ -18,7 +18,7 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `SPC .` | n | Find any file (includes hidden) |
 | `SPC ,` / `SPC b b` | n | Switch buffer |
 | `SPC :` | n | Command palette |
-| `C-n` | n v | Toggle nvim-tree sidebar |
+| `C-n` | n v | Toggle Oil file browser: opens at the current file's folder, again goes back |
 | `SPC e` | n | Oil file browser (edit files as text). It also opens for `nvim .` and `:e .` instead of netrw |
 | `C-b` | n v | List all buffers (same as `SPC b b`) |
 | `C-k a` | n v | New file (creates parent folders) |
@@ -113,24 +113,30 @@ The bottom statusline starts with the current directory name in brackets (e.g. `
 `nvim` with no file shows a start screen with just an ASCII cat. Open anything
 (`SPC SPC`, `C-n`) to leave it.
 
-### nvim-tree keys (inside the sidebar)
+### Oil keys (inside the file browser)
 
-Only these exist; the defaults (live filter, search, etc.) are removed.
+Oil is a text buffer: edit the list like normal text, and `:w` applies the
+changes after a confirmation. Multi-cursor, `:s`, macros and `.` work on it.
 
 | Key | Does |
 |---|---|
-| `Enter` / `o` / double-click | Open file or fold/unfold folder |
-| `C-v` / `C-x` | Open in vertical / horizontal split |
-| `a` | New file (end the name with `/` for a folder) |
-| `r` | Rename |
-| `d` | Delete |
-| `x`, `c`, `p` | Cut, copy, paste (move or copy a file) |
-| `y` / `Y` / `gy` | Copy name / relative path / absolute path |
-| `R` | Refresh |
-| `H` | Toggle dotfiles |
-| `E` / `W` | Expand all / collapse all |
-| `q` | Close the sidebar |
-| `g?` | Show these keys |
+| `C-n` | Close Oil, back to where you were (refuses while there are unsaved changes) |
+| `Enter` | Open file or enter folder |
+| `-` | Parent folder |
+| `C-s` / `C-h` / `C-t` | Open in vertical split / horizontal split / tab |
+| `C-p` | Preview |
+| `o`, type a name, `:w` | New file (end the name with `/` for a folder) |
+| Edit the name, `:w` | Rename (imports update) |
+| `dd`, `:w` | Delete (to the trash, see section 10) |
+| `dd`, go to the folder, `p`, `:w` | Move (imports update) |
+| `yy`, go to the folder, `p`, `:w` | Copy |
+| `gx` | Open with the default app (PDF, images) |
+| `C-l` | Refresh |
+| `g.` | Toggle dotfiles (shown by default) |
+| `gs` | Change the sort order |
+| `` ` `` / `g~` | `:cd` / `:tcd` to the shown folder |
+| `g\` | Show this folder's trash |
+| `g?` | Show all keys |
 
 ## 7. Code intelligence (LSP)
 
@@ -177,8 +183,10 @@ Alacritty may not send Ctrl+` distinctly. If it does nothing, use `C-@`
 | `:pwd` | cmd | Show the current directory |
 
 Telescope (`SPC SPC`, `SPC s p`) searches from the current directory, so set it
-first. The tree follows `:cd`; change the directory from Oil:
-`` ` `` runs `:cd` to the shown folder, `~` runs `:tcd`, `-` goes to parent.
+first. Change the directory from Oil:
+`` ` `` runs `:cd` to the shown folder, `g~` runs `:tcd`, `-` goes to parent.
+
+Deleting in Oil sends files to the trash. To get one back: `g\` in the folder it was deleted from shows its trash, `dd` the file, `g\` back, `p`, `:w`. `:Oil --trash /` lists everything in the trash. A delete inside the trash view that is not pasted anywhere purges the file for good.
 
 ## 11. Help
 
@@ -201,7 +209,7 @@ first. The tree follows `:cd`; change the directory from Oil:
 | `C-p` | Previous line | Find file |
 | `C-t` | Tag stack pop | Find symbol |
 | `C-w q`, `C-w C-w` | Close window, next window | Close buffer |
-| `C-b` / `C-n` | Scroll back, next line | List buffers, toggle sidebar |
+| `C-b` / `C-n` | Scroll back, next line | List buffers, toggle Oil |
 | `grr`, `gra`, `grn`, `gri`, `grt` | Neovim 0.11 LSP defaults | Removed so `gr` has no delay |
 
 Scrolling down is gone with `C-d` and `C-f`. Use `}`, `G` or `C-e`.

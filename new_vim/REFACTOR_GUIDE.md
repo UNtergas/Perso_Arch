@@ -43,17 +43,9 @@ Only in the current file: `C-d` (multi-cursor on the word), type the new name,
 `SPC f R`, then the new path (new name, or a new folder to move it).
 `Snacks.rename` asks the LSP to update the imports.
 
-### Rename a folder or file in the sidebar (nvim-tree)
-
-1. `C-b` to open, put the cursor on the item.
-2. Rename: `r`, type the new name.
-3. Move: `x` (cut) on the item, go to the target folder, `p` (paste).
-   Moves and renames both trigger the import update (nvim-tree sends a rename
-   event to Snacks).
-
 ### Rename or move in Oil (edit the file list as text)
 
-1. `SPC e` opens the folder as a buffer.
+1. `C-n` or `SPC e` opens the folder as a buffer.
 2. Edit a name, or cut/paste a line (`dd` then `p` in another folder's buffer)
    to move it.
 3. `:w` applies the changes. Oil moves also call Snacks, so imports update.
@@ -107,8 +99,8 @@ or `SPC g m`. Undo a bad replace with `u`, or `SPC s u` for the undo tree.
 | Task | Automatic | Manual |
 |---|---|---|
 | Rename variable | `SPC c r` | `SPC s p` → `C-q` → `:cfdo %s/…/…/gc \| update` |
-| Rename folder | nvim-tree `r`, or Oil `:w` | move, then project search + replace |
-| Move folder | nvim-tree `x` + `p`, or Oil | move, then project search + replace |
+| Rename folder | Oil: edit the name, `:w` | move, then project search + replace |
+| Move folder | Oil: `dd`, `p`, `:w` | move, then project search + replace |
 | Rename/move file | `SPC f R` | move, then project search + replace |
 | Save all | `SPC b S` | `SPC b S` |
 
