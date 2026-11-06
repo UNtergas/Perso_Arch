@@ -15,6 +15,6 @@ Before applying `new_vim/nvim/` on a machine, tell the user about this and check
 
 An older `lazy-lock.json` brings back a bug: `nvim-lspconfig` at `8a1529e4` (March 2025) has no `lsp/` folder, so no server starts, `gd` and `gr` do nothing, and Ctrl-click gives `E433: No tags file`. `lsp.log` shows `invalid "ts_ls" config ... cmd`. Always copy the lockfile from `new_vim/nvim/`, never from an older machine or backup.
 
-`trouble.nvim` (`gr`, `C-g` in Telescope) and `grug-far.nvim` (`SPC s r`) were added in commits `a7129a36` and `48b4a9b1`. Check both are installed after step 4. `SPC s r` needs `ripgrep`.
+`trouble.nvim` (`gr`, `C-g` in Telescope) and `grug-far.nvim` (`SPC s r`) were added in commit `a7129a36`. Check both are installed after step 4. `SPC s r` needs `ripgrep`.
 
 Delete this section once every machine is done.
