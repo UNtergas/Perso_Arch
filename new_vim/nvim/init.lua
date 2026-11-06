@@ -404,7 +404,7 @@ require("lazy").setup({
     cmd = "Trouble",
     opts = {
       focus = true,
-      win = { position = "bottom", size = 0.4 },
+      win = { position = "bottom", size = 0.5 },
     },
   },
 
