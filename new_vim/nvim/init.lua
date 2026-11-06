@@ -797,6 +797,33 @@ local function toggle_term()
   vim.cmd("startinsert")
 end
 map("n", "<leader>ot", toggle_term, { desc = "Toggle terminal" })
+-- markdown: SPC o m renders the file with glow in a buffer (vim motions and / work, q goes back)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function(ev)
+    map("n", "<leader>om", function()
+      local file = vim.api.nvim_buf_get_name(ev.buf)
+      if file == "" then return vim.notify("Save the file first", vim.log.levels.WARN) end
+      vim.cmd("silent update") -- glow reads the file on disk
+      local win = vim.api.nvim_get_current_win()
+      local width = math.min(vim.api.nvim_win_get_width(win) - 8, 100)
+      vim.cmd("enew")
+      local view = vim.api.nvim_get_current_buf()
+      vim.bo[view].bufhidden = "wipe"
+      vim.fn.jobstart({ "glow", "-s", "light", "-w", tostring(width), file }, {
+        term = true,
+        on_exit = function()
+          vim.schedule(function()
+            if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == view then
+              vim.api.nvim_win_set_cursor(win, { 1, 0 }) -- start reading from the top
+            end
+          end)
+        end,
+      })
+      map("n", "q", function() vim.api.nvim_win_set_buf(win, ev.buf) end, { buffer = view, desc = "Back to the file" })
+    end, { buffer = ev.buf, desc = "Read with glow" })
+  end,
+})
 -- ctrl+` (VSCode). Many terminals send Ctrl+` as <Nul>, so bind both.
 map({ "n", "i", "t" }, "<C-`>", toggle_term, { desc = "Toggle terminal" })
 map({ "n", "i", "t" }, "<C-@>", toggle_term, { desc = "Toggle terminal" })

@@ -160,6 +160,7 @@ Only these exist; the defaults (live filter, search, etc.) are removed.
 | ``C-` `` | n i t | Toggle bottom terminal (VSCode) |
 | `C-@` | n i t | Same (many terminals send Ctrl+` as this). Opens at half the screen height |
 | `SPC o t` | n | Same, from the leader |
+| `SPC o m` | n | Read the Markdown file rendered by glow in a buffer (`q` goes back) |
 | `C-\ C-n` | t | Leave terminal mode, back to normal |
 
 Alacritty may not send Ctrl+` distinctly. If it does nothing, use `C-@`
