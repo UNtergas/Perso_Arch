@@ -378,6 +378,10 @@ require("lazy").setup({
     -- one tab per nvim: no "open in new tab" from a picker
     opts = {
       defaults = {
+        -- flex: narrow windows stack the preview above the results instead of dropping it
+        layout_strategy = "flex",
+        layout_config = { width = 0.95, height = 0.95 },
+        path_display = { "truncate" },
         mappings = {
           i = { ["<C-t>"] = false },
           n = { ["<C-t>"] = false },
