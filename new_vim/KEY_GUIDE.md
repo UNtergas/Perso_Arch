@@ -33,7 +33,7 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `s` | n v o | Flash jump (type chars, press label) |
 | `S` | n v o | Flash treesitter select |
 | `gd` / `gD` / `gi` | n | Definition / declaration / implementation |
-| `gr` | n | References (Telescope) |
+| `gr` | n | References, grouped by file (Trouble) |
 | `K` | n | Hover docs |
 | `C-t` | n | Find symbol in workspace (VSCode) |
 | `]d` / `[d` | n | Next / previous diagnostic |
@@ -48,7 +48,10 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `SPC s s` | n | Fuzzy search lines in buffer |
 | `SPC s p` | n | Search project (live grep) |
 | `SPC s w` | n | Search the word under the cursor in the project, whole word only |
+| `SPC s r` | n v | Search and replace in the project, grouped by file (grug-far). `SPC s` syncs all, `SPC l` this line, `SPC n` / `SPC p` this line then next / previous, `SPC v` this file. `dd` drops a result. `g?` lists every key. `SPC r` (Replace) is off |
 | `SPC f g` | n | Search project (live grep, old bind) |
+| `C-g` | Telescope | Show the results grouped by file (Trouble) |
+| `C-q` | Telescope | Send the results to the quickfix list |
 | `Esc` | n | Clear search highlight |
 | `:%s/a/b/g` | n | Replace in buffer (`/gc` asks each) |
 

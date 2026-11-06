@@ -308,7 +308,7 @@ require("lazy").setup({
           end
           m("gd", vim.lsp.buf.definition, "Go to definition")
           m("gD", vim.lsp.buf.declaration, "Go to declaration")
-          m("gr", function() require("telescope.builtin").lsp_references() end, "Show references")
+          m("gr", function() require("trouble").open({ mode = "lsp_references", focus = true }) end, "Show references")
           m("gi", vim.lsp.buf.implementation, "Go to implementation")
           m("K", vim.lsp.buf.hover, "Hover docs")
           m("<leader>cr", vim.lsp.buf.rename, "Rename symbol")
@@ -382,11 +382,55 @@ require("lazy").setup({
         layout_strategy = "flex",
         layout_config = { width = 0.95, height = 0.95 },
         path_display = { "truncate" },
+        -- C-g: show the results in Trouble, grouped by file (C-q still fills the quickfix list)
         mappings = {
-          i = { ["<C-t>"] = false },
-          n = { ["<C-t>"] = false },
+          i = {
+            ["<C-t>"] = false,
+            ["<C-g>"] = function(...) return require("trouble.sources.telescope").open(...) end,
+          },
+          n = {
+            ["<C-t>"] = false,
+            ["<C-g>"] = function(...) return require("trouble.sources.telescope").open(...) end,
+          },
         },
       },
+    },
+  },
+
+  -- Trouble: results listed under one header per file
+  {
+    "folke/trouble.nvim",
+    enabled = not vim.g.vscode,
+    cmd = "Trouble",
+    opts = {
+      focus = true,
+      win = { position = "bottom", size = 0.4 },
+    },
+  },
+
+  -- grug-far: project search and replace, live results under one header per file
+  {
+    "MagicDuck/grug-far.nvim",
+    enabled = not vim.g.vscode,
+    cmd = "GrugFar",
+    opts = {
+      headerMaxWidth = 80,
+      keymaps = { replace = false }, -- sync only: Replace ignores what's in the results list
+    },
+    config = function(_, opts)
+      require("grug-far").setup(opts)
+      -- header shows Help and the sync actions; the other keys still work (g? lists them)
+      local help = require("grug-far.render.help")
+      local render = help.getHelpVirtLines
+      help.getHelpVirtLines = function(context, actions)
+        if actions ~= context.actions then return render(context, actions) end -- history window has its own
+        return render(context, vim.tbl_filter(function(a)
+          return a.text == "Help" or a.text:find("^Sync") ~= nil
+        end, actions))
+      end
+    end,
+    keys = {
+      { "<leader>sr", function() require("grug-far").open({ transient = true }) end, mode = { "n", "v" }, desc = "Search and replace (grouped by file)" },
     },
   },
 
