@@ -368,6 +368,16 @@ require("lazy").setup({
         desc = "Help",
       },
     },
+
+    -- one tab per nvim: no "open in new tab" from a picker
+    opts = {
+      defaults = {
+        mappings = {
+          i = { ["<C-t>"] = false },
+          n = { ["<C-t>"] = false },
+        },
+      },
+    },
   },
 
   -- Icons
@@ -628,6 +638,12 @@ require("lazy").setup({
       default_file_explorer = true,
       delete_to_trash = true, -- restore: g\ shows the trash, dd the file, go to the folder, p, :w
 
+      -- one tab per nvim: no "open in new tab", no tab-local :tcd
+      keymaps = {
+        ["<C-t>"] = false,
+        ["g~"] = false,
+      },
+
       view_options = {
         show_hidden = true,
       },
@@ -679,6 +695,7 @@ end
 map("n", "<C-w>q", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
+map("n", "<C-w>T", "<Nop>", { desc = "Disabled: one tab per nvim" })
 
 -- ctrl+k chords
 local function mk_parent(p)
@@ -830,7 +847,7 @@ function _G.diag_status()
   if h > 0 then out = out .. "%#DiagnosticHint# H" .. h .. "%* " end -- e.g. "declared but never read"
   return out
 end
--- current project: the working directory (follows :cd, so also Oil's ` and g~)
+-- current project: the working directory (follows :cd, so also Oil's `)
 function _G.project_name()
   return "[ " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t") .. "]"
 end

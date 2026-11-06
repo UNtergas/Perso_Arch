@@ -123,7 +123,7 @@ changes after a confirmation. Multi-cursor, `:s`, macros and `.` work on it.
 | `C-n` | Close Oil, back to where you were (refuses while there are unsaved changes) |
 | `Enter` | Open file or enter folder |
 | `-` | Parent folder |
-| `C-s` / `C-h` / `C-t` | Open in vertical split / horizontal split / tab |
+| `C-s` / `C-h` | Open in vertical / horizontal split |
 | `C-p` | Preview |
 | `o`, type a name, `:w` | New file (end the name with `/` for a folder) |
 | Edit the name, `:w` | Rename (imports update) |
@@ -134,7 +134,7 @@ changes after a confirmation. Multi-cursor, `:s`, macros and `.` work on it.
 | `C-l` | Refresh |
 | `g.` | Toggle dotfiles (shown by default) |
 | `gs` | Change the sort order |
-| `` ` `` / `g~` | `:cd` / `:tcd` to the shown folder |
+| `` ` `` | `:cd` to the shown folder |
 | `g\` | Show this folder's trash |
 | `g?` | Show all keys |
 
@@ -179,12 +179,12 @@ Alacritty may not send Ctrl+` distinctly. If it does nothing, use `C-@`
 | `SPC c d` | n | `cd` to the current file's folder |
 | `SPC c D` | n | `cd` to the git root |
 | `:cd path` | cmd | Change directory (global) |
-| `:lcd path` / `:tcd path` | cmd | Change for this window / tab only |
+| `:lcd path` | cmd | Change for this window only |
 | `:pwd` | cmd | Show the current directory |
 
 Telescope (`SPC SPC`, `SPC s p`) searches from the current directory, so set it
 first. Change the directory from Oil:
-`` ` `` runs `:cd` to the shown folder, `g~` runs `:tcd`, `-` goes to parent.
+`` ` `` runs `:cd` to the shown folder, `-` goes to parent.
 
 Deleting in Oil sends files to the trash. To get one back: `g\` in the folder it was deleted from shows its trash, `dd` the file, `g\` back, `p`, `:w`. `:Oil --trash /` lists everything in the trash. A delete inside the trash view that is not pasted anywhere purges the file for good.
 
@@ -208,11 +208,14 @@ Deleting in Oil sends files to the trash. To get one back: `g\` in the folder it
 | `C-f` | Scroll page | Search in buffer |
 | `C-p` | Previous line | Find file |
 | `C-t` | Tag stack pop | Find symbol |
+| `C-w T` | Move window to a new tab | Disabled |
 | `C-w q`, `C-w C-w` | Close window, next window | Close buffer |
 | `C-b` / `C-n` | Scroll back, next line | List buffers, toggle Oil |
 | `grr`, `gra`, `grn`, `gri`, `grt` | Neovim 0.11 LSP defaults | Removed so `gr` has no delay |
 
 Scrolling down is gone with `C-d` and `C-f`. Use `}`, `G` or `C-e`.
+
+One tab per nvim: the keys that open a tab are removed (Oil, Telescope, `C-w T`). Move between files with buffers (`C-b`) and Harpoon. The merge tool (`SPC g m`) still opens its own tab, and `SPC g q` closes it.
 
 ## Gutter marks
 
