@@ -133,6 +133,10 @@ require("lazy").setup({
         "(new_expression constructor: (identifier) @AlabasterDefinition (#set! priority 130))",
         "(method_definition name: (property_identifier) @AlabasterDefinition (#set! priority 130))",
         "(function_declaration name: (identifier) @AlabasterDefinition (#set! priority 130))",
+        -- JSX / TSX tag names (<Table>, <thead>, <ui.Button/>) are entity.name.tag: blue; the < > stay grey
+        "(jsx_opening_element name: (_) @AlabasterDefinition (#set! priority 130))",
+        "(jsx_closing_element name: (_) @AlabasterDefinition (#set! priority 130))",
+        "(jsx_self_closing_element name: (_) @AlabasterDefinition (#set! priority 130))",
       }
       for _, lang in ipairs({ "typescript", "tsx", "javascript" }) do
         -- keep only the rules this grammar understands (e.g. JavaScript has no type_identifier)
@@ -559,7 +563,7 @@ require("lazy").setup({
     end,
   },
 
-  -- Indent guides: one colour per indent level
+  -- Indent guides: light gray everywhere; only the guide of the block the cursor is in gets its level colour
   {
     "lukas-reineke/indent-blankline.nvim",
     enabled = not vim.g.vscode,
@@ -569,14 +573,53 @@ require("lazy").setup({
       local hooks = require("ibl.hooks")
       local names = { "IblL1", "IblL2", "IblL3", "IblL4", "IblL5", "IblL6" }
       local colors = { "#d98a8a", "#d9b25f", "#7fae6f", "#5fa8b8", "#7d95d6", "#b58ad6" }
-      hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-        for k, name in ipairs(names) do
-          vim.api.nvim_set_hl(0, name, { fg = colors[k] })
+      -- mix a colour into the background: share = how much of the colour (0..1)
+      local function tint(hex, share)
+        local bg = { 0xf5, 0xf5, 0xf5 }
+        local out = {}
+        for i = 1, 3 do
+          local c = tonumber(hex:sub(2 * i, 2 * i + 1), 16)
+          out[i] = math.floor(bg[i] + (c - bg[i]) * share + 0.5)
         end
+        return ("#%02x%02x%02x"):format(out[1], out[2], out[3])
+      end
+      local share = 0.3 -- strength of the tint, used by both the band and the active guide
+      hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+        vim.api.nvim_set_hl(0, "IblIndent", { fg = "#d6d6d6" })
+        for k, name in ipairs(names) do
+          vim.api.nvim_set_hl(0, name, { fg = tint(colors[k], share) }) -- active guide: same colour as the band
+        end
+        -- ibl paints the opening line of the block (from the guide's column to the end of the text) with these
+        -- groups, as a thin terminal underline. A terminal draws that underline itself, thin and detached from the
+        -- guide, so use a tinted band in the level colour instead: a thick bar that starts at the guide.
+        -- ibl creates the groups right after this hook, so replace them one tick later.
+        vim.schedule(function()
+          for k in ipairs(names) do
+            vim.api.nvim_set_hl(0, "@ibl.scope.underline." .. k, { bg = tint(colors[k], share) })
+          end
+        end)
       end)
+      -- ibl only counts functions and statement blocks as scopes by default, so inside `where: { ... }` it
+      -- jumped up to the whole method. Add the other bracket pairs, so the innermost { } [ ] ( ) is the scope.
+      local brackets = {
+        "object", "array", "arguments", "formal_parameters", "class_body", "interface_body", "enum_body",
+        "switch_body", "object_pattern", "object_type", "named_imports",
+      }
       ibl.setup({
-        indent = { char = "│", highlight = names },
-        scope = { enabled = false }, -- scope line would hide the per-level colours
+        indent = { char = "│", highlight = "IblIndent" }, -- inactive guides: thin, light gray
+        -- the scope is the bracket pair / block (treesitter) around the cursor; a list here is picked by its
+        -- depth, so level 1 is red, level 2 yellow... as before. Its guide is the thick ▎ in the same tint as
+        -- the band on the opening line (the "underline" groups above), so the two read as one shape.
+        scope = {
+          enabled = true,
+          highlight = names,
+          -- left quarter block: thicker than │ and flush with the left edge of its cell, so it meets the
+          -- underline of the opening line, which starts at the same column's left edge
+          char = "▎",
+          show_start = true,
+          show_end = true,
+          include = { node_type = { typescript = brackets, tsx = brackets, javascript = brackets } },
+        },
       })
     end,
   },
@@ -688,7 +731,13 @@ require("lazy").setup({
       })
     end,
   },
-  { "HiPhish/rainbow-delimiters.nvim", event = "BufReadPost" },
+  {
+    "HiPhish/rainbow-delimiters.nvim",
+    event = "BufReadPost",
+    -- tsx: its default query paints JSX tag names and < > in the bracket-depth colours; "rainbow-parens"
+    -- keeps the rainbow on ( ) [ ] { } only, so tag names get Alabaster's blue instead
+    init = function() vim.g.rainbow_delimiters = { query = { tsx = "rainbow-parens" } } end,
+  },
   { "nvim-treesitter/nvim-treesitter-context", event = "BufReadPost", opts = { max_lines = 3 } },
   {
     "kylechui/nvim-surround",
