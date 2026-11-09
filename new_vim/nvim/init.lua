@@ -408,6 +408,36 @@ require("lazy").setup({
     },
   },
 
+  -- Dropbar: winbar with only the symbol breadcrumb of the current file (class > method).
+  -- The file path is in the tabline row above.
+  {
+    "Bekaboo/dropbar.nvim",
+    enabled = not vim.g.vscode,
+    event = "VeryLazy",
+    opts = {
+      bar = {
+        -- the default sources minus `path`
+        sources = function(buf)
+          local sources = require("dropbar.sources")
+          local utils = require("dropbar.utils")
+          if vim.bo[buf].ft == "markdown" then return { sources.markdown } end
+          if vim.bo[buf].buftype == "terminal" then return { sources.terminal } end
+          return { utils.source.fallback({ sources.lsp, sources.treesitter }) }
+        end,
+        -- every real file gets the bar (the default only shows it for treesitter / LSP buffers)
+        enable = function(buf, win)
+          return vim.api.nvim_buf_is_valid(buf)
+            and vim.api.nvim_win_is_valid(win)
+            and vim.fn.win_gettype(win) == ""
+            and vim.bo[buf].buftype == ""
+            and vim.api.nvim_buf_get_name(buf) ~= ""
+            and vim.bo[buf].filetype ~= "oil"
+            and vim.wo[win].winbar == ""
+        end,
+      },
+    },
+  },
+
   -- grug-far: project search and replace, live results under one header per file
   {
     "MagicDuck/grug-far.nvim",
@@ -822,7 +852,10 @@ map("n", "<leader>fR", function() Snacks.rename.rename_file() end, { desc = "Ren
 map({ "n", "v" }, "<leader>cf", function()
   require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "Format (manual)" })
-map("n", "<leader>cx", tb("diagnostics"), { desc = "Diagnostics list" })
+-- SPC c x: Trouble, diagnostics of every open file grouped under one header per file (again closes it).
+-- SPC c X: the same diagnostics in a flat Telescope list.
+map("n", "<leader>cx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (grouped by file)" })
+map("n", "<leader>cX", tb("diagnostics"), { desc = "Diagnostics list (Telescope)" })
 -- merge conflicts
 map("n", "<leader>gm", "<cmd>DiffviewOpen<cr>", { desc = "Merge tool (3-way)" })
 map("n", "<leader>gq", "<cmd>DiffviewClose<cr>", { desc = "Close merge tool" })
@@ -865,11 +898,15 @@ local function close_popups()
     term.win = nil
   end
   for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    local ft = vim.bo[buf].filetype
-    local floating = vim.api.nvim_win_get_config(win).relative ~= ""
-    if (popup_ft[ft] or floating) and not ft:match("^snacks_notif") then
-      pcall(vim.api.nvim_win_close, win, false) -- fails harmlessly on the last window
+    -- closing one popup can take others with it (Trouble closes its preview float), so the window
+    -- from the list may already be gone; check each one right before touching it
+    if vim.api.nvim_win_is_valid(win) then
+      local buf = vim.api.nvim_win_get_buf(win)
+      local ft = vim.bo[buf].filetype
+      local floating = vim.api.nvim_win_get_config(win).relative ~= ""
+      if (popup_ft[ft] or floating) and not ft:match("^snacks_notif") then
+        pcall(vim.api.nvim_win_close, win, false) -- fails harmlessly on the last window
+      end
     end
   end
 end
@@ -946,17 +983,22 @@ vim.api.nvim_create_autocmd("User", {
   end,
 })
 
--- bottom statusline: file, flags, error/warning counts, position
+-- bottom statusline: flags, diagnostic counts, position.
+-- The four counts always show, each with an icon; a zero is plain, a non-zero count is colored.
+local diag_items = {
+  { vim.diagnostic.severity.ERROR, "\u{f057}", "DiagnosticError" },
+  { vim.diagnostic.severity.WARN, "\u{f071}", "DiagnosticWarn" },
+  { vim.diagnostic.severity.INFO, "\u{f05a}", "DiagnosticInfo" },
+  { vim.diagnostic.severity.HINT, "\u{f0eb}", "DiagnosticHint" }, -- e.g. "declared but never read"
+}
 function _G.diag_status()
   local c = vim.diagnostic.count(0)
-  local e, w = c[vim.diagnostic.severity.ERROR] or 0, c[vim.diagnostic.severity.WARN] or 0
-  local out = ""
-  if e > 0 then out = out .. "%#DiagnosticError# E" .. e .. "%* " end
-  if w > 0 then out = out .. "%#DiagnosticWarn# W" .. w .. "%* " end
-  local i, h = c[vim.diagnostic.severity.INFO] or 0, c[vim.diagnostic.severity.HINT] or 0
-  if i > 0 then out = out .. "%#DiagnosticInfo# I" .. i .. "%* " end
-  if h > 0 then out = out .. "%#DiagnosticHint# H" .. h .. "%* " end -- e.g. "declared but never read"
-  return out
+  local out = {}
+  for _, d in ipairs(diag_items) do
+    local n = c[d[1]] or 0
+    table.insert(out, (n > 0 and "%#" .. d[3] .. "#" or "%*") .. d[2] .. " " .. n .. "%*")
+  end
+  return table.concat(out, "  ") .. " "
 end
 -- current project: the working directory (follows :cd, so also Oil's `)
 function _G.project_name()
@@ -1008,19 +1050,31 @@ function _G.lang_status()
   local ft = vim.bo.filetype
   return ft == "" and "" or " [" .. ft:sub(1, 1):upper() .. ft:sub(2) .. "]"
 end
-vim.opt.statusline = "%{v:lua.project_name()}%{v:lua.git_status()} %f %m%r%h%w %{%v:lua.diag_status()%}%=%l:%c %P%{v:lua.lang_status()}"
+-- the file path and symbol breadcrumb live in the winbar (dropbar.nvim), so the statusline
+-- only names windows that have no winbar: terminal, help, quickfix, Oil...
+function _G.name_status()
+  return (vim.bo.buftype ~= "" or vim.bo.filetype == "oil") and " %t" or ""
+end
+vim.opt.statusline = "%{v:lua.project_name()}%{v:lua.git_status()}%{%v:lua.name_status()%} %m%r%h%w %{%v:lua.diag_status()%}%=%l:%c %P%{v:lua.lang_status()}"
 
--- top line (own row): the harpoon slots, current file highlighted
+-- top line (own row): the current file's path as plain text on the left, compact harpoon slots on the
+-- right (just the numbers, current file highlighted; SPC 1-4 jump, SPC h h lists the names).
+-- %< cuts a too-long path from its left end, so the slots never get pushed around.
+-- The row under it is dropbar's symbol breadcrumb.
 function _G.harpoon_tabline()
+  local name = vim.api.nvim_buf_get_name(0)
+  local current = vim.fn.fnamemodify(name, ":.")
+  local parts = { "%#TabLineFill# [󰀱]" } -- then one bracketed slot each: [󰀱] [1] [2]
   local ok, harpoon = pcall(require, "harpoon")
-  if not ok then return "" end
-  local current = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
-  local parts = { "%#TabLineFill# [󰀱 Harpoon] " }
-  for i, item in ipairs(harpoon:list().items) do
-    local label = " " .. i .. ":" .. vim.fn.fnamemodify(item.value, ":t") .. " "
-    table.insert(parts, (item.value == current and "%#TabLineSel#" or "%#TabLine#") .. label)
+  if ok then
+    for i, item in ipairs(harpoon:list().items) do
+      table.insert(parts, "%#TabLineFill# " .. (item.value == current and "%#TabLineSel#" or "%#TabLine#") .. "[" .. i .. "]")
+    end
   end
-  return table.concat(parts, "%#TabLine# ") .. "%#TabLineFill#"
+  local real = name ~= "" and vim.bo.buftype == "" and vim.bo.filetype ~= "oil"
+  local path = real and vim.fn.fnamemodify(name, ":~:."):gsub("%%", "%%%%") or ""
+  local left = path == "" and "" or " %<" .. path
+  return "%#TabLineFill#" .. left .. "%=" .. table.concat(parts) .. "%#TabLineFill# "
 end
 vim.opt.showtabline = 2
 vim.opt.tabline = "%{%v:lua.harpoon_tabline()%}"
