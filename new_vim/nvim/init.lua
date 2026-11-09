@@ -776,7 +776,7 @@ end
 -- ctrl+s save, ctrl+f search in buffer, esc clears highlight
 map({ "n", "v", "i" }, "<C-s>", "<cmd>write<cr>", { desc = "Save" })
 map({ "n", "v" }, "<C-f>", "/", { desc = "Search in buffer" })
-map("n", "<Esc>", "<cmd>nohlsearch<cr>", { desc = "Clear highlight" })
+map("n", "<Esc>", "<cmd>nohlsearch<bar>redrawstatus<cr>", { desc = "Clear highlight" })
 
 -- alt+p / alt+o: indent / outdent
 map("n", "<M-p>", ">>", { desc = "Indent" })
@@ -995,19 +995,22 @@ vim.api.nvim_create_autocmd("User", {
 })
 
 -- bottom statusline: flags, diagnostic counts, position.
--- The four counts always show, each with an icon; a zero is plain, a non-zero count is colored.
+-- Order: error, warning, hint, info. Each count has an icon; a zero is plain, a non-zero count is colored.
+-- Error, warning and hint always show; info is rare, so it only shows when there is one (4th field).
 local diag_items = {
-  { vim.diagnostic.severity.ERROR, "\u{f057}", "DiagnosticError" },
-  { vim.diagnostic.severity.WARN, "\u{f071}", "DiagnosticWarn" },
-  { vim.diagnostic.severity.INFO, "\u{f05a}", "DiagnosticInfo" },
-  { vim.diagnostic.severity.HINT, "\u{f0eb}", "DiagnosticHint" }, -- e.g. "declared but never read"
+  { vim.diagnostic.severity.ERROR, "\u{f057}", "DiagnosticError", true },
+  { vim.diagnostic.severity.WARN, "\u{f071}", "DiagnosticWarn", true },
+  { vim.diagnostic.severity.HINT, "\u{f0eb}", "DiagnosticHint", true }, -- e.g. "declared but never read"
+  { vim.diagnostic.severity.INFO, "\u{f05a}", "DiagnosticInfo", false },
 }
 function _G.diag_status()
   local c = vim.diagnostic.count(0)
   local out = {}
   for _, d in ipairs(diag_items) do
     local n = c[d[1]] or 0
-    table.insert(out, (n > 0 and "%#" .. d[3] .. "#" or "%*") .. d[2] .. " " .. n .. "%*")
+    if n > 0 or d[4] then
+      table.insert(out, (n > 0 and "%#" .. d[3] .. "#" or "%*") .. d[2] .. " " .. n .. "%*")
+    end
   end
   return table.concat(out, "  ") .. " "
 end
@@ -1066,7 +1069,34 @@ end
 function _G.name_status()
   return (vim.bo.buftype ~= "" or vim.bo.filetype == "oil") and " %t" or ""
 end
-vim.opt.statusline = "%{v:lua.project_name()}%{v:lua.git_status()}%{%v:lua.name_status()%} %m%r%h%w %{%v:lua.diag_status()%}%=%l:%c %P%{v:lua.lang_status()}"
+-- lines added / changed / removed in the current buffer (from gitsigns), e.g. " +3 ~1 -2"; zeros are left out
+function _G.diff_status()
+  local d = vim.b.gitsigns_status_dict
+  if not d then return "" end
+  local out = ""
+  for _, x in ipairs({ { d.added, "+", "Added" }, { d.changed, "~", "Changed" }, { d.removed, "-", "Removed" } }) do
+    if (x[1] or 0) > 0 then out = out .. " %#" .. x[3] .. "#" .. x[2] .. x[1] .. "%*" end
+  end
+  return out
+end
+-- macro being recorded, e.g. "● @q"
+function _G.macro_status()
+  local reg = vim.fn.reg_recording()
+  return reg == "" and "" or "%#DiagnosticError#\u{f111} @" .. reg .. "%*  "
+end
+-- match under the cursor while a search highlight is on, e.g. "[3/12] "; Esc clears it
+function _G.search_status()
+  if vim.v.hlsearch == 0 then return "" end
+  local ok, s = pcall(vim.fn.searchcount, { maxcount = 999, timeout = 100 })
+  if not ok or not s.total or s.total == 0 then return "" end
+  return ("[%d/%d%s] "):format(s.current, s.total, s.incomplete == 0 and "" or "+")
+end
+-- the statusline doesn't redraw by itself when these change
+vim.api.nvim_create_autocmd({ "RecordingEnter", "RecordingLeave", "CmdlineLeave" }, {
+  callback = function() vim.schedule(vim.cmd.redrawstatus) end,
+})
+vim.api.nvim_create_autocmd("User", { pattern = "GitSignsUpdate", callback = function() vim.cmd.redrawstatus() end })
+vim.opt.statusline = "%{v:lua.project_name()}%{v:lua.git_status()}%{%v:lua.diff_status()%}%{%v:lua.name_status()%} %m%r%h%w %{%v:lua.diag_status()%}%=%{%v:lua.macro_status()%}%{v:lua.search_status()}%l:%c %P%{v:lua.lang_status()}"
 
 -- top line (own row): the current file's path as plain text on the left, compact harpoon slots on the
 -- right (just the numbers, current file highlighted; SPC 1-4 jump, SPC h h lists the names).
