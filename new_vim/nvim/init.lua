@@ -1059,23 +1059,45 @@ end
 vim.api.nvim_create_autocmd({ "DirChanged", "FocusGained" }, { callback = git_refresh }) -- FocusGained: catches a `git init`
 vim.api.nvim_create_autocmd("DirChanged", { callback = function() vim.cmd.redrawstatus() end })
 git_refresh()
--- file language, e.g. [Markdown]; empty when no filetype
+-- file language with its icon (nvim-web-devicons), lowercase, e.g. [ typescript]; no icon if it has none,
+-- nothing without a filetype
 function _G.lang_status()
   local ft = vim.bo.filetype
-  return ft == "" and "" or " [" .. ft:sub(1, 1):upper() .. ft:sub(2) .. "]"
+  if ft == "" then return "" end
+  local mark = ""
+  local ok, devicons = pcall(require, "nvim-web-devicons")
+  if ok then
+    local icon, hl = devicons.get_icon_by_filetype(ft)
+    if icon then mark = (hl and "%#" .. hl .. "#" or "") .. icon .. "%* " end
+  end
+  return " [" .. mark .. ft:lower() .. "]"
+end
+-- [+] modified, [RO], [Help]... with a space in front, nothing when there are none
+function _G.flags_status()
+  local f = vim.api.nvim_eval_statusline("%m%r%h%w", {}).str
+  return f == "" and "" or " " .. f
 end
 -- the file path and symbol breadcrumb live in the winbar (dropbar.nvim), so the statusline
 -- only names windows that have no winbar: terminal, help, quickfix, Oil...
 function _G.name_status()
   return (vim.bo.buftype ~= "" or vim.bo.filetype == "oil") and " %t" or ""
 end
--- lines added / changed / removed in the current buffer (from gitsigns), e.g. " +3 ~1 -2"; zeros are left out
+-- dark yellow for the changed-lines count (re-applied after a colorscheme change, which clears custom groups)
+local function diff_changed_hl() vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#a57c00" }) end
+diff_changed_hl()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = diff_changed_hl })
+-- lines added / changed / removed in the current buffer (from gitsigns), each with an icon
+-- (plus / pencil / minus square) and colored; zeros are left out
 function _G.diff_status()
   local d = vim.b.gitsigns_status_dict
   if not d then return "" end
   local out = ""
-  for _, x in ipairs({ { d.added, "+", "Added" }, { d.changed, "~", "Changed" }, { d.removed, "-", "Removed" } }) do
-    if (x[1] or 0) > 0 then out = out .. " %#" .. x[3] .. "#" .. x[2] .. x[1] .. "%*" end
+  for _, x in ipairs({
+    { d.added, "\u{f0fe}", "Added" },
+    { d.changed, "\u{f14b}", "StatusDiffChanged" },
+    { d.removed, "\u{f146}", "Removed" },
+  }) do
+    if (x[1] or 0) > 0 then out = out .. "  %#" .. x[3] .. "#" .. x[2] .. " " .. x[1] .. "%*" end
   end
   return out
 end
@@ -1095,8 +1117,11 @@ end
 vim.api.nvim_create_autocmd({ "RecordingEnter", "RecordingLeave", "CmdlineLeave" }, {
   callback = function() vim.schedule(vim.cmd.redrawstatus) end,
 })
-vim.api.nvim_create_autocmd("User", { pattern = "GitSignsUpdate", callback = function() vim.cmd.redrawstatus() end })
-vim.opt.statusline = "%{v:lua.project_name()}%{v:lua.git_status()}%{%v:lua.diff_status()%}%{%v:lua.name_status()%} %m%r%h%w %{%v:lua.diag_status()%}%=%{%v:lua.macro_status()%}%{v:lua.search_status()}%l:%c %P%{v:lua.lang_status()}"
+vim.api.nvim_create_autocmd("User", {
+  pattern = "GitSignsUpdate",
+  callback = function() vim.cmd.redrawstatus() vim.cmd.redrawtabline() end, -- the diff counts are in the tabline
+})
+vim.opt.statusline = "%{v:lua.project_name()}%{v:lua.git_status()}%{%v:lua.name_status()%}%{%v:lua.flags_status()%} %#NonText#•%* %{%v:lua.diag_status()%}%#NonText#•%*%=%{%v:lua.macro_status()%}%{v:lua.search_status()}%l:%c %P%{%v:lua.lang_status()%}"
 
 -- top line (own row): the current file's path as plain text on the left, compact harpoon slots on the
 -- right (just the numbers, current file highlighted; SPC 1-4 jump, SPC h h lists the names).
@@ -1114,7 +1139,8 @@ function _G.harpoon_tabline()
   end
   local real = name ~= "" and vim.bo.buftype == "" and vim.bo.filetype ~= "oil"
   local path = real and vim.fn.fnamemodify(name, ":~:."):gsub("%%", "%%%%") or ""
-  local left = path == "" and "" or " %<" .. path
+  -- git diff counts of this file (+added ~changed -removed) sit right after the path
+  local left = path == "" and "" or " %<" .. path .. _G.diff_status() .. "%#TabLineFill#"
   return "%#TabLineFill#" .. left .. "%=" .. table.concat(parts) .. "%#TabLineFill# "
 end
 vim.opt.showtabline = 2
