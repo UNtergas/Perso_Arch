@@ -613,9 +613,10 @@ require("lazy").setup({
         scope = {
           enabled = true,
           highlight = names,
-          -- left quarter block: thicker than │ and flush with the left edge of its cell, so it meets the
-          -- underline of the opening line, which starts at the same column's left edge
-          char = "▎",
+          -- left three-eighths block: thicker than │ and flush with the left edge of its cell, so it meets
+          -- the band on the opening line, which starts at the same column's left edge.
+          -- ▏ 1/8, ▎ 2/8, ▍ 3/8, ▌ 4/8 of the cell width
+          char = "▍",
           show_start = true,
           show_end = true,
           include = { node_type = { typescript = brackets, tsx = brackets, javascript = brackets } },
