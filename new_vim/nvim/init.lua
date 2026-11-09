@@ -312,7 +312,7 @@ require("lazy").setup({
           m("gi", vim.lsp.buf.implementation, "Go to implementation")
           m("K", vim.lsp.buf.hover, "Hover docs")
           m("<leader>cr", vim.lsp.buf.rename, "Rename symbol")
-          m("<leader>ca", vim.lsp.buf.code_action, "Code action", { "n", "v" })
+          m("<leader>ca", function() _G.code_action() end, "Code action", { "n", "v" })
           m("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
           m("<leader>d", vim.diagnostic.open_float, "Line diagnostics")
         end,
@@ -560,6 +560,7 @@ require("lazy").setup({
     lazy = false,
     priority = 900,
     opts = {
+      picker = { enabled = true }, -- also replaces vim.ui.select (code actions, etc.) with a filterable list
       dashboard = {
         enabled = true,
         preset = {
@@ -854,6 +855,35 @@ local function toggle_term()
   vim.cmd("startinsert")
 end
 map("n", "<leader>ot", toggle_term, { desc = "Toggle terminal" })
+
+-- Alt-q (or SPC q): close the popups (Trouble, quickfix, help, grug-far, floats, bottom terminal), keep the files
+local popup_ft = { trouble = true, qf = true, help = true, checkhealth = true, ["grug-far"] = true, ["grug-far-history"] = true }
+local function close_popups()
+  if vim.fn.mode() == "t" then vim.cmd("stopinsert") end
+  if term.win and vim.api.nvim_win_is_valid(term.win) then
+    pcall(vim.api.nvim_win_hide, term.win)
+    term.win = nil
+  end
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local ft = vim.bo[buf].filetype
+    local floating = vim.api.nvim_win_get_config(win).relative ~= ""
+    if (popup_ft[ft] or floating) and not ft:match("^snacks_notif") then
+      pcall(vim.api.nvim_win_close, win, false) -- fails harmlessly on the last window
+    end
+  end
+end
+map({ "n", "i", "t" }, "<M-q>", close_popups, { desc = "Close popups" })
+map("n", "<leader>q", close_popups, { desc = "Close popups" })
+
+-- ctrl+. (VSCode quick fix) = code action; alt+. as a fallback for terminals that drop the Ctrl
+-- ts_ls also lists actions that can't apply here, marked disabled; hide them
+function _G.code_action()
+  vim.lsp.buf.code_action({ filter = function(a) return not a.disabled end })
+end
+map({ "n", "i", "v" }, "<C-.>", _G.code_action, { desc = "Code action" })
+map({ "n", "i", "v" }, "<M-.>", _G.code_action, { desc = "Code action" })
+
 -- markdown: SPC o m renders the file with glow in a buffer (vim motions and / work, q goes back)
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
