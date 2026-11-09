@@ -700,7 +700,11 @@ require("lazy").setup({
       vim.keymap.set("x", "gs", "<Plug>(nvim-surround-visual)", { desc = "Surround selection" })
     end,
   },
-  { "mbbill/undotree", cmd = "UndotreeToggle" },
+  {
+    "mbbill/undotree",
+    cmd = "UndotreeToggle",
+    init = function() vim.g.undotree_SetFocusWhenToggle = 1 end, -- SPC s u moves the cursor into the tree
+  },
   {
     "stevearc/conform.nvim",
     cmd = "ConformInfo",
@@ -889,13 +893,20 @@ local function toggle_term()
 end
 map("n", "<leader>ot", toggle_term, { desc = "Toggle terminal" })
 
--- Alt-q (or SPC q): close the popups (Trouble, quickfix, help, grug-far, floats, bottom terminal), keep the files
+-- Alt-q (or SPC q): close the popups (Trouble, quickfix, help, grug-far, undo tree, floats, bottom terminal), keep the files
 local popup_ft = { trouble = true, qf = true, help = true, checkhealth = true, ["grug-far"] = true, ["grug-far-history"] = true }
 local function close_popups()
   if vim.fn.mode() == "t" then vim.cmd("stopinsert") end
   if term.win and vim.api.nvim_win_is_valid(term.win) then
     pcall(vim.api.nvim_win_hide, term.win)
     term.win = nil
+  end
+  -- the undo tree is two windows (tree + diff panel); its own hide command closes both
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "undotree" then
+      pcall(vim.cmd, "UndotreeHide")
+      break
+    end
   end
   for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
     -- closing one popup can take others with it (Trouble closes its preview float), so the window
