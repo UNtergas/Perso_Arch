@@ -381,6 +381,14 @@ require("lazy").setup({
 
     -- one tab per nvim: no "open in new tab" from a picker
     opts = {
+      pickers = {
+        -- old file versions (githist://<hash>/<path>) are listed as just <hash>/<filename>
+        buffers = {
+          path_display = function(_, path)
+            return _G.githist_label(path) or vim.fn.fnamemodify(path, ":~:.")
+          end,
+        },
+      },
       defaults = {
         -- flex: narrow windows stack the preview above the results instead of dropping it
         layout_strategy = "flex",
@@ -696,9 +704,20 @@ require("lazy").setup({
       vim.api.nvim_create_autocmd("ColorScheme", { callback = conflict_colors })
     end,
   },
+  { -- git graph buffer, see SPC g l. Enter on a commit opens it in Diffview; Enter in visual mode diffs the range.
+    "isakbm/gitgraph.nvim",
+    lazy = true,
+    opts = {
+      format = { timestamp = "%Y-%m-%d %H:%M", fields = { "hash", "timestamp", "author", "branch_name", "tag" } },
+      hooks = {
+        on_select_commit = function(c) vim.cmd("DiffviewOpen " .. c.hash .. "^!") end,
+        on_select_range_commit = function(from, to) vim.cmd("DiffviewOpen " .. from.hash .. "~1.." .. to.hash) end,
+      },
+    },
+  },
   { -- 3-way merge tool: ours | merged (edit here) | theirs
     "sindrets/diffview.nvim",
-    cmd = { "DiffviewOpen", "DiffviewClose" },
+    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory" },
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       local function merge_colors()
@@ -873,6 +892,9 @@ map(ck, "<C-k><Left>", "<cmd>leftabove vsplit<cr>", { desc = "Split left" })
 map(ck, "<C-k><Right>", "<cmd>rightbelow vsplit<cr>", { desc = "Split right" })
 map(ck, "<C-k><Up>", "<cmd>leftabove split<cr>", { desc = "Split up" })
 map(ck, "<C-k><Down>", "<cmd>rightbelow split<cr>", { desc = "Split down" })
+-- VSCode: Ctrl+\ splits side by side, Ctrl+K \ splits stacked
+map("n", "<C-\\>", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
+map(ck, "<C-k>\\", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })
 map(ck, "<C-k>h", "<C-w>H", { desc = "Move window left" })
 map(ck, "<C-k>j", "<C-w>J", { desc = "Move window down" })
 map(ck, "<C-k>k", "<C-w>K", { desc = "Move window up" })
@@ -920,6 +942,93 @@ map("n", "<leader>gt", "<cmd>GitConflictChooseTheirs<cr>", { desc = "Conflict: k
 map("n", "<leader>gb", "<cmd>GitConflictChooseBoth<cr>", { desc = "Conflict: keep both" })
 map("n", "<leader>g0", "<cmd>GitConflictChooseNone<cr>", { desc = "Conflict: keep none" })
 map("n", "<leader>gr", function() require("gitsigns").reset_hunk() end, { desc = "Revert hunk" })
+-- SPC g g: lazygit (floating); SPC g f: lazygit log of this file
+map("n", "<leader>gg", function() Snacks.lazygit.open() end, { desc = "Lazygit" })
+map("n", "<leader>gf", function() Snacks.lazygit.log_file() end, { desc = "Lazygit: this file's history" })
+-- Old versions of a file as ordinary read-only buffers named githist://<hash>/<path>. The content is loaded
+-- by a BufReadCmd, so :edit, harpoon and sessions can reopen them. buftype=nofile + nomodifiable: no :w.
+vim.api.nvim_create_autocmd("BufReadCmd", {
+  pattern = "githist://*",
+  callback = function(ev)
+    local hash, rel = ev.match:match("^githist://([^/]+)/(.+)$")
+    if not hash then return end
+    local from = vim.fn.expand("#:p:h")
+    local r
+    for _, cwd in ipairs({ vim.fn.getcwd(), from ~= "" and from or nil }) do
+      r = vim.system({ "git", "show", hash .. ":" .. rel }, { cwd = cwd }):wait()
+      if r.code == 0 then break end
+    end
+    if r.code ~= 0 then
+      vim.notify("git show " .. hash .. ":" .. rel .. " failed (file missing at that commit, or not run from the repo)", vim.log.levels.ERROR)
+      return
+    end
+    local lines = vim.split(r.stdout, "\n", { plain = true })
+    if lines[#lines] == "" then table.remove(lines) end
+    local b = ev.buf
+    vim.bo[b].modifiable = true
+    vim.api.nvim_buf_set_lines(b, 0, -1, false, lines)
+    vim.bo[b].buftype, vim.bo[b].bufhidden, vim.bo[b].swapfile = "nofile", "hide", false
+    vim.bo[b].filetype = vim.filetype.match({ filename = rel, contents = lines }) or ""
+    vim.bo[b].modifiable, vim.bo[b].readonly, vim.bo[b].modified = false, true, false
+  end,
+})
+-- SPC g v: pick a commit that touched this file, open that version as a read-only buffer.
+map("n", "<leader>gv", function()
+  local path = vim.api.nvim_buf_get_name(0)
+  local dir = vim.fs.dirname(path)
+  local rel = vim.system({ "git", "-C", dir, "ls-files", "--full-name", "--", path }):wait().stdout:gsub("%s+$", "")
+  if rel == "" then vim.notify("File is not tracked by git", vim.log.levels.WARN) return end
+  local act, st = require("telescope.actions"), require("telescope.actions.state")
+  require("telescope.builtin").git_bcommits({
+    prompt_title = "Open old version (read-only)",
+    attach_mappings = function(pb)
+      act.select_default:replace(function()
+        local hash = st.get_selected_entry().value:sub(1, 8)
+        act.close(pb)
+        -- the file may have had another path back then (renames): ask git for its name at that commit
+        local at = rel
+        local out = vim.system({ "git", "-C", dir, "log", "--follow", "--name-only", "--format=C:%h", "--", path }):wait().stdout or ""
+        local cur
+        for line in out:gmatch("[^\r\n]+") do
+          local h = line:match("^C:(%x+)$")
+          if h then cur = h:sub(1, 8) == hash and true or false
+          elseif cur then at = line break end
+        end
+        vim.cmd("edit githist://" .. hash .. "/" .. vim.fn.fnameescape(at))
+      end)
+      return true
+    end,
+  })
+end, { desc = "Open old version of file (read-only)" })
+-- SPC g h: history of this file in Diffview (commit list + side-by-side diffs). In the commit panel,
+-- X restores the file to the selected commit's version; SPC g q closes it. SPC g H: history of the whole repo.
+map("n", "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", { desc = "File history (Diffview)" })
+map("n", "<leader>gH", "<cmd>DiffviewFileHistory<cr>", { desc = "Repo history (Diffview)" })
+-- SPC g l: git graph (gitgraph.nvim, all branches) in its own tab. Enter on a commit = Diffview of it.
+-- Again, q or Alt-q closes it.
+map("n", "<leader>gl", function()
+  for _, w in ipairs(vim.api.nvim_list_wins()) do
+    if vim.b[vim.api.nvim_win_get_buf(w)].git_graph then
+      vim.cmd("tabclose " .. vim.api.nvim_tabpage_get_number(vim.api.nvim_win_get_tabpage(w)))
+      return
+    end
+  end
+  local dir = vim.fn.expand("%:p:h")
+  if dir == "" or vim.fn.isdirectory(dir) == 0 then dir = vim.fn.getcwd() end
+  if vim.system({ "git", "-C", dir, "rev-parse", "--git-dir" }):wait().code ~= 0 then
+    vim.notify("Not in a git repository", vim.log.levels.WARN)
+    return
+  end
+  vim.cmd("tabnew")
+  vim.cmd("tcd " .. vim.fn.fnameescape(dir))
+  require("gitgraph").draw({}, { all = true, max_count = 5000 })
+  local buf = vim.api.nvim_get_current_buf()
+  vim.b[buf].git_graph = true
+  local close = function() vim.cmd("tabclose") end
+  for _, key in ipairs({ "q", "<A-q>", "<leader>gl" }) do
+    vim.keymap.set("n", key, close, { buffer = buf, desc = "Close git graph" })
+  end
+end, { desc = "Git graph (toggle)" })
 
 -- terminal: toggle a bottom terminal (keeps its shell alive when hidden)
 local term = { buf = nil, win = nil }
@@ -1016,6 +1125,10 @@ map({ "n", "i", "t" }, "<C-@>", toggle_term, { desc = "Toggle terminal" })
 -- VSCode-style keys, kept alongside the SPC ones
 map("n", "<C-p>", tb("find_files"), { desc = "Find file in project" })
 map("n", "<C-t>", tb("lsp_dynamic_workspace_symbols"), { desc = "Find symbol in workspace" })
+-- Ctrl+V pastes from the system clipboard in insert mode only (elsewhere it keeps its default)
+map("i", "<C-v>", "<C-r><C-p>+", { desc = "Paste" })
+map("n", "<C-S-t>", tb("lsp_document_symbols"), { desc = "Find symbol in this file" })
+map("n", "<leader>so", tb("lsp_document_symbols"), { desc = "Find symbol in this file" })
 
 -- change directory
 map("n", "<leader>cd", function()
@@ -1124,18 +1237,33 @@ function _G.lang_status()
 end
 -- [+] modified, [RO], [Help]... with a space in front, nothing when there are none
 function _G.flags_status()
+  -- old file versions (githist://): just a read-only marker, the name is in the tabline
+  if vim.api.nvim_buf_get_name(0):match("^githist://") then return " [READ-ONLY]" end
   local f = vim.api.nvim_eval_statusline("%m%r%h%w", {}).str
   return f == "" and "" or " " .. f
 end
 -- the file path and symbol breadcrumb live in the winbar (dropbar.nvim), so the statusline
 -- only names windows that have no winbar: terminal, help, quickfix, Oil...
+-- githist://<hash>/<path/to/file> -> "<hash>/file", nil for any other name
+function _G.githist_label(name)
+  local hash, rel = (name or ""):match("^githist://([^/]+)/(.+)$")
+  return hash and (hash .. "/" .. vim.fs.basename(rel)) or nil
+end
 function _G.name_status()
+  if _G.githist_label(vim.api.nvim_buf_get_name(0)) then return "" end
   return (vim.bo.buftype ~= "" or vim.bo.filetype == "oil") and " %t" or ""
 end
 -- dark yellow for the changed-lines count (re-applied after a colorscheme change, which clears custom groups)
 local function diff_changed_hl() vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#a57c00" }) end
 diff_changed_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = diff_changed_hl })
+-- diff mode: changed lines light blue instead of Alabaster's yellow, changed words a stronger blue
+local function diff_colors()
+  vim.api.nvim_set_hl(0, "DiffChange", { bg = "#d6e6f7" })
+  vim.api.nvim_set_hl(0, "DiffText", { bg = "#9cc8f0", bold = true })
+end
+diff_colors()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = diff_colors })
 -- lines added / changed / removed in the current buffer (from gitsigns), each with an icon
 -- (plus / pencil / minus square) and colored; zeros are left out
 function _G.diff_status()
@@ -1189,6 +1317,8 @@ function _G.harpoon_tabline()
   end
   local real = name ~= "" and vim.bo.buftype == "" and vim.bo.filetype ~= "oil"
   local path = real and vim.fn.fnamemodify(name, ":~:."):gsub("%%", "%%%%") or ""
+  local label = _G.githist_label(name)
+  if label then path = label:gsub("%%", "%%%%") end
   -- git diff counts of this file (+added ~changed -removed) sit right after the path
   local left = path == "" and "" or " %<" .. path .. _G.diff_status() .. "%#TabLineFill#"
   return "%#TabLineFill#" .. left .. "%=" .. table.concat(parts) .. "%#TabLineFill# "
