@@ -472,7 +472,11 @@ require("lazy").setup({
       end
     end,
     keys = {
-      { "<leader>sr", function() require("grug-far").open({ transient = true }) end, mode = { "n", "v" }, desc = "Search and replace (grouped by file)" },
+      { "<leader>sR", function() require("grug-far").open({ transient = true }) end, mode = { "n", "v" }, desc = "Search and replace (grouped by file)" },
+      -- same UI, limited to the current file (word under cursor prefilled)
+      { "<leader>sr", function()
+        require("grug-far").open({ transient = true, prefills = { search = vim.fn.expand("<cword>"), paths = vim.fn.expand("%") } })
+      end, desc = "Search and replace in this file" },
     },
   },
 
@@ -847,6 +851,17 @@ map({ "n", "v", "i" }, "<C-s>", "<cmd>write<cr>", { desc = "Save" })
 map({ "n", "v" }, "<C-f>", "/", { desc = "Search in buffer" })
 map("n", "<Esc>", "<cmd>nohlsearch<bar>redrawstatus<cr>", { desc = "Clear highlight" })
 
+-- IDE-style selection: shift+arrows/home/end start a selection, typing replaces it,
+-- plain movement drops it. ctrl+shift+arrow = shift+arrow (vim's <S-Left>/<S-Right> already move by word).
+vim.opt.keymodel = "startsel,stopsel"
+vim.opt.selectmode = "key"
+for key, w in pairs({ ["<C-S-Left>"] = "b", ["<C-S-Right>"] = "w" }) do
+  map("i", key, "<C-o>v" .. w .. "<C-g>", { desc = "Select word" })
+  map("n", key, "v" .. w .. "<C-g>", { desc = "Select word" })
+  map("x", key, w, { desc = "Select word" })
+  map("s", key, "<C-o>" .. w, { desc = "Select word" })
+end
+
 -- alt+p / alt+o: indent / outdent
 map("n", "<M-p>", ">>", { desc = "Indent" })
 map("n", "<M-o>", "<<", { desc = "Outdent" })
@@ -1179,7 +1194,7 @@ function _G.diag_status()
 end
 -- current project: the working directory (follows :cd, so also Oil's `)
 function _G.project_name()
-  return "[ " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t") .. "]"
+  return "[%#StatusFolder#%* " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t"):gsub("%%", "%%%%") .. "]"
 end
 -- git branch of the working directory, e.g. [ main]; empty outside a repo.
 -- Watches the git dir (git replaces HEAD by rename, so a watch on the file itself would go stale),
@@ -1217,7 +1232,7 @@ git_refresh = function()
   end)
 end
 function _G.git_status()
-  return git_branch == "" and "" or "[\u{f418} " .. git_branch .. "]"
+  return git_branch == "" and "" or "[%#StatusBranch#\u{f418}%* " .. git_branch:gsub("%%", "%%%%") .. "]"
 end
 vim.api.nvim_create_autocmd({ "DirChanged", "FocusGained" }, { callback = git_refresh }) -- FocusGained: catches a `git init`
 vim.api.nvim_create_autocmd("DirChanged", { callback = function() vim.cmd.redrawstatus() end })
@@ -1254,7 +1269,11 @@ function _G.name_status()
   return (vim.bo.buftype ~= "" or vim.bo.filetype == "oil") and " %t" or ""
 end
 -- dark yellow for the changed-lines count (re-applied after a colorscheme change, which clears custom groups)
-local function diff_changed_hl() vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#a57c00" }) end
+local function diff_changed_hl()
+  vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#a57c00" })
+  vim.api.nvim_set_hl(0, "StatusFolder", { fg = "#a57c00" }) -- dark yellow folder icon
+  vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#6f3fa0" }) -- dark purple branch icon
+end
 diff_changed_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = diff_changed_hl })
 -- diff mode: changed lines light blue instead of Alabaster's yellow, changed words a stronger blue
@@ -1299,7 +1318,7 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "GitSignsUpdate",
   callback = function() vim.cmd.redrawstatus() vim.cmd.redrawtabline() end, -- the diff counts are in the tabline
 })
-vim.opt.statusline = "%{v:lua.project_name()}%{v:lua.git_status()}%{%v:lua.name_status()%}%{%v:lua.flags_status()%} %#NonText#•%* %{%v:lua.diag_status()%}%#NonText#•%*%=%{%v:lua.macro_status()%}%{v:lua.search_status()}%l:%c %P%{%v:lua.lang_status()%}"
+vim.opt.statusline = "%{%v:lua.project_name()%}%{%v:lua.git_status()%}%{%v:lua.name_status()%}%{%v:lua.flags_status()%} %#NonText#•%* %{%v:lua.diag_status()%}%#NonText#•%*%=%{%v:lua.macro_status()%}%{v:lua.search_status()}%l:%c %P%{%v:lua.lang_status()%}"
 
 -- top line (own row): the current file's path as plain text on the left, compact harpoon slots on the
 -- right (just the numbers, current file highlighted; SPC 1-4 jump, SPC h h lists the names).
