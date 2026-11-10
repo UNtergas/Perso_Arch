@@ -1194,7 +1194,7 @@ function _G.diag_status()
 end
 -- current project: the working directory (follows :cd, so also Oil's `)
 function _G.project_name()
-  return "[%#StatusFolder#%* " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t"):gsub("%%", "%%%%") .. "]"
+  return "[" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t"):gsub("%%", "%%%%") .. "]"
 end
 -- git branch of the working directory, e.g. [ main]; empty outside a repo.
 -- Watches the git dir (git replaces HEAD by rename, so a watch on the file itself would go stale),
@@ -1271,7 +1271,6 @@ end
 -- dark yellow for the changed-lines count (re-applied after a colorscheme change, which clears custom groups)
 local function diff_changed_hl()
   vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#a57c00" })
-  vim.api.nvim_set_hl(0, "StatusFolder", { fg = "#a57c00" }) -- dark yellow folder icon
   vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#6f3fa0" }) -- dark purple branch icon
 end
 diff_changed_hl()
