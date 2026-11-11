@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree-sitter --version)",
+      "Bash(nvim --version)",
+      "Bash(git -C * status *)",
+      "Bash(git -C * log *)",
+      "Bash(git -C * diff *)",
+      "Bash(git -C * show *)",
+      "Bash(pdfinfo *)",
+      "Bash(pacman -Q *)",
+      "Bash(pacman -Si *)",
+      "Bash(typst fonts)",
+      "Bash(typst --version)",
+      "mcp__Claude_Browser__get_page_text"
+    ]
+  }
+}

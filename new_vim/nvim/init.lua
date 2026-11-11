@@ -434,7 +434,15 @@ require("lazy").setup({
           local utils = require("dropbar.utils")
           if vim.bo[buf].ft == "markdown" then return { sources.markdown } end
           if vim.bo[buf].buftype == "terminal" then return { sources.terminal } end
-          return { utils.source.fallback({ sources.lsp, sources.treesitter }) }
+          -- file name first, so the bar is never empty outside a function (full path is in the tabline)
+          local file = {
+            get_symbols = function(b)
+              local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(b), ":t")
+              local icon, hl = require("dropbar.configs").opts.icons.kinds.file_icon(name)
+              return { require("dropbar.bar").dropbar_symbol_t:new({ name = name, icon = icon, icon_hl = hl }) }
+            end,
+          }
+          return { file, utils.source.fallback({ sources.lsp, sources.treesitter }) }
         end,
         -- every real file gets the bar (the default only shows it for treesitter / LSP buffers)
         enable = function(buf, win)
@@ -779,6 +787,29 @@ require("lazy").setup({
     init = function() vim.g.undotree_SetFocusWhenToggle = 1 end, -- SPC s u moves the cursor into the tree
   },
   {
+    "rcarriga/nvim-notify",
+    event = "VeryLazy",
+    config = function()
+      local notify = require("notify")
+      notify.setup({ timeout = 3000, render = "compact", stages = "fade", background_colour = "#ededed" })
+      vim.notify = notify -- every vim.notify call in this config (and plugins) goes through it
+      -- Alabaster-friendly colours (the defaults are neon green / pale yellow); darker than the
+      -- diagnostic signs so they stay readable as text on the light grey background
+      local function colours()
+        local lvl = { ERROR = "#c62828", WARN = "#a86400", INFO = "#325cc0", DEBUG = "#6a6a6a", TRACE = "#7b4fa3" }
+        for name, fg in pairs(lvl) do
+          for _, part in ipairs({ "Border", "Icon", "Title" }) do
+            vim.api.nvim_set_hl(0, "Notify" .. name .. part, { fg = fg })
+          end
+          vim.api.nvim_set_hl(0, "Notify" .. name .. "Body", { fg = "#333333", bg = "#ededed" })
+        end
+        vim.api.nvim_set_hl(0, "NotifyBackground", { bg = "#ededed" })
+      end
+      colours()
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = colours })
+    end,
+  },
+  {
     "stevearc/conform.nvim",
     cmd = "ConformInfo",
     opts = { formatters_by_ft = { python = { "black" }, rust = { "rustfmt" } } },
@@ -877,6 +908,12 @@ map({ "n", "v" }, "<C-n>", function()
   require("oil").close()
 end, { desc = "Toggle Oil" })
 map({ "n", "v" }, "<C-b>", tb("buffers"), { desc = "Switch buffer" })
+
+-- scroll: <C-d>/<C-f>/<C-b> are taken above, so the native scrolls live on other keys
+-- (normal! ignores mappings, so it reaches the built-in <C-d>/<C-u>)
+map({ "n", "x" }, "<C-j>", [[<Cmd>exe "normal! \<C-d>"<CR>]], { desc = "Half page down" })
+map({ "n", "x" }, "<C-k>", [[<Cmd>exe "normal! \<C-u>"<CR>]], { desc = "Half page up" })
+-- <PageDown>/<PageUp> are already full-page scroll natively
 
 -- diagnostics / hunks: ]d [d ]g [g
 map("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "Next diagnostic" })
@@ -1272,6 +1309,7 @@ end
 local function diff_changed_hl()
   vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#a57c00" })
   vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#6f3fa0" }) -- dark purple branch icon
+  vim.api.nvim_set_hl(0, "TabModified", { fg = "#1f4e9c" }) -- dark blue: path + dot of an unsaved buffer in the tabline
 end
 diff_changed_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = diff_changed_hl })
@@ -1338,8 +1376,29 @@ function _G.harpoon_tabline()
   local label = _G.githist_label(name)
   if label then path = label:gsub("%%", "%%%%") end
   -- git diff counts of this file (+added ~changed -removed) sit right after the path
-  local left = path == "" and "" or " %<" .. path .. _G.diff_status() .. "%#TabLineFill#"
+  -- unsaved changes: path and a small dot turn dark blue (like VSCode's dot)
+  local mod = vim.bo.modified
+  local left = path == "" and "" or " %<" .. (mod and "%#TabModified#" or "") .. path .. (mod and " \u{f444}" or "") .. "%#TabLineFill#" .. _G.diff_status() .. "%#TabLineFill#"
   return "%#TabLineFill#" .. left .. "%=" .. table.concat(parts) .. "%#TabLineFill# "
 end
+vim.api.nvim_create_autocmd("BufModifiedSet", { callback = function() vim.cmd.redrawtabline() end })
 vim.opt.showtabline = 2
 vim.opt.tabline = "%{%v:lua.harpoon_tabline()%}"
+
+-- cowboy: after LIMIT hjkl/arrow/+/- presses within 2s of the first one (no count), the key is blocked until the window ends.
+-- Use w b f t / } instead. A count (5j) resets it; nofile buffers (Oil, pickers) are exempt.
+local LIMIT = 5
+for _, key in ipairs({ "h", "j", "k", "l", "+", "-", "<Left>", "<Down>", "<Up>", "<Right>" }) do
+  local count, timer = 0, assert(vim.uv.new_timer())
+  vim.keymap.set("n", key, function()
+    if vim.v.count > 0 then count = 0 end
+    if count >= LIMIT and vim.bo.buftype ~= "nofile" then
+      -- expr maps run under textlock: nvim-notify opens a window, so defer it
+      vim.schedule(function() vim.notify("Hold it Cowboy! 🤠", vim.log.levels.WARN, { icon = "🤠", id = "cowboy" }) end)
+      return ""
+    end
+    if count == 0 then timer:start(2000, 0, function() count = 0 end) end -- fixed window from the first press
+    count = count + 1
+    return key
+  end, { expr = true, silent = true })
+end
