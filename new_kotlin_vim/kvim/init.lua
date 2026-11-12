@@ -83,92 +83,48 @@ require("lazy").setup({
 
   -- Theme (Alabaster, same as the Emacs config)
   {
+    -- Alabaster with its own default colours, no patches. Installed and loaded, but koda-glade (below) is the startup
+    -- colour scheme; `:Theme alabaster` switches to it.
     "dchinmay2/alabaster.nvim",
     lazy = false,
     priority = 1000,
     config = function()
       vim.opt.background = "light"
-      local function tweak()
-        local hl = vim.api.nvim_set_hl
-        -- slightly grey background (Alabaster's own is near white)
-        local bg, float, line = "#f5f5f5", "#ededed", "#ebebeb"
-        hl(0, "Normal", { fg = vim.api.nvim_get_hl(0, { name = "Normal" }).fg, bg = bg })
-        hl(0, "NormalNC", { bg = bg })
-        hl(0, "NormalFloat", { bg = float })
-        hl(0, "SignColumn", { bg = bg })
-        hl(0, "FoldColumn", { fg = "#8a8a8a", bg = bg })
-        hl(0, "LineNr", { fg = "#8a8a8a", bg = bg })
-        hl(0, "EndOfBuffer", { fg = bg, bg = bg })
-        hl(0, "CursorLine", { bg = line })
-        -- VS Code Chalice: standard-library classes/types (Promise, Set, Map...) are blue too
-        for _, k in ipairs({ "class", "interface", "type", "enum" }) do
-          hl(0, "@lsp.typemod." .. k .. ".defaultLibrary", { fg = "#325cc0" })
-        end
-        -- LSP sets a black fg on these tokens, which hides the treesitter blue: make all type names blue
-        for _, k in ipairs({ "class", "interface", "type", "enum" }) do
-          hl(0, "@lsp.type." .. k, { fg = "#325cc0" })
-          hl(0, "@lsp.typemod." .. k .. ".declaration", { fg = "#325cc0" }) -- beats @lsp.mod.declaration (black)
-        end
-        -- type parameters: blue where declared (<P extends X>), black where used
-        hl(0, "@lsp.type.typeParameter", { fg = "#000000" })
-        hl(0, "@lsp.typemod.typeParameter.declaration", { fg = "#325cc0" })
-        -- flash: grey out all text, red on the letters being jumped to
-        hl(0, "FlashBackdrop", { fg = "#b4b4b4" })
-        hl(0, "FlashLabel", { fg = "#ffffff", bg = "#d32f2f", bold = true })
-        hl(0, "FlashMatch", { fg = "#d32f2f", bold = true })
-        hl(0, "FlashCurrent", { fg = "#d32f2f", bold = true, underline = true })
-        hl(0, "Folded", { fg = "#6a6a6a", bg = "#e4e4e4" })
-        -- diagnostic marks: red = error, yellow = warning
-        hl(0, "DiagnosticSignError", { fg = "#d32f2f", bold = true })
-        hl(0, "DiagnosticSignWarn", { fg = "#e6a700", bold = true })
-        hl(0, "DiagnosticSignInfo", { fg = "#1e88e5" })
-      end
-      vim.api.nvim_create_autocmd("ColorScheme", { pattern = "alabaster", callback = tweak })
-      -- Chalice/Alabaster in VS Code: only entity.name is blue (function-valued keys, calls, types); `string` etc. stay black
-      local blue_rules = {
-        "(pair key: (property_identifier) @AlabasterDefinition value: [(arrow_function) (function_expression)] (#set! priority 130))",
-        "(call_expression function: (identifier) @AlabasterDefinition (#set! priority 130))",
-        "(call_expression function: (member_expression property: (property_identifier) @AlabasterDefinition (#set! priority 130)))",
-        "(type_identifier) @AlabasterDefinition (#set! priority 130)", -- TS only
-        "(new_expression constructor: (identifier) @AlabasterDefinition (#set! priority 130))",
-        "(method_definition name: (property_identifier) @AlabasterDefinition (#set! priority 130))",
-        "(function_declaration name: (identifier) @AlabasterDefinition (#set! priority 130))",
-        -- JSX / TSX tag names (<Table>, <thead>, <ui.Button/>) are entity.name.tag: blue; the < > stay grey
-        "(jsx_opening_element name: (_) @AlabasterDefinition (#set! priority 130))",
-        "(jsx_closing_element name: (_) @AlabasterDefinition (#set! priority 130))",
-        "(jsx_self_closing_element name: (_) @AlabasterDefinition (#set! priority 130))",
-      }
-      for _, lang in ipairs({ "typescript", "tsx", "javascript" }) do
-        -- keep only the rules this grammar understands (e.g. JavaScript has no type_identifier)
-        local ok_rules = {}
-        for _, rule in ipairs(blue_rules) do
-          if pcall(vim.treesitter.query.parse, lang, rule) then table.insert(ok_rules, rule) end
-        end
-        pcall(vim.treesitter.query.set, lang, "highlights", "; extends\n" .. table.concat(ok_rules, "\n"))
-      end
-      -- treesitter highlighting is not on by default; the blue rules above need it (TS/JS only)
+      -- treesitter highlighting is not on by default for TS/JS
       vim.api.nvim_create_autocmd("FileType", {
         pattern = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
         callback = function(ev) pcall(vim.treesitter.start, ev.buf) end,
       })
-      vim.cmd.colorscheme("alabaster")
-      tweak()
     end,
   },
 
-  -- kvim colour scheme: zenbones, light, bright variant (minimal colouring). Loads after alabaster (priority 1000)
-  -- so it wins; alabaster stays installed, `:colorscheme alabaster` switches back (its tweaks re-apply on that).
+  -- Startup colour scheme: koda-glade (loads after alabaster, priority 1000). Other schemes: :Theme <name>
   {
-    "mcchrish/zenbones.nvim",
-    dependencies = { "rktjmp/lush.nvim" },
+    "oskarnurm/koda.nvim",
     lazy = false,
     priority = 900,
     config = function()
-      vim.opt.background = "light"
-      vim.g.zenbones_lightness = "bright" -- lighter background than the default variant (other value: "dim")
-      vim.cmd.colorscheme("zenbones")
+      -- koda-glade: dim the background a little (its #f7f7f7 is too bright). Every group that uses koda's background
+      -- gets the new one; the string/type colours are light, so only a small step (#f3f3f3 keeps strings at about
+      -- 3.8:1 contrast). Registered before the scheme loads so it also applies at startup.
+      local koda_glade_bg = 0xf3f3f3
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        pattern = "koda-glade",
+        callback = function()
+          local normal_bg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
+          if not normal_bg then return end
+          for name, hl in pairs(vim.api.nvim_get_hl(0, {})) do
+            if hl.bg == normal_bg and not hl.link then
+              vim.api.nvim_set_hl(0, name, vim.tbl_extend("force", hl, { bg = koda_glade_bg }))
+            end
+          end
+        end,
+      })
+      vim.cmd.colorscheme("koda-glade")
     end,
   },
+  -- installed but NOT loaded at startup; switch with :Theme onedark-<style>
+  { "navarasu/onedark.nvim", lazy = true },
 
   -- Treesitter
   {
@@ -1767,3 +1723,29 @@ for _, key in ipairs({ "h", "j", "k", "l", "+", "-", "<Left>", "<Down>", "<Up>",
     return key
   end, { expr = true, silent = true })
 end
+
+-- :Theme <name> switches the colour scheme for this session (the one at startup is koda-glade).
+-- koda-<variant>: dark light moss glade. onedark-<style>: dark darker cool deep warm warmer light.
+local themes = { "alabaster", "koda-dark", "koda-light", "koda-moss", "koda-glade" }
+for _, style in ipairs({ "dark", "darker", "cool", "deep", "warm", "warmer", "light" }) do
+  table.insert(themes, "onedark-" .. style)
+end
+vim.api.nvim_create_user_command("Theme", function(opts)
+  local name = opts.args
+  local style = name:match("^onedark%-(%a+)$")
+  if style then
+    vim.opt.background = style == "light" and "light" or "dark"
+    require("lazy").load({ plugins = { "onedark.nvim" } })
+    require("onedark").setup({ style = style })
+    require("onedark").load()
+  elseif vim.tbl_contains(themes, name) then
+    vim.opt.background = (name == "koda-dark" or name == "koda-moss") and "dark" or "light"
+    vim.cmd.colorscheme(name)
+  else
+    vim.notify("Theme: unknown '" .. name .. "'. Options: " .. table.concat(themes, ", "), vim.log.levels.WARN)
+  end
+end, {
+  nargs = 1,
+  complete = function(arg) return vim.tbl_filter(function(t) return t:find(arg, 1, true) == 1 end, themes) end,
+  desc = "Switch colour scheme",
+})

@@ -53,7 +53,7 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
 ## 3. Verify (headless where possible)
 
 - `NVIM_APPNAME=kvim nvim --headless '+lua vim.wait(1500)' '+lua print(vim.g.colors_name, vim.o.background)' +qa`
-  prints `zenbones light`.
+  prints `koda-glade light`.
 - `ls ~/.local/share/kvim/mason/bin/kotlin-language-server` exists.
 - In a real Kotlin file in a Gradle project, wait 1 to 2 minutes (the server imports Gradle and indexes), then:
   the **Kotlin icon at the start of the tabline** is **purple** when a server is attached and idle,
@@ -89,8 +89,14 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
 - **dropbar `ttl_init = 300`**: the server takes 1 to 2 minutes to answer `documentSymbol` after a Gradle
   project opens; the default 60 one-second retries gave up first and left the noisy treesitter breadcrumb.
 - **Kotlin icon in the tabline** (kvim only), first item; colour shows the LSP state (see Verify).
-- **Theme**: zenbones, light, `vim.g.zenbones_lightness = "bright"` (same as `nvim`). The old Alabaster
-  tweaks no longer apply under zenbones.
+- **Theme**: `koda-glade` (koda.nvim, light) is the startup colour scheme, same as `nvim`. Its background is
+  dimmed from `#f7f7f7` to `#f3f3f3` by a `ColorScheme` autocmd in the koda block (`koda_glade_bg`), a small
+  step because the string and type colours are light. Alabaster stays installed with its own default colours;
+  the earlier patches that made it resemble VS Code (blue class and function names, custom grey background,
+  treesitter name rules) were removed on purpose, so do not add them back unless the user asks.
+  `onedark.nvim` is installed but lazy. `:Theme <name>` switches for the session (`alabaster`,
+  `koda-dark/light/moss/glade`, `onedark-dark/darker/cool/deep/warm/warmer/light`). The lualine
+  second-section grey is hard-coded for light themes, so it may look off on the dark ones.
 - Same as `nvim`: lualine statusline and tabline, `Esc Esc` leaves terminal mode, the cowboy limit.
 
 ## 5. Known limits
