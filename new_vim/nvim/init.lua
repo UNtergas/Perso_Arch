@@ -630,8 +630,8 @@ require("lazy").setup({
     opts = {
       picker = { enabled = true }, -- also replaces vim.ui.select (code actions, etc.) with a filterable list
       -- smooth scrolling: any viewport change (Ctrl-J/K half page, search jumps, gg/G, mouse wheel) is animated.
-      -- Short on purpose (default total is 250 ms); `vim.g.snacks_scroll = false` turns it off, per buffer: vim.b.snacks_scroll
-      scroll = { enabled = true, animate = { duration = { step = 10, total = 150 }, easing = "linear" } },
+      -- Short on purpose (default total is 250 ms; was 150, now 60, ~4 frames); `vim.g.snacks_scroll = false` turns it off, per buffer: vim.b.snacks_scroll
+      scroll = { enabled = true, animate = { duration = { step = 15, total = 60 }, easing = "linear" } },
       dashboard = {
         enabled = true,
         preset = {
@@ -1220,6 +1220,13 @@ map("n", "<leader>gl", function()
     vim.keymap.set("n", key, close, { buffer = buf, desc = "Close git graph" })
   end
 end, { desc = "Git graph (toggle)" })
+
+-- no snacks smooth-scroll in Oil: resizing the window (terminal split opens/closes) while its animation state is
+-- stale made the viewport fight the cursor (stuck, flicker back down). Oil lists are short, scroll jumps are fine.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "oil",
+  callback = function(a) vim.b[a.buf].snacks_scroll = false end,
+})
 
 -- terminal: toggle a bottom terminal (keeps its shell alive when hidden)
 local term = { buf = nil, win = nil }
