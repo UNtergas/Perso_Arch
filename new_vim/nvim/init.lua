@@ -810,6 +810,53 @@ require("lazy").setup({
     end,
   },
   {
+    -- bottom statusline only: no tabline / winbar sections, so harpoon_tabline and dropbar are left alone.
+    -- Same content as the old hand-written statusline (project, branch, name, flags, diagnostics | macro, search, lang, position), lualine styling
+    "nvim-lualine/lualine.nvim",
+    event = "VeryLazy",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      -- "auto" follows the colorscheme, but gives sections b and c the same background, which hides the
+      -- arrow between them (folder > branch > diagnostics): give b its own, in between a and c
+      local theme = require("lualine.themes.auto")
+      for _, m in ipairs({ "normal", "insert", "visual", "replace", "command", "inactive" }) do
+        if theme[m] and theme[m].b then theme[m].b = { fg = "#222222", bg = "#b8b8b8" } end
+      end
+      require("lualine").setup({
+        options = {
+          theme = theme, -- section a changes colour with the mode
+          globalstatus = false,
+          component_separators = { left = "\u{e0b1}", right = "\u{e0b3}" },
+          section_separators = { left = "\u{e0b0}", right = "\u{e0b2}" },
+        },
+        sections = {
+          lualine_a = { function() return vim.fn.fnamemodify(vim.fn.getcwd(), ":t") end },
+          lualine_b = { { "branch", icon = "\u{f418}" } },
+          lualine_c = {
+            -- error / warn / hint always show (zeros too); info only when there is one
+            { "diagnostics", sections = { "error", "warn", "hint" }, always_visible = true,
+              symbols = { error = "\u{f057} ", warn = "\u{f071} ", hint = "\u{f0eb} " } },
+            { "diagnostics", sections = { "info" }, symbols = { info = "\u{f05a} " } },
+            -- terminal / help / quickfix / Oil have no winbar, so the statusline names them
+            function()
+              if _G.githist_label(vim.api.nvim_buf_get_name(0)) then return "" end
+              return (vim.bo.buftype ~= "" or vim.bo.filetype == "oil") and vim.fn.expand("%:t") or ""
+            end,
+            function() return vim.trim(_G.flags_status()) end,
+          },
+          lualine_x = {
+            function() local r = vim.fn.reg_recording() return r == "" and "" or "\u{f111} @" .. r end,
+            { "searchcount", maxcount = 999, timeout = 100 },
+            { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " } }, -- attached server names, no spinner
+          },
+          lualine_y = { "encoding", "fileformat", { "filetype", colored = false, fmt = function(s) return s:lower() end } },
+          lualine_z = { "progress", "location" },
+        },
+        inactive_sections = { lualine_c = { "filename" }, lualine_x = { "location" } },
+      })
+    end,
+  },
+  {
     "stevearc/conform.nvim",
     cmd = "ConformInfo",
     opts = { formatters_by_ft = { python = { "black" }, rust = { "rustfmt" } } },
