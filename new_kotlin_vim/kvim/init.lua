@@ -53,6 +53,7 @@ vim.opt.statuscolumn = "%@v:lua.fold_click@%{v:lua.fold_icon()}%X %s%=%l "
 -- keep the cursor a few lines from the edge: the sticky function header
 -- (treesitter-context) needs room above the cursor to show
 vim.opt.scrolloff = 5
+vim.opt.laststatus = 3 -- global statusline (lualine globalstatus = true); set early so the bar does not jump when lualine loads
 
 -- Light theme
 vim.opt.background = "light"
@@ -118,6 +119,9 @@ require("lazy").setup({
               vim.api.nvim_set_hl(0, name, vim.tbl_extend("force", hl, { bg = koda_glade_bg }))
             end
           end
+          -- selection: koda's #e2eeee is barely darker than the page (1.07:1); a light blue (#c9dcf2, 1.26:1) shows
+          -- it clearly and still leaves the string green about 3:1. Matches the visual mode colour in lualine.
+          vim.api.nvim_set_hl(0, "Visual", { bg = 0xc9dcf2 })
         end,
       })
       vim.cmd.colorscheme("koda-glade")
@@ -840,6 +844,9 @@ require("lazy").setup({
     priority = 900,
     opts = {
       picker = { enabled = true }, -- also replaces vim.ui.select (code actions, etc.) with a filterable list
+      -- smooth scrolling: any viewport change (Ctrl-J/K half page, search jumps, gg/G, mouse wheel) is animated.
+      -- Short on purpose (default total is 250 ms); `vim.g.snacks_scroll = false` turns it off, per buffer: vim.b.snacks_scroll
+      scroll = { enabled = true, animate = { duration = { step = 10, total = 150 }, easing = "linear" } },
       dashboard = {
         enabled = true,
         preset = {
@@ -1007,6 +1014,11 @@ require("lazy").setup({
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command", "inactive" }) do
         if theme[m] and theme[m].b then theme[m].b = { fg = "#222222", bg = "#b8b8b8" } end
       end
+      -- mode colours of the first section (statusline and tabline): insert = light green, visual = light blue, replace = light yellow,
+      -- tints of koda-glade's own string green (#448c27) and function blue (#325cc0), with dark text
+      theme.insert.a = { fg = "#1d3a0f", bg = "#b5d99c", gui = "bold" }
+      theme.visual.a = { fg = "#1a2f55", bg = "#b8d0f0", gui = "bold" }
+      theme.replace.a = { fg = "#4a3800", bg = "#ecd98f", gui = "bold" } -- replace = light yellow (command stays purple)
       -- "#rrggbb" foreground of a highlight group (lualine wants a hex string, not the number nvim returns)
       _G.hl_hex = function(name)
         local fg = vim.api.nvim_get_hl(0, { name = name, link = false }).fg
@@ -1019,7 +1031,7 @@ require("lazy").setup({
       require("lualine").setup({
         options = {
           theme = theme, -- section a changes colour with the mode
-          globalstatus = false,
+          globalstatus = true, -- one statusline at the bottom, for the focused window (dropbar names every window at its top)
           component_separators = { left = "\u{e0b1}", right = "\u{e0b3}" },
           section_separators = { left = "\u{e0b0}", right = "\u{e0b2}" },
         },
@@ -1229,9 +1241,11 @@ end, { desc = "Toggle Oil" })
 map({ "n", "v" }, "<C-b>", tb("buffers"), { desc = "Switch buffer" })
 
 -- scroll: <C-d>/<C-f>/<C-b> are taken above, so the native scrolls live on other keys
--- (normal! ignores mappings, so it reaches the built-in <C-d>/<C-u>)
-map({ "n", "x" }, "<C-j>", [[<Cmd>exe "normal! \<C-d>"<CR>]], { desc = "Half page down" })
-map({ "n", "x" }, "<C-k>", [[<Cmd>exe "normal! \<C-u>"<CR>]], { desc = "Half page up" })
+-- (normal! ignores mappings, so it reaches the built-in <C-d>/<C-u>).
+-- Alt-j / Alt-k, not Ctrl-K: Ctrl-K starts the window chords (C-k h/j/k/l, C-k a ...), so a lone Ctrl-K waited a full
+-- timeoutlen (1 s) for a second key before it scrolled
+map({ "n", "x" }, "<M-j>", [[<Cmd>exe "normal! \<C-d>"<CR>]], { desc = "Half page down" })
+map({ "n", "x" }, "<M-k>", [[<Cmd>exe "normal! \<C-u>"<CR>]], { desc = "Half page up" })
 -- <PageDown>/<PageUp> are already full-page scroll natively
 
 -- diagnostics / hunks: ]d [d ]g [g
