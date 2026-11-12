@@ -36,6 +36,7 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `gr` | n | References, grouped by file (Trouble) |
 | `K` | n | Hover docs |
 | `C-t` | n | Find symbol in workspace (VSCode) |
+| `M-j` / `M-k` | n x | Scroll half a page down / up (animated, about 150 ms). Not `C-k`: it starts the window chords |
 | `]d` / `[d` | n | Next / previous diagnostic |
 | `]g` / `[g` | n | Next / previous git hunk |
 
