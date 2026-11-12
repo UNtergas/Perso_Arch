@@ -1150,6 +1150,8 @@ local function toggle_term()
   vim.cmd("startinsert")
 end
 map("n", "<leader>ot", toggle_term, { desc = "Toggle terminal" })
+-- Esc Esc leaves terminal mode (a single Esc still goes to the program inside, e.g. vim / fzf)
+map("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Leave terminal mode" })
 
 -- Alt-q (or SPC q): close the popups (Trouble, quickfix, help, grug-far, undo tree, floats, bottom terminal), keep the files
 local popup_ft = { trouble = true, qf = true, help = true, checkhealth = true, ["grug-far"] = true, ["grug-far-history"] = true }

@@ -181,6 +181,7 @@ changes after a confirmation. Multi-cursor, `:s`, macros and `.` work on it.
 | `C-@` | n i t | Same (many terminals send Ctrl+` as this). Opens at half the screen height |
 | `SPC o t` | n | Same, from the leader |
 | `SPC o m` | n | Read the Markdown file rendered by glow in a buffer (`q` goes back) |
+| `Esc Esc` | t | Leave terminal mode, back to normal (a single `Esc` still reaches the program inside) |
 | `C-\ C-n` | t | Leave terminal mode, back to normal |
 
 Alacritty may not send Ctrl+` distinctly. If it does nothing, use `C-@`
