@@ -579,7 +579,7 @@ require("lazy").setup({
     config = function()
       require("harpoon"):setup()
       -- refresh the statusline when the list is edited in the menu
-      require("harpoon"):extend({ LIST_CHANGE = function() vim.cmd.redrawstatus() end })
+      require("harpoon"):extend({ LIST_CHANGE = function() vim.cmd.redrawstatus() vim.cmd.redrawtabline() end })
     end,
   },
 
@@ -810,7 +810,7 @@ require("lazy").setup({
     end,
   },
   {
-    -- bottom statusline only: no tabline / winbar sections, so harpoon_tabline and dropbar are left alone.
+    -- statusline + tabline (encoding > path > git counts ... harpoon slots); no winbar section, dropbar owns that.
     -- Same content as the old hand-written statusline (project, branch, name, flags, diagnostics | macro, search, lang, position), lualine styling
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
@@ -821,6 +821,11 @@ require("lazy").setup({
       local theme = require("lualine.themes.auto")
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command", "inactive" }) do
         if theme[m] and theme[m].b then theme[m].b = { fg = "#222222", bg = "#b8b8b8" } end
+      end
+      -- "#rrggbb" foreground of a highlight group (lualine wants a hex string, not the number nvim returns)
+      _G.hl_hex = function(name)
+        local fg = vim.api.nvim_get_hl(0, { name = name, link = false }).fg
+        return fg and string.format("#%06x", fg) or "#888888"
       end
       require("lualine").setup({
         options = {
@@ -849,8 +854,70 @@ require("lazy").setup({
             { "searchcount", maxcount = 999, timeout = 100 },
             { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " } }, -- attached server names, no spinner
           },
-          lualine_y = { "encoding", "fileformat", { "filetype", colored = false, fmt = function(s) return s:lower() end } },
+          lualine_y = { { "filetype", colored = false, fmt = function(s) return s:lower() end } },
           lualine_z = { "progress", "location" },
+        },
+        -- top row: encoding > path > git counts ........ harpoon slots (replaces harpoon_tabline once lualine loads)
+        tabline = {
+          lualine_a = { "encoding", "fileformat" },
+          lualine_b = {
+            {
+              function()
+                local name = vim.api.nvim_buf_get_name(0)
+                local label = _G.githist_label(name)
+                local path = label
+                if not path then
+                  local real = name ~= "" and vim.bo.buftype == "" and vim.bo.filetype ~= "oil"
+                  path = real and vim.fn.fnamemodify(name, ":~:.") or ""
+                end
+                if path == "" then return "" end
+                local max = math.max(20, vim.o.columns - 70) -- cut a too-long path from its left end
+                if vim.fn.strdisplaywidth(path) > max then path = "\u{2026}" .. vim.fn.strcharpart(path, vim.fn.strchars(path) - max + 1) end
+                return path .. (vim.bo.modified and " \u{f444}" or "") -- dark blue dot: unsaved changes
+              end,
+              color = function() return vim.bo.modified and { fg = "#1f4e9c" } or nil end,
+            },
+          },
+          lualine_c = {
+            {
+              "diff", -- from gitsigns (b:gitsigns_status_dict)
+              symbols = { added = "\u{f0fe} ", modified = "\u{f14b} ", removed = "\u{f146} " },
+              diff_color = {
+                added = function() return { fg = _G.hl_hex("Added") } end,
+                modified = function() return { fg = "#a57c00" } end,
+                removed = function() return { fg = _G.hl_hex("Removed") } end,
+              },
+            },
+          },
+          lualine_x = (function()
+            -- harpoon: [󰀱] then one slot each, the current file's slot highlighted (SPC 1-4 jump, SPC h h lists)
+            local parts = {
+              {
+                function()
+                  local ok, harpoon = pcall(require, "harpoon")
+                  return ok and #harpoon:list().items > 0 and "[\u{f0031}]" or ""
+                end,
+                separator = "",
+              },
+            }
+            for i = 1, 9 do
+              table.insert(parts, {
+                function()
+                  local ok, harpoon = pcall(require, "harpoon")
+                  return ok and harpoon:list().items[i] and "[" .. i .. "]" or ""
+                end,
+                separator = "",
+                padding = { left = 1, right = 0 },
+                color = function()
+                  local ok, harpoon = pcall(require, "harpoon")
+                  local item = ok and harpoon:list().items[i]
+                  if item and item.value == vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.") then return "TabLineSel" end
+                  return "TabLine"
+                end,
+              })
+            end
+            return parts
+          end)(),
         },
         inactive_sections = { lualine_c = { "filename" }, lualine_x = { "location" } },
       })
