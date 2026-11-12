@@ -940,6 +940,17 @@ require("lazy").setup({
       "nvim-tree/nvim-web-devicons",
     },
 
+    -- top row of every Oil window: the full path of the folder it shows (read-only; dropbar skips Oil buffers).
+    -- Evaluated per window (statusline_winid), so splits each show their own folder. %< cuts a too-long path from its left.
+    init = function()
+      function _G.oil_winbar()
+        local buf = vim.api.nvim_win_get_buf(vim.g.statusline_winid)
+        local dir = require("oil").get_current_dir(buf)
+        local path = dir and vim.fn.fnamemodify(dir, ":~") or vim.api.nvim_buf_get_name(buf) -- trash / ssh: the buffer name
+        return "%< \u{f07c} " .. path:gsub("%%", "%%%%")
+      end
+    end,
+
     keys = {
       {
         "<leader>e",
@@ -956,7 +967,37 @@ require("lazy").setup({
       keymaps = {
         ["<C-t>"] = false,
         ["g~"] = false,
+        -- Alt-Enter: like Enter on a folder, but keeps going down while the folder holds exactly one entry and that
+        -- entry is a folder (Java packages: com/application/app). Stops at the first folder with a file, several
+        -- entries, or a symlink. Hidden entries count. On a file it is the same as Enter.
+        ["<M-CR>"] = {
+          desc = "Open folder, descending through single-child folders",
+          mode = "n",
+          callback = function()
+            local oil = require("oil")
+            local entry, dir = oil.get_cursor_entry(), oil.get_current_dir()
+            if not entry or not dir or entry.type ~= "directory" then return require("oil.actions").select.callback() end
+            local path = vim.fs.joinpath(dir, entry.name)
+            for _ = 1, 64 do -- bounded, in case of odd trees
+              local handle = vim.uv.fs_scandir(path)
+              if not handle then break end
+              local first, count = nil, 0
+              while true do
+                local name, kind = vim.uv.fs_scandir_next(handle)
+                if not name then break end
+                count = count + 1
+                if count == 1 then first = { name = name, kind = kind } end
+                if count > 1 then break end
+              end
+              if count ~= 1 or first.kind ~= "directory" then break end
+              path = vim.fs.joinpath(path, first.name)
+            end
+            oil.open(path)
+          end,
+        },
       },
+
+      win_options = { winbar = "%!v:lua.oil_winbar()" },
 
       view_options = {
         show_hidden = true,

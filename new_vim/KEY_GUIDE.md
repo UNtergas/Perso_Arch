@@ -132,11 +132,14 @@ shown, or open anything (`SPC SPC`, `C-n`) to leave it.
 
 Oil is a text buffer: edit the list like normal text, and `:w` applies the
 changes after a confirmation. Multi-cursor, `:s`, macros and `.` work on it.
+The top row of every Oil window shows the full path of the folder it lists
+(read-only, `~` for home, a too-long path is cut from its left end).
 
 | Key | Does |
 |---|---|
 | `C-n` | Close Oil, back to where you were (refuses while there are unsaved changes) |
 | `Enter` | Open file or enter folder |
+| `M-Enter` | Enter a folder and keep going down while it holds only one folder (Java `com/application/app`). Stops at a folder with a file or several entries. On a file: same as `Enter` |
 | `-` | Parent folder |
 | `C-s` / `C-h` | Open in vertical / horizontal split |
 | `C-p` | Preview |
