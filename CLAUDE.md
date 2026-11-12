@@ -18,3 +18,9 @@ An older `lazy-lock.json` brings back a bug: `nvim-lspconfig` at `8a1529e4` (Mar
 `trouble.nvim` (`gr`, `C-g` in Telescope) and `grug-far.nvim` (`SPC s r`) were added in commit `a7129a36`. Check both are installed after step 4. `SPC s r` needs `ripgrep`.
 
 Delete this section once every machine is done.
+
+## kvim: the Kotlin Neovim (`new_kotlin_vim/`)
+
+`kvim` is a second Neovim for Kotlin and Android work, run as `NVIM_APPNAME=kvim nvim` through the alias `alias kvim='NVIM_APPNAME=kvim nvim'` in `~/.zshrc`. It never touches the normal `nvim`.
+
+When the user asks to set up `kvim` on a machine, or to work on its config, read `new_kotlin_vim/SETUP_FOR_CLAUDE.md` first. It has the install steps (including the alias), the checks, why each Kotlin customisation exists, and the rules for testing safely. The same `tree-sitter-cli` check as above applies.
