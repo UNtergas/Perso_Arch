@@ -1014,11 +1014,19 @@ require("lazy").setup({
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command", "inactive" }) do
         if theme[m] and theme[m].b then theme[m].b = { fg = "#222222", bg = "#b8b8b8" } end
       end
+      -- normal mode: a > b > c fade from darkest to lightest (c stays the theme's #cbd6d6)
+      theme.normal.a = { fg = "#14201f", bg = "#8da1a1", gui = "bold" }
+      theme.normal.b = { fg = "#1c2828", bg = "#adbcbc" }
+      -- right side mirrors the left: y (percent) = b shade, z (line:col) = a (project) colour, so it fades c > b > a > language
+      for _, m in ipairs({ "normal", "insert", "visual", "replace", "command" }) do
+        theme[m].y = theme.normal.b
+      end
       -- mode colours of the first section (statusline and tabline): insert = light green, visual = light blue, replace = light yellow,
       -- tints of koda-glade's own string green (#448c27) and function blue (#325cc0), with dark text
       theme.insert.a = { fg = "#1d3a0f", bg = "#b5d99c", gui = "bold" }
       theme.visual.a = { fg = "#1a2f55", bg = "#b8d0f0", gui = "bold" }
       theme.replace.a = { fg = "#4a3800", bg = "#ecd98f", gui = "bold" } -- replace = light yellow (command stays purple)
+      for _, m in ipairs({ "normal", "insert", "visual", "replace", "command" }) do theme[m].z = theme[m].a end
       -- "#rrggbb" foreground of a highlight group (lualine wants a hex string, not the number nvim returns)
       _G.hl_hex = function(name)
         local fg = vim.api.nvim_get_hl(0, { name = name, link = false }).fg
@@ -1055,8 +1063,9 @@ require("lazy").setup({
             { "searchcount", maxcount = 999, timeout = 100 },
             { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " } }, -- attached server names, no spinner
           },
-          lualine_y = { { "filetype", colored = false, fmt = function(s) return s:lower() end } },
-          lualine_z = { "progress", "location" },
+          lualine_y = { "progress" },
+          -- language: darkest grey, light text, same in every mode
+          lualine_z = { "location", { "filetype", colored = false, separator = { left = "\u{e0b2}" }, padding = { left = 1, right = 1 }, fmt = function(s) return s:lower() end, color = { fg = "#e6e6e6", bg = "#3c3c3c", gui = "bold" } } },
         },
         -- top row: encoding > path > git counts ........ harpoon slots (replaces harpoon_tabline once lualine loads)
         tabline = {
@@ -1075,7 +1084,6 @@ require("lazy").setup({
               end,
             },
             "encoding",
-            "fileformat",
           },
           lualine_b = {
             {
