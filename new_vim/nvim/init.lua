@@ -1436,7 +1436,7 @@ vim.opt.tabline = "%{%v:lua.harpoon_tabline()%}"
 
 -- cowboy: after LIMIT hjkl/arrow/+/- presses within 2s of the first one (no count), the key is blocked until the window ends.
 -- Use w b f t / } instead. A count (5j) resets it; nofile buffers (Oil, pickers) are exempt.
-local LIMIT = 5
+local LIMIT = 7
 for _, key in ipairs({ "h", "j", "k", "l", "+", "-", "<Left>", "<Down>", "<Up>", "<Right>" }) do
   local count, timer = 0, assert(vim.uv.new_timer())
   vim.keymap.set("n", key, function()
