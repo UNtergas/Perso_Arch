@@ -94,9 +94,10 @@ Mouse is on: click a pane to focus it, drag a border to resize.
 
 Far left, on the darkest colour: the OS icon (Nerd Font, picked from
 `/etc/os-release`) and the current user.
-Then: session name + state. Grey `NORMAL`, yellow `PREFIX` while the prefix
-is pressed, blue `COPY` in copy mode, `ZOOM` when a pane is zoomed (same idea as
-the nvim mode colours).
+Then: the mode label. Grey `NORMAL`, yellow `PREFIX` while the prefix is pressed,
+blue `COPY` in copy mode, `ZOOM` when a pane is zoomed (same idea as the nvim mode
+colours). The session name is on the far right (`Session <name>` with an icon, on
+the same dark colour as the user); it is hidden while the prefix hint is shown.
 Middle: windows, the current one as a darker block (`Z` marks a zoomed window).
 Right (fades like lualine): `pane/total`, date + time, and on the far
 right what the current pane is running (`nvim`, `zsh`, ...).
