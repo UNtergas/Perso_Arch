@@ -36,11 +36,15 @@ Both start in the current pane's directory and focus the nvim pane.
 
 | Keys | Does |
 |---|---|
-| `h` `j` `k` `l` | Move left / down / up / right |
+| `h` `j` `k` `l` | Move focus left / down / up / right |
+| `←` `↓` `↑` `→` | Move the pane itself: swaps places with its neighbour in that direction, focus goes with it (repeatable). Wraps around at the edge, and the pane takes the size of the slot it lands in |
 | `H` `J` `K` `L` | Resize (repeatable without pressing the prefix again) |
 | `\` | Split side by side |
 | `-` | Split stacked |
 | `z` | Zoom this pane to the whole window, again to restore the layout |
+| `[` / `]` | Like niri's `Mod+[` / `Mod+]` (consume-or-expel): a pane alone in its column is consumed into the column on the left / right (stacked below that pane). A pane in a stack is expelled into its own full-height column at the left / right edge. col1 \| col2, `[` on col2 gives col1 over col2, `[` again gives col2 \| col1, `]` reverses. Other columns keep their width: a consumed pane frees its width to the column it joins, an expelled pane takes half of its old column's width. Does nothing at the edge. Expelling goes to the window edge, so with 3+ columns it does not land next to its old column. Replaces stock `]` (paste buffer) |
+| `Space` | Flip columns <-> rows, again to flip back. Preset: nvim left + 2 terminals on the right becomes nvim on top (65% height) + 2 terminals side by side below. Two panes: side by side <-> stacked. The first pane (lowest number) is the big one; replaces tmux's own `Space` (cycle layouts) |
+| `m` | Focus mode: this pane moves to the big 65% slot on the left, all the other panes stack on the right (35%). Again to put everything back exactly as before. If you add or close a pane in between, it just applies focus mode again |
 | `c` | Make this pane fill its column, again to restore the old split |
 | `x` | Close this pane |
 
@@ -81,7 +85,7 @@ Closing the last window of a session ends it.
 | Keys | Does |
 |---|---|
 | `r` | Reload `~/.tmux.conf` |
-| `[` | Copy mode (vi keys, `q` leaves). The mouse wheel also scrolls history |
+| `v` | Copy mode (vi keys, `q` leaves). The mouse wheel also scrolls history. Was `[` in stock tmux |
 
 Mouse is on: click a pane to focus it, drag a border to resize.
 
