@@ -134,7 +134,7 @@ require("lazy").setup({
     event = "WinLeave",
     opts = {
       border = "bold",
-      colors = { "#325cc0" },
+      colors = { "#4a6a6a" },
       animate = { enabled = false },
       excluded_ft = { "packer", "TelescopePrompt", "mason", "lazy" },
     },
@@ -1709,6 +1709,7 @@ local function diff_changed_hl()
   vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#a57c00" })
   vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#6f3fa0" }) -- dark purple branch icon
   vim.api.nvim_set_hl(0, "TabModified", { fg = "#1f4e9c" }) -- dark blue: path + dot of an unsaved buffer in the tabline
+  vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#d3dcdc" }) -- inactive window dividers: light grey, so the active teal one stands out
 end
 diff_changed_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = diff_changed_hl })
