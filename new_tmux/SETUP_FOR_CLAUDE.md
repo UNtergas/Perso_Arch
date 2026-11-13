@@ -36,10 +36,10 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
   call it. `Alt-e b` runs `box.sh toggle` (sets `@box` to 0 and `status on`, or back). The colours are at the top of
   `box.sh` (`D` active, `L` inactive) and must match `pane-border-style` / `pane-active-border-style` in `tmux.conf`.
 - **Borders**: heavy lines, active `#4a6a6a`, inactive `#dde5e5`. nvim and kvim use the same teal for the active window.
-- **Statusline**: left = OS icon + user, mode label (grey `NORMAL`, yellow `PREFIX`, blue `COPY`, grey `ZOOM`).
-  Right = pane n/total, time, running command, then `Session <name>` with an icon on the same dark colour as the user.
-  While the prefix is pressed the right side shows a key hint instead (the session name is hidden then, because the
-  hint is longer than `status-right-length`).
+- **Statusline**: left = OS icon + user, mode label (grey `NORMAL`, yellow `PREFIX`, blue `COPY`, grey `ZOOM`),
+  pane n/total, running command. Right (`status-justify right` puts the window tabs there) = tabs, time, then
+  `Session <name>` with an icon on the same dark colour as the user. While the prefix is pressed the right side shows
+  a key hint instead (the session name is hidden, and the hint is dropped in windows narrower than about 150 columns).
 - **Known quirk**: tmux colours each stretch of a divider with the style of the pane that owns it, so a tall pane next
   to a stack can leave its divider half dark. Do not try to fix it with a `pane-border-style` format that looks at the
   neighbours: it was tried, and it darkens dividers that are not next to the active pane.
