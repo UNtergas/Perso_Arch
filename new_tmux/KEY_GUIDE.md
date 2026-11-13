@@ -96,7 +96,7 @@ Left: session name + state. Grey `NORMAL`, yellow `PREFIX` while the prefix
 is pressed, blue `COPY` in copy mode, `ZOOM` when a pane is zoomed (same idea as
 the nvim mode colours).
 Middle: windows, the current one as a darker block (`Z` marks a zoomed window).
-Right (fades like lualine): git branch, `pane/total` + time, and on the far
+Right (fades like lualine): `pane/total`, date + time, and on the far
 right what the current pane is running (`nvim`, `zsh`, ...).
 
 Colours are the koda-glade ones from the nvim lualine (see the comment above
