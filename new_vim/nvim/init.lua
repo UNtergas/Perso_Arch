@@ -1327,10 +1327,6 @@ vim.api.nvim_create_autocmd("FileType", {
     end, { buffer = ev.buf, desc = "Read with glow" })
   end,
 })
--- ctrl+` (VSCode). Many terminals send Ctrl+` as <Nul>, so bind both.
-map({ "n", "i", "t" }, "<C-`>", toggle_term, { desc = "Toggle terminal" })
-map({ "n", "i", "t" }, "<C-@>", toggle_term, { desc = "Toggle terminal" })
-
 -- VSCode-style keys, kept alongside the SPC ones
 map("n", "<C-p>", tb("find_files"), { desc = "Find file in project" })
 map("n", "<C-t>", tb("lsp_dynamic_workspace_symbols"), { desc = "Find symbol in workspace" })

@@ -181,15 +181,10 @@ The top row of every Oil window shows the full path of the folder it lists
 
 | Key | Mode | Does |
 |---|---|---|
-| ``C-` `` | n i t | Toggle bottom terminal (VSCode) |
-| `C-@` | n i t | Same (many terminals send Ctrl+` as this). Opens at half the screen height |
-| `SPC o t` | n | Same, from the leader |
+| `SPC o t` | n | Toggle bottom terminal (opens at half the screen height) |
 | `SPC o m` | n | Read the Markdown file rendered by glow in a buffer (`q` goes back) |
 | `Esc Esc` | t | Leave terminal mode, back to normal (a single `Esc` still reaches the program inside) |
 | `C-\ C-n` | t | Leave terminal mode, back to normal |
-
-Alacritty may not send Ctrl+` distinctly. If it does nothing, use `C-@`
-(Ctrl+Space) or `SPC o t`.
 
 ## 10. Directory and project
 
@@ -253,5 +248,5 @@ cursor sits on the first visible line.
 ## Not verified
 
 The binds were checked to load without errors in headless Neovim, not typed
-interactively. Terminal-dependent keys (`C-``, `C-M-arrows`, `M-p`, `M-o`)
+interactively. Terminal-dependent keys (`C-M-arrows`, `M-p`, `M-o`)
 depend on your terminal sending them.
