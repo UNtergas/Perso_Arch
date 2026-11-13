@@ -43,10 +43,10 @@ Both start in the current pane's directory and focus the nvim pane.
 | `-` | Split stacked |
 | `z` | Zoom this pane to the whole window, again to restore the layout |
 | `[` / `]` | Like niri's `Mod+[` / `Mod+]` (consume-or-expel): a pane alone in its column is consumed into the column on the left / right (stacked below that pane). A pane in a stack is expelled into its own full-height column at the left / right edge. col1 \| col2, `[` on col2 gives col1 over col2, `[` again gives col2 \| col1, `]` reverses. Other columns keep their width: a consumed pane frees its width to the column it joins, an expelled pane takes half of its old column's width. Does nothing at the edge. Expelling goes to the window edge, so with 3+ columns it does not land next to its old column. Replaces stock `]` (paste buffer) |
-| `Space` | Flip columns <-> rows, again to flip back. Preset: nvim left + 2 terminals on the right becomes nvim on top (65% height) + 2 terminals side by side below. Two panes: side by side <-> stacked. The first pane (lowest number) is the big one; replaces tmux's own `Space` (cycle layouts) |
 | `m` | Focus mode: this pane moves to the big 65% slot on the left, all the other panes stack on the right (35%). Again to put everything back exactly as before. If you add or close a pane in between, it just applies focus mode again |
 | `c` | Make this pane fill its column, again to restore the old split |
 | `x` | Close this pane |
+| `b` | Turn the active-pane box on / off for this session. On by default: the status becomes 2 rows, row 2 is a top edge that is dark over the active pane (plain line while zoomed). Needs `~/.tmux/box.sh` (copy of `new_tmux/box.sh`) |
 
 `c` does nothing visible on a pane that already fills its column (the nvim
 pane in the presets): use it on one of the two right terminals.
