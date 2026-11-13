@@ -1325,6 +1325,10 @@ map("n", "<C-w>q", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
 map("n", "<C-w>T", "<Nop>", { desc = "Disabled: one tab per nvim" })
+-- ctrl+w x closes the current split (the buffer stays open); it replaces the window exchange. ctrl+w c is disabled.
+map("n", "<C-w>x", "<cmd>close<cr>", { desc = "Close split" })
+map("n", "<C-w><C-x>", "<cmd>close<cr>", { desc = "Close split" })
+map("n", "<C-w>c", "<Nop>", { desc = "Disabled: use ctrl+w x" })
 -- ; is : (this also makes flash leave ; alone in every mode); f/t repeat: press f/t again, , goes back
 map({ "n", "x" }, ";", ":", { desc = "Command line" })
 
@@ -1334,17 +1338,19 @@ local function mk_parent(p)
   if dir ~= "" and dir ~= "." then vim.fn.mkdir(dir, "p") end
 end
 local ck = { "n", "v" }
-map(ck, "<C-k><Left>", "<cmd>leftabove vsplit<cr>", { desc = "Split left" })
-map(ck, "<C-k><Right>", "<cmd>rightbelow vsplit<cr>", { desc = "Split right" })
-map(ck, "<C-k><Up>", "<cmd>leftabove split<cr>", { desc = "Split up" })
-map(ck, "<C-k><Down>", "<cmd>rightbelow split<cr>", { desc = "Split down" })
--- VSCode: Ctrl+\ splits side by side, Ctrl+K \ splits stacked
-map("n", "<C-\\>", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
-map(ck, "<C-k>\\", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })
-map(ck, "<C-k>h", "<C-w>H", { desc = "Move window left" })
-map(ck, "<C-k>j", "<C-w>J", { desc = "Move window down" })
-map(ck, "<C-k>k", "<C-w>K", { desc = "Move window up" })
-map(ck, "<C-k>l", "<C-w>L", { desc = "Move window right" })
+-- C-k arrows move the window
+map(ck, "<C-k><Left>", "<C-w>H", { desc = "Move window left" })
+map(ck, "<C-k><Down>", "<C-w>J", { desc = "Move window down" })
+map(ck, "<C-k><Up>", "<C-w>K", { desc = "Move window up" })
+map(ck, "<C-k><Right>", "<C-w>L", { desc = "Move window right" })
+-- C-k h/j/k/l resize the window (what C-w < > - + did): h narrower, l wider, j shorter, k taller
+map(ck, "<C-k>h", "<C-w>2<", { desc = "Window narrower" })
+map(ck, "<C-k>l", "<C-w>2>", { desc = "Window wider" })
+map(ck, "<C-k>j", "<C-w>2-", { desc = "Window shorter" })
+map(ck, "<C-k>k", "<C-w>2+", { desc = "Window taller" })
+-- C-w \ splits side by side, C-w - splits stacked (like tmux: \ side by side, - stacked)
+map("n", "<C-w>\\", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
+map("n", "<C-w>-", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })
 map(ck, "<C-k>a", function()
   vim.ui.input({ prompt = "New file: ", completion = "file" }, function(p)
     if p and p ~= "" then mk_parent(p); vim.cmd("edit " .. vim.fn.fnameescape(p)) end
