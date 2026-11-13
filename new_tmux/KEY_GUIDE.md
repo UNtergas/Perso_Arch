@@ -10,15 +10,15 @@ cp new_tmux/tmux.conf ~/.tmux.conf
 tmux            # or: tmux new -As dev   (attach to "dev", or create it)
 ```
 
-Reload in a running session: `Alt-Space r`. A tmux server that is already
+Reload in a running session: `Alt-e r`. A tmux server that is already
 running keeps its old config until you reload or `tmux kill-server`.
 
-## The prefix is Alt-Space
+## The prefix is Alt-e
 
-Every key below is pressed after `Alt-Space` (release, then press the key).
-Not `C-Space`: Ctrl+Space and Ctrl+\` both send NUL, and the prefix would
-swallow them before nvim sees them. Alt-Space is unused by nvim, kvim,
-Alacritty and niri. `Alt-Space Alt-Space` sends a literal Alt-Space to the app inside.
+Every key below is pressed after `Alt-e` (release, then press the key).
+Alt-e is unused by nvim, kvim, zsh, Alacritty and niri. Not `Alt-k` (nvim/kvim
+half page up), not `C-Space` (Alacritty sends the same NUL for Ctrl+\`).
+`Alt-e Alt-e` sends a literal Alt-e to the app inside.
 
 While the prefix is waiting for its key, the status bar shows a yellow hint
 line with these keys, and goes back to normal after the chord.
@@ -92,7 +92,9 @@ Mouse is on: click a pane to focus it, drag a border to resize.
 
 ## Status bar
 
-Left: session name + state. Grey `NORMAL`, yellow `PREFIX` while the prefix
+Far left, on the darkest colour: the OS icon (Nerd Font, picked from
+`/etc/os-release`) and the current user.
+Then: session name + state. Grey `NORMAL`, yellow `PREFIX` while the prefix
 is pressed, blue `COPY` in copy mode, `ZOOM` when a pane is zoomed (same idea as
 the nvim mode colours).
 Middle: windows, the current one as a darker block (`Z` marks a zoomed window).
