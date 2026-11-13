@@ -1088,17 +1088,15 @@ local function mk_parent(p)
   if dir ~= "" and dir ~= "." then vim.fn.mkdir(dir, "p") end
 end
 local ck = { "n", "v" }
-map(ck, "<C-k><Left>", "<cmd>leftabove vsplit<cr>", { desc = "Split left" })
-map(ck, "<C-k><Right>", "<cmd>rightbelow vsplit<cr>", { desc = "Split right" })
-map(ck, "<C-k><Up>", "<cmd>leftabove split<cr>", { desc = "Split up" })
-map(ck, "<C-k><Down>", "<cmd>rightbelow split<cr>", { desc = "Split down" })
--- VSCode: Ctrl+\ splits side by side, Ctrl+K \ splits stacked
-map("n", "<C-\\>", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
-map(ck, "<C-k>\\", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })
-map(ck, "<C-k>h", "<C-w>H", { desc = "Move window left" })
-map(ck, "<C-k>j", "<C-w>J", { desc = "Move window down" })
-map(ck, "<C-k>k", "<C-w>K", { desc = "Move window up" })
-map(ck, "<C-k>l", "<C-w>L", { desc = "Move window right" })
+-- C-k arrows move the window; C-k h/j/k/l do nothing on purpose (Nop, so the second key is not a plain h/j/k/l)
+map(ck, "<C-k><Left>", "<C-w>H", { desc = "Move window left" })
+map(ck, "<C-k><Down>", "<C-w>J", { desc = "Move window down" })
+map(ck, "<C-k><Up>", "<C-w>K", { desc = "Move window up" })
+map(ck, "<C-k><Right>", "<C-w>L", { desc = "Move window right" })
+for _, k in ipairs({ "h", "j", "k", "l" }) do map(ck, "<C-k>" .. k, "<Nop>", { desc = "Disabled" }) end
+-- Ctrl+K \ splits side by side, Ctrl+K - splits stacked (like tmux: \ side by side, - stacked)
+map(ck, "<C-k>\\", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
+map(ck, "<C-k>-", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })
 map(ck, "<C-k>a", function()
   vim.ui.input({ prompt = "New file: ", completion = "file" }, function(p)
     if p and p ~= "" then mk_parent(p); vim.cmd("edit " .. vim.fn.fnameescape(p)) end
@@ -1258,6 +1256,9 @@ local function toggle_term()
   vim.cmd("startinsert")
 end
 map("n", "<leader>ot", toggle_term, { desc = "Toggle terminal" })
+-- Ctrl+\ toggles the terminal too; in terminal mode it is Ctrl+\ Ctrl+\ (a lone Ctrl+\ starts nvim's <C-\><C-n>)
+map("n", "<C-\\>", toggle_term, { desc = "Toggle terminal" })
+map("t", "<C-\\><C-\\>", toggle_term, { desc = "Toggle terminal" })
 -- Esc Esc leaves terminal mode (a single Esc still goes to the program inside, e.g. vim / fzf)
 map("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Leave terminal mode" })
 

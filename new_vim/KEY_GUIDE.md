@@ -60,8 +60,10 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 
 | Key | Mode | Does |
 |---|---|---|
-| `C-k <arrow>` | n v | Split toward the arrow, focus the new window |
-| `C-k h/j/k/l` | n v | Move window left/down/up/right |
+| `C-k <arrow>` | n v | Move the window to the far left/bottom/top/right |
+| `C-k h/j/k/l` | n v | Nothing (disabled on purpose) |
+| `C-k -` | n v | Split stacked (new window below) |
+| `C-k \` | n v | Split side by side (new window to the right) |
 | `C-M-<arrows>` | n | Focus window in that direction |
 | `C-w q` | n | Close buffer |
 | `C-w C-w` | n | Close buffer |
@@ -181,7 +183,7 @@ The top row of every Oil window shows the full path of the folder it lists
 
 | Key | Mode | Does |
 |---|---|---|
-| `SPC o t` | n | Toggle bottom terminal (opens at half the screen height) |
+| `SPC o t` / `C-\` | n | Toggle bottom terminal (opens at half the screen height). From inside the terminal: `C-\ C-\` |
 | `SPC o m` | n | Read the Markdown file rendered by glow in a buffer (`q` goes back) |
 | `Esc Esc` | t | Leave terminal mode, back to normal (a single `Esc` still reaches the program inside) |
 | `C-\ C-n` | t | Leave terminal mode, back to normal |
