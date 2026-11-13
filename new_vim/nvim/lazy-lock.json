@@ -1,6 +1,7 @@
 {
   "alabaster.nvim": { "branch": "main", "commit": "b902c73fabefc13583bfc0c18b28950ea8f6244f" },
   "blink.cmp": { "branch": "main", "commit": "78336bc89ee5365633bcf754d93df01678b5c08f" },
+  "colorful-winsep.nvim": { "branch": "main", "commit": "7a8664fb8e91bd3435b3128c18dc814b3ddb11f5" },
   "conform.nvim": { "branch": "master", "commit": "db8a4a9edb217067b1d7a2e0362c74bfe9cc944d" },
   "diffview.nvim": { "branch": "main", "commit": "4516612fe98ff56ae0415a259ff6361a89419b0a" },
   "dropbar.nvim": { "branch": "master", "commit": "f7c6fa21e2a7c32576e7a1791774a3736987f467" },
