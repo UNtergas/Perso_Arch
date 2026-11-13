@@ -31,10 +31,10 @@ line with these keys, and goes back to normal after the chord.
 
 | Keys | Does |
 |---|---|
-| `d` | New `dev` window: nvim 65% on the left, 2 terminals stacked on the right (35%) |
-| `a` | New `kdev` window: same layout, `kvim` on the left |
+| `a` | New `side` window: 3 terminals. One big terminal on the left (65%), 2 stacked on the right (35%) |
+| `d` | New `dev` window: 3 terminals. One on top (70% of the height), 2 side by side below it (30%) |
 
-Both start in the current pane's directory and focus the nvim pane.
+Both start in the current pane's directory. `a` focuses the left terminal, `d` the top one.
 
 ## Panes
 
@@ -48,12 +48,13 @@ Both start in the current pane's directory and focus the nvim pane.
 | `z` | Zoom this pane to the whole window, again to restore the layout |
 | `[` / `]` | Like niri's `Mod+[` / `Mod+]` (consume-or-expel): a pane alone in its column is consumed into the column on the left / right (stacked below that pane). A pane in a stack is expelled into its own full-height column at the left / right edge. col1 \| col2, `[` on col2 gives col1 over col2, `[` again gives col2 \| col1, `]` reverses. Other columns keep their width: a consumed pane frees its width to the column it joins, an expelled pane takes half of its old column's width. Does nothing at the edge. Expelling goes to the window edge, so with 3+ columns it does not land next to its old column. Replaces stock `]` (paste buffer) |
 | `m` | Focus mode: this pane moves to the big 65% slot on the left, all the other panes stack on the right (35%). Again to put everything back exactly as before. If you add or close a pane in between, it just applies focus mode again |
+| `n` | Focus mode, top version: this pane moves to the top (70% of the height), all the other panes sit side by side below it (30%). Again to put everything back exactly as before. Same logic as `m` with its own saved layout |
 | `c` | Make this pane fill its column, again to restore the old split |
 | `x` | Close this pane |
 | `b` | Turn the active-pane box on / off for this session. On by default: the status becomes 2 rows, row 2 is a top edge that is dark over the active pane (plain line while zoomed). Needs `~/.tmux/box.sh` (copy of `new_tmux/box.sh`) |
 
-`c` does nothing visible on a pane that already fills its column (the nvim
-pane in the presets): use it on one of the two right terminals.
+`c` does nothing visible on a pane that already fills its column (the big left
+terminal of the `a` preset): use it on one of the two right terminals.
 
 ### Resize and layouts (stock tmux keys that still work)
 
@@ -63,7 +64,7 @@ pane in the presets): use it on one of the two right terminals.
 | `Alt-←` `↓` `↑` `→` | Resize by 5 cells (repeatable). `H` `J` `K` `L` above do the same with vim keys |
 | `Alt-1` | Layout: even-horizontal (all panes side by side) |
 | `Alt-2` | Layout: even-vertical (all panes stacked) |
-| `Alt-3` / `Alt-4` | Layout: main-horizontal / main-vertical (one big pane, the others in a row / column). They use the 65% size set in the config |
+| `Alt-3` / `Alt-4` | Layout: main-horizontal / main-vertical (one big pane, the others in a row / column). They use the sizes set in the config: 70% of the height for `Alt-3`, 65% of the width for `Alt-4` |
 | `Alt-5` | Layout: tiled |
 | `Alt-6` / `Alt-7` | Layout: main-horizontal-mirrored / main-vertical-mirrored |
 | `E` | Spread the panes out evenly |
@@ -81,7 +82,7 @@ pane in the presets): use it on one of the two right terminals.
 
 | Keys | Does |
 |---|---|
-| `n` | New window in the current directory |
+| `N` | New window in the current directory |
 | `o` | Previous window |
 | `p` | Next window |
 | `1`..`9` | Jump to window by number |
@@ -209,11 +210,12 @@ the statusline in `tmux.conf`).
 | Key | Stock | Here |
 |---|---|---|
 | prefix | `Ctrl-b` | `Alt-e` |
-| `d` | detach | `dev` preset (detach is `Q`) |
-| `a` | (unused) | `kdev` preset |
+| `d` | detach | `dev` preset: 3 terminals, 1 on top (detach is `Q`) |
+| `a` | (unused) | `side` preset: 3 terminals, 65 / 35 |
 | `o` | next pane | previous window |
 | `p` | previous window | next window |
-| `n` | next window | new window |
+| `n` | next window | focus mode, top version |
+| `N` | (unused) | new window |
 | `c` | new window | grow the pane to fill its column |
 | `[` / `]` | copy mode / paste | consume / expel panes (copy mode is `v`) |
 | `\` / `-` | (unused) / (unused) | split side by side / stacked |
