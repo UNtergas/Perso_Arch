@@ -86,6 +86,7 @@ Closing the last window of a session ends it.
 |---|---|
 | `r` | Reload `~/.tmux.conf` |
 | `v` | Copy mode (vi keys, `q` leaves). The mouse wheel also scrolls history. Was `[` in stock tmux |
+| in copy mode | `v` starts selecting (`V` whole lines, `C-v` block), `y` yanks to the system clipboard and leaves, `Esc` leaves. `Enter` copies to tmux's own buffer only |
 
 Mouse is on: click a pane to focus it, drag a border to resize.
 
