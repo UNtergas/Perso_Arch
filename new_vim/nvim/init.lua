@@ -1091,6 +1091,10 @@ map("n", "<C-w>q", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
 map("n", "<C-w>T", "<Nop>", { desc = "Disabled: one tab per nvim" })
+-- ctrl+w x closes the current split (the buffer stays open); it replaces the window exchange. ctrl+w c is disabled.
+map("n", "<C-w>x", "<cmd>close<cr>", { desc = "Close split" })
+map("n", "<C-w><C-x>", "<cmd>close<cr>", { desc = "Close split" })
+map("n", "<C-w>c", "<Nop>", { desc = "Disabled: use ctrl+w x" })
 -- ; is : (this also makes flash leave ; alone in every mode); f/t repeat: press f/t again, , goes back
 map({ "n", "x" }, ";", ":", { desc = "Command line" })
 
