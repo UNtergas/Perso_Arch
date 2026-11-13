@@ -127,6 +127,18 @@ require("lazy").setup({
       vim.cmd.colorscheme("koda-glade")
     end,
   },
+  -- active window tracking: the border around the focused window is drawn thick and blue (same blue as the active
+  -- tmux pane border). Backgrounds stay as they are. Loads on the first WinLeave, i.e. once there is a split.
+  {
+    "nvim-zh/colorful-winsep.nvim",
+    event = "WinLeave",
+    opts = {
+      border = "bold",
+      colors = { "#325cc0" },
+      animate = { enabled = false },
+      excluded_ft = { "packer", "TelescopePrompt", "mason", "lazy" },
+    },
+  },
   -- installed but NOT loaded at startup; switch with :Theme onedark-<style>
   { "navarasu/onedark.nvim", lazy = true },
 
