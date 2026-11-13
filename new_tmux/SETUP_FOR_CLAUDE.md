@@ -8,11 +8,12 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
 | Config | `new_tmux/tmux.conf` | `~/.tmux.conf` |
 | Top edge of the box, and the `Alt-e b` toggle | `new_tmux/box.sh` | `~/.tmux/box.sh` (executable) |
 | `[` / `]` consume-or-expel panes | `new_tmux/pane-col.sh` | `~/.tmux/pane-col.sh` (executable) |
+| The `Alt-e` key dropdown | `new_tmux/which-key.sh` | `~/.tmux/which-key.sh` (executable) |
 | Key guide for the user | `new_tmux/KEY_GUIDE.md` | stays in the repo |
 
 ## 1. Prerequisites (check each, tell the user what is missing)
 
-- `tmux -V` is 3.4 or later (built and tested on 3.6). The config uses `status 2` with `status-format[1]`,
+- `tmux -V` is 3.4 or later (`display-popup -b` and `send-keys -K` need it) (built and tested on 3.6). The config uses `status 2` with `status-format[1]`,
   `#[bg=terminal]`, format maths (`e|+`) and `set -F`; older tmux ignores or rejects them.
 - A Nerd Font in the terminal (the statusline arrows and the OS icon are Nerd Font glyphs).
 - Copy mode yanks to the clipboard with `wl-copy` (Wayland) or `xclip` (X11): one of them must be installed.
@@ -21,7 +22,7 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
 ## 2. Install
 
 1. Back up an existing `~/.tmux.conf`.
-2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
+2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
 3. `cp new_tmux/tmux.conf ~/.tmux.conf`
 4. Inside tmux: `tmux source ~/.tmux.conf`, or start a fresh server (see the reload note below).
 5. Check: the status is 2 rows (row 1 the statusline, row 2 the top edge), `Alt-e b` toggles row 2, and with a split
@@ -38,8 +39,14 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
 - **Borders**: heavy lines, active `#4a6a6a`, inactive `#dde5e5`. nvim and kvim use the same teal for the active window.
 - **Statusline**: left = OS icon + user, mode label (grey `NORMAL`, yellow `PREFIX`, blue `COPY`, grey `ZOOM`),
   pane n/total, running command. Right (`status-justify right` puts the window tabs there) = tabs, time, then
-  `Session <name>` with an icon on the same dark colour as the user. While the prefix is pressed the right side shows
-  a key hint instead (the session name is hidden, and the hint is dropped in windows narrower than about 150 columns).
+  `Session <name>` with an icon on the same dark colour as the user. The key hints are in the `Alt-e` dropdown.
+- **The `Alt-e` dropdown**: the real prefix is off (`set -g prefix None`). `Alt-e` is a root key (`bind -n M-e`) that opens a
+  popup running `~/.tmux/which-key.sh`. The script prints the key list, reads one key, closes, and then runs
+  `switch-client -T prefix` + `send-keys -K` so the key goes through the normal prefix table (every `bind` in the
+  config, listed or not, keeps working; `Alt-e Alt-e` sends a literal Alt-e). The status label shows `PREFIX` while the
+  popup is open through the global option `@popup` (the script sets and unsets it). `display-popup -h` does not take a
+  format, so `tmux.conf` has two popup commands, chosen by the terminal height. When you add a key to `tmux.conf`, add
+  a row to the list in `which-key.sh` and to `KEY_GUIDE.md`.
 - **Known quirk**: tmux colours each stretch of a divider with the style of the pane that owns it, so a tall pane next
   to a stack can leave its divider half dark. Do not try to fix it with a `pane-border-style` format that looks at the
   neighbours: it was tried, and it darkens dividers that are not next to the active pane.

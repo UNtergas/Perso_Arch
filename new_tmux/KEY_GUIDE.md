@@ -6,35 +6,44 @@ The status bar uses powerline arrows, so it needs a Nerd Font (same as the nvim 
 ## Install
 
 ```sh
-mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh
+mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh
 cp new_tmux/tmux.conf ~/.tmux.conf
 tmux            # or: tmux new -As dev   (attach to "dev", or create it)
 ```
 
-`box.sh` (the top edge and `b`) and `pane-col.sh` (`[` / `]`) must be in `~/.tmux/`.
+`box.sh` (the top edge and `b`), `pane-col.sh` (`[` / `]`) and `which-key.sh` (the `Alt-e` dropdown) must be in `~/.tmux/`.
 `SETUP_FOR_CLAUDE.md` has the full steps, the checks and the rules for changing the config.
 
 Reload in a running session: `Alt-e r`. A tmux server that is already
 running keeps its old config until you reload or `tmux kill-server`.
 
-## The prefix is Alt-e
+## The prefix is Alt-e (it opens a key dropdown)
 
 Every key below is pressed after `Alt-e` (release, then press the key).
 Alt-e is unused by nvim, kvim, zsh, Alacritty and niri. Not `Alt-k` (nvim/kvim
 half page up), not `C-Space` (Alacritty sends the same NUL for Ctrl+\`).
-`Alt-e Alt-e` sends a literal Alt-e to the app inside.
 
-While the prefix is waiting for its key, the status bar shows a yellow hint
-line with these keys, and goes back to normal after the chord.
+Pressing `Alt-e` opens a dropdown under the status bar, at the right, that lists the
+main keys. Press a key and it runs; `Esc` closes the dropdown. Keys that are not
+listed (the stock ones in this guide) work too: the dropdown passes any key on to
+tmux. `Alt-e Alt-e` sends a literal Alt-e to the program in the pane. While the
+dropdown is open the mode label in the status bar shows `PREFIX`.
+
+How it works: the real tmux prefix is switched off (`prefix None`). `Alt-e` is an
+ordinary key bound to a popup running `~/.tmux/which-key.sh`, which reads one key
+and hands it to tmux's prefix table. So every "prefix + key" binding is unchanged.
 
 ## Presets
 
 | Keys | Does |
 |---|---|
-| `a` | New `side` window: 3 terminals. One big terminal on the left (65%), 2 stacked on the right (35%) |
-| `d` | New `dev` window: 3 terminals. One on top (70% of the height), 2 side by side below it (30%) |
+| `a` | 3 terminals: one big terminal on the left (65%), 2 stacked on the right (35%) |
+| `d` | 3 terminals: one on top (70% of the height), 2 side by side below it (30%) |
 
-Both start in the current pane's directory. `a` focuses the left terminal, `d` the top one.
+If the current window has a single pane, the preset turns that window into the layout: the pane you are in
+stays and 2 more are added. If the window already has several panes, it is not touched and the preset opens a
+new window instead (named `side` for `a`, `stacked` for `d`). Panes start in the current pane's directory;
+`a` focuses the left terminal, `d` the top one.
 
 ## Panes
 
@@ -49,12 +58,14 @@ Both start in the current pane's directory. `a` focuses the left terminal, `d` t
 | `[` / `]` | Like niri's `Mod+[` / `Mod+]` (consume-or-expel): a pane alone in its column is consumed into the column on the left / right (stacked below that pane). A pane in a stack is expelled into its own full-height column at the left / right edge. col1 \| col2, `[` on col2 gives col1 over col2, `[` again gives col2 \| col1, `]` reverses. Other columns keep their width: a consumed pane frees its width to the column it joins, an expelled pane takes half of its old column's width. Does nothing at the edge. Expelling goes to the window edge, so with 3+ columns it does not land next to its old column. Replaces stock `]` (paste buffer) |
 | `m` | Focus mode: this pane moves to the big 65% slot on the left, all the other panes stack on the right (35%). Again to put everything back exactly as before. If you add or close a pane in between, it just applies focus mode again |
 | `n` | Focus mode, top version: this pane moves to the top (70% of the height), all the other panes sit side by side below it (30%). Again to put everything back exactly as before. Same logic as `m` with its own saved layout |
-| `c` | Make this pane fill its column, again to restore the old split |
+| `c` | Make this pane fill its column (full height), again to restore the old split |
+| `C` | Make this pane fill its row (95% of the width), again to restore the old split |
 | `x` | Close this pane |
 | `b` | Turn the active-pane box on / off for this session. On by default: the status becomes 2 rows, row 2 is a top edge that is dark over the active pane (plain line while zoomed). Needs `~/.tmux/box.sh` (copy of `new_tmux/box.sh`) |
 
 `c` does nothing visible on a pane that already fills its column (the big left
-terminal of the `a` preset): use it on one of the two right terminals.
+terminal of the `a` preset): use it on one of the two right terminals. `C` is the same
+for rows: use it on one of the two bottom terminals of the `d` preset.
 
 ### Resize and layouts (stock tmux keys that still work)
 
@@ -184,9 +195,9 @@ The mouse is on.
 | `/` then a key | Describe what that key does |
 | `t` | Clock (any key leaves) |
 | `~` | Show the last messages |
-| `C` | Customize mode: browse and edit options and keys |
+
 | `Ctrl-z` | Suspend the tmux client |
-| `Alt-e Alt-e` | Send a literal `Alt-e` to the program in the pane |
+| `Alt-e` `Alt-e` | Send a literal `Alt-e` to the program in the pane |
 
 ## Status bar
 
@@ -198,9 +209,8 @@ colours). Next to it, joined: `pane/total` and what the current pane is running
 (`nvim`, `zsh`, ...).
 Right side: the window tabs (the current one as a darker block, `Z` marks a zoomed
 window), then date + time, and on the far right `Session <name>` with an icon on
-the same dark colour as the user. While the prefix is pressed the right side shows
-the key hint instead (the session name is hidden then; in a window narrower than
-about 150 columns the hint does not fit and is dropped).
+the same dark colour as the user. The key hints are in the `Alt-e` dropdown, not in
+the status bar.
 
 Colours are the koda-glade ones from the nvim lualine (see the comment above
 the statusline in `tmux.conf`).
@@ -209,9 +219,10 @@ the statusline in `tmux.conf`).
 
 | Key | Stock | Here |
 |---|---|---|
-| prefix | `Ctrl-b` | `Alt-e` |
-| `d` | detach | `dev` preset: 3 terminals, 1 on top (detach is `Q`) |
+| prefix | `Ctrl-b` | `Alt-e` (opens the key dropdown) |
+| `d` | detach | `stacked` preset: 3 terminals, 1 on top (detach is `Q`) |
 | `a` | (unused) | `side` preset: 3 terminals, 65 / 35 |
+| `C` | customize mode | fill the row |
 | `o` | next pane | previous window |
 | `p` | previous window | next window |
 | `n` | next window | focus mode, top version |
