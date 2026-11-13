@@ -127,14 +127,14 @@ require("lazy").setup({
       vim.cmd.colorscheme("koda-glade")
     end,
   },
-  -- active window tracking: the border around the focused window is drawn thick and blue (same blue as the active
-  -- tmux pane border). Backgrounds stay as they are. Loads on the first WinLeave, i.e. once there is a split.
+  -- active window tracking: the border around the focused window is drawn thick in the same deep teal as the active
+  -- tmux pane border. Backgrounds stay as they are. Loads on the first WinLeave, i.e. once there is a split.
   {
     "nvim-zh/colorful-winsep.nvim",
     event = "WinLeave",
     opts = {
       border = "bold",
-      colors = { "#325cc0" },
+      colors = { "#4a6a6a" },
       animate = { enabled = false },
       excluded_ft = { "packer", "TelescopePrompt", "mason", "lazy" },
     },
@@ -1100,15 +1100,19 @@ local function mk_parent(p)
   if dir ~= "" and dir ~= "." then vim.fn.mkdir(dir, "p") end
 end
 local ck = { "n", "v" }
--- C-k arrows move the window; C-k h/j/k/l do nothing on purpose (Nop, so the second key is not a plain h/j/k/l)
+-- C-k arrows move the window
 map(ck, "<C-k><Left>", "<C-w>H", { desc = "Move window left" })
 map(ck, "<C-k><Down>", "<C-w>J", { desc = "Move window down" })
 map(ck, "<C-k><Up>", "<C-w>K", { desc = "Move window up" })
 map(ck, "<C-k><Right>", "<C-w>L", { desc = "Move window right" })
-for _, k in ipairs({ "h", "j", "k", "l" }) do map(ck, "<C-k>" .. k, "<Nop>", { desc = "Disabled" }) end
--- Ctrl+K \ splits side by side, Ctrl+K - splits stacked (like tmux: \ side by side, - stacked)
-map(ck, "<C-k>\\", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
-map(ck, "<C-k>-", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })
+-- C-k h/j/k/l resize the window (what C-w < > - + did): h narrower, l wider, j shorter, k taller
+map(ck, "<C-k>h", "<C-w>2<", { desc = "Window narrower" })
+map(ck, "<C-k>l", "<C-w>2>", { desc = "Window wider" })
+map(ck, "<C-k>j", "<C-w>2-", { desc = "Window shorter" })
+map(ck, "<C-k>k", "<C-w>2+", { desc = "Window taller" })
+-- C-w \ splits side by side, C-w - splits stacked (like tmux: \ side by side, - stacked)
+map("n", "<C-w>\\", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
+map("n", "<C-w>-", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })
 map(ck, "<C-k>a", function()
   vim.ui.input({ prompt = "New file: ", completion = "file" }, function(p)
     if p and p ~= "" then mk_parent(p); vim.cmd("edit " .. vim.fn.fnameescape(p)) end
@@ -1476,6 +1480,7 @@ local function diff_changed_hl()
   vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#a57c00" })
   vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#6f3fa0" }) -- dark purple branch icon
   vim.api.nvim_set_hl(0, "TabModified", { fg = "#1f4e9c" }) -- dark blue: path + dot of an unsaved buffer in the tabline
+  vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#d3dcdc" }) -- inactive window dividers: light grey, so the active teal one stands out
 end
 diff_changed_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = diff_changed_hl })
