@@ -6,9 +6,13 @@ The status bar uses powerline arrows, so it needs a Nerd Font (same as the nvim 
 ## Install
 
 ```sh
+mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh
 cp new_tmux/tmux.conf ~/.tmux.conf
 tmux            # or: tmux new -As dev   (attach to "dev", or create it)
 ```
+
+`box.sh` (the top edge and `b`) and `pane-col.sh` (`[` / `]`) must be in `~/.tmux/`.
+`SETUP_FOR_CLAUDE.md` has the full steps, the checks and the rules for changing the config.
 
 Reload in a running session: `Alt-e r`. A tmux server that is already
 running keeps its old config until you reload or `tmux kill-server`.
@@ -51,6 +55,28 @@ Both start in the current pane's directory and focus the nvim pane.
 `c` does nothing visible on a pane that already fills its column (the nvim
 pane in the presets): use it on one of the two right terminals.
 
+### Resize and layouts (stock tmux keys that still work)
+
+| Keys | Does |
+|---|---|
+| `Ctrl-←` `↓` `↑` `→` | Resize by 1 cell (repeatable) |
+| `Alt-←` `↓` `↑` `→` | Resize by 5 cells (repeatable). `H` `J` `K` `L` above do the same with vim keys |
+| `Alt-1` | Layout: even-horizontal (all panes side by side) |
+| `Alt-2` | Layout: even-vertical (all panes stacked) |
+| `Alt-3` / `Alt-4` | Layout: main-horizontal / main-vertical (one big pane, the others in a row / column). They use the 65% size set in the config |
+| `Alt-5` | Layout: tiled |
+| `Alt-6` / `Alt-7` | Layout: main-horizontal-mirrored / main-vertical-mirrored |
+| `E` | Spread the panes out evenly |
+| `Ctrl-o` / `Alt-o` | Rotate the panes forward / backward |
+| `{` / `}` | Swap this pane with the previous / next one |
+| `!` | Break this pane out into its own window |
+| `;` | Last (previously active) pane |
+| `q` | Show pane numbers (press a number to jump to it) |
+| `"` / `%` | Stock splits (stacked / side by side). They do not keep the directory, use `-` and `\` |
+| `M` | Clear the marked pane |
+
+`Space` (stock: cycle layouts) is unbound. `Alt-e Space` does nothing.
+
 ## Windows (tabs)
 
 | Keys | Does |
@@ -62,7 +88,14 @@ pane in the presets): use it on one of the two right terminals.
 | `,` | Rename window |
 | `&` | Close the whole window (asks y/n) |
 | `w` | Tree of all sessions and windows (`j`/`k`, Enter, `x` kills the highlighted one) |
+| `Alt-n` / `Alt-p` | Next / previous window that has an alert (activity, bell) |
+| `f` | Find a window by the text in its panes |
+| `'` | Jump to a window by number or name (prompt) |
+| `.` | Move this window to another index (prompt) |
+| `<` / `>` | Menu for the window / pane (swap, kill, rename, mark, ...). The same menus open with a right-click |
+| `i` | Show info about the current window |
 
+The window name follows the running command (`automatic-rename` is on) until you rename it with `,`.
 A window also closes when its last pane closes (`exit`, `Ctrl-D`, or `x`).
 
 ## Sessions
@@ -73,6 +106,7 @@ A window also closes when its last pane closes (`exit`, `Ctrl-D`, or `x`).
 | `s` | Session picker |
 | `(` / `)` | Previous / next session |
 | `$` | Rename session |
+| `D` | Choose which attached client to detach |
 | `tmux ls` | List sessions |
 | `tmux attach -t NAME` (or `tmux a`) | Resume |
 | `tmux kill-session -t NAME` | Close one session for good |
@@ -80,15 +114,78 @@ A window also closes when its last pane closes (`exit`, `Ctrl-D`, or `x`).
 
 Closing the last window of a session ends it.
 
+## Copy mode and clipboard
+
+`Alt-e v` enters copy mode (`Alt-e PageUp` enters it and scrolls up a page). `q`, `Esc` or `Ctrl-c` leaves.
+The mode uses vi keys. Selecting and copying:
+
+| Keys | Does |
+|---|---|
+| `v` or `Space` | Start selecting |
+| `V` | Select whole lines |
+| `Ctrl-v` | Block (rectangle) selection |
+| `o` | Jump to the other end of the selection |
+| `y` | Copy to the system clipboard and leave (`wl-copy` on Wayland, `xclip` on X11) |
+| `Enter` or `Ctrl-j` | Copy to tmux's own buffer only and leave |
+| `A` | Append the selection to the buffer and leave |
+| `D` | Copy from the cursor to the end of the line and leave |
+| `Esc` | Leave (the config binds it to cancel) |
+
+Moving and searching in copy mode:
+
+| Keys | Does |
+|---|---|
+| `h` `j` `k` `l` | Cursor left / down / up / right |
+| `w` `b` `e` | Next word / previous word / end of word (`W` `B` `E` for whitespace-separated words) |
+| `0` `^` `$` | Start of line / first non-blank / end of line |
+| `g` / `G` | Top / bottom of the history |
+| `H` `M` `L` | Top / middle / bottom line of the screen |
+| `{` / `}` | Previous / next paragraph |
+| `%` | Matching bracket |
+| `Ctrl-u` / `Ctrl-d` | Half page up / down |
+| `Ctrl-b` / `Ctrl-f` | Page up / down |
+| `Ctrl-y` / `Ctrl-e` | Scroll one line up / down |
+| `z` | Scroll so the cursor is in the middle |
+| `/` / `?` | Search forward / backward (prompt) |
+| `n` / `N` | Next / previous match |
+| `*` / `#` | Search forward / backward for the word under the cursor |
+| `f` `F` `t` `T` + a character | Jump to / before that character on the line. `;` repeats, `,` repeats the other way |
+| `X` / `Alt-x` | Set a mark / jump to it |
+| `1`..`9` | Count prefix (for example `5j`) |
+| `:` | Go to a line number |
+| `r` | Refresh from the pane |
+
+Pasting: stock `Alt-e ]` (paste the tmux buffer) is taken by consume-or-expel, so paste the system clipboard with the
+terminal's own paste (`Ctrl-Shift-v` in Alacritty). `Alt-e =` lists the tmux buffers and pastes the one you pick, `Alt-e #` just lists them.
+
+## Mouse
+
+The mouse is on.
+
+| Action | Does |
+|---|---|
+| Click a pane | Focus it |
+| Click a window tab | Switch to that window |
+| Wheel over a pane | Scroll the history (enters copy mode); over a full-screen app such as nvim it is sent to the app |
+| Wheel over the status bar | Previous / next window |
+| Drag inside a pane | Select text; releasing copies it to tmux's buffer (use `y` in copy mode to be sure it reaches the system clipboard) |
+| Double-click / triple-click | Select a word / a line (and copy) |
+| Drag a border | Resize the panes |
+| Right-click a pane / a tab / the left of the status bar | Menus (pane actions, window actions, session actions) |
+
 ## Other
 
 | Keys | Does |
 |---|---|
 | `r` | Reload `~/.tmux.conf` |
-| `v` | Copy mode (vi keys, `q` leaves). The mouse wheel also scrolls history. Was `[` in stock tmux |
-| in copy mode | `v` starts selecting (`V` whole lines, `C-v` block), `y` yanks to the system clipboard and leaves, `Esc` leaves. `Enter` copies to tmux's own buffer only |
-
-Mouse is on: click a pane to focus it, drag a border to resize.
+| `:` | tmux command prompt |
+| `?` | List every key binding (searchable) |
+| `/` then a key | Describe what that key does |
+| `t` | Clock (any key leaves) |
+| `~` | Show the last messages |
+| `C` | Customize mode: browse and edit options and keys |
+| `Ctrl-z` | Suspend the tmux client |
+| `Alt-e Alt-e` | Send a literal `Alt-e` to the program in the pane |
 
 ## Status bar
 
@@ -107,7 +204,21 @@ about 150 columns the hint does not fit and is dropped).
 Colours are the koda-glade ones from the nvim lualine (see the comment above
 the statusline in `tmux.conf`).
 
-## Unchanged tmux defaults that still work
+## Keys that changed from stock tmux
 
-`o` is no longer "next pane" (it is previous window). `;` last pane, `q` pane
-numbers, `{` `}` swap panes, `!` break pane to its own window.
+| Key | Stock | Here |
+|---|---|---|
+| prefix | `Ctrl-b` | `Alt-e` |
+| `d` | detach | `dev` preset (detach is `Q`) |
+| `a` | (unused) | `kdev` preset |
+| `o` | next pane | previous window |
+| `p` | previous window | next window |
+| `n` | next window | new window |
+| `c` | new window | grow the pane to fill its column |
+| `[` / `]` | copy mode / paste | consume / expel panes (copy mode is `v`) |
+| `\` / `-` | (unused) / (unused) | split side by side / stacked |
+| `←` `↓` `↑` `→` | focus | move the pane (focus is `h` `j` `k` `l`) |
+| `H` `J` `K` `L` | (unused) | resize |
+| `Space` | cycle layouts | unbound |
+| `b` | (unused) | box on / off |
+| `m` | (unused; `M` clears the marked pane) | focus mode |
