@@ -6,12 +6,12 @@ The status bar uses powerline arrows, so it needs a Nerd Font (same as the nvim 
 ## Install
 
 ```sh
-mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh
+mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh
 cp new_tmux/tmux.conf ~/.tmux.conf
 tmux            # or: tmux new -As dev   (attach to "dev", or create it)
 ```
 
-`box.sh` (the top edge and `b`), `pane-col.sh` (`[` / `]`) and `which-key.sh` (the `Alt-e` dropdown) must be in `~/.tmux/`.
+`box.sh` (the top edge and `b`), `pane-col.sh` (`[` / `]`), `which-key.sh` (the `Alt-e` dropdown) and `ask-name.sh` (the new-window name dialog, needs `fzf`) must be in `~/.tmux/`.
 `SETUP_FOR_CLAUDE.md` has the full steps, the checks and the rules for changing the config.
 
 Reload in a running session: `Alt-e r`. A tmux server that is already
@@ -42,7 +42,7 @@ and hands it to tmux's prefix table. So every "prefix + key" binding is unchange
 
 If the current window has a single pane, the preset turns that window into the layout: the pane you are in
 stays and 2 more are added. If the window already has several panes, it is not touched and the preset opens a
-new window instead (named `side` for `a`, `stacked` for `d`). Panes start in the current pane's directory;
+new window instead. It opens the same name dialog first (prefilled `side` for `a`, `stacked` for `d`; Esc cancels). Panes start in the current pane's directory;
 `a` focuses the left terminal, `d` the top one.
 
 ## Panes
@@ -93,7 +93,7 @@ for rows: use it on one of the two bottom terminals of the `d` preset.
 
 | Keys | Does |
 |---|---|
-| `N` | New window in the current directory |
+| `N` | New window in the current directory. A floating name dialog opens first (Enter on an empty name keeps the automatic name, Esc cancels) |
 | `o` | Previous window |
 | `p` | Next window |
 | `1`..`9` | Jump to window by number |

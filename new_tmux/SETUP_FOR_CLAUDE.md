@@ -9,6 +9,7 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
 | Top edge of the box, and the `Alt-e b` toggle | `new_tmux/box.sh` | `~/.tmux/box.sh` (executable) |
 | `[` / `]` consume-or-expel panes | `new_tmux/pane-col.sh` | `~/.tmux/pane-col.sh` (executable) |
 | The `Alt-e` key dropdown | `new_tmux/which-key.sh` | `~/.tmux/which-key.sh` (executable) |
+| New-window name dialog (`N`, `a`, `d`) | `new_tmux/ask-name.sh` | `~/.tmux/ask-name.sh` (executable) |
 | Key guide for the user | `new_tmux/KEY_GUIDE.md` | stays in the repo |
 
 ## 1. Prerequisites (check each, tell the user what is missing)
@@ -17,12 +18,13 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
   `#[bg=terminal]`, format maths (`e|+`) and `set -F`; older tmux ignores or rejects them.
 - A Nerd Font in the terminal (the statusline arrows and the OS icon are Nerd Font glyphs).
 - Copy mode yanks to the clipboard with `wl-copy` (Wayland) or `xclip` (X11): one of them must be installed.
+- `fzf` (the name dialog is fzf used as a text box; without it `N`, `a` and `d` open no window).
 - True colour: the config sets `terminal-overrides ",*:RGB"`; the terminal must support it.
 
 ## 2. Install
 
 1. Back up an existing `~/.tmux.conf`.
-2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
+2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
 3. `cp new_tmux/tmux.conf ~/.tmux.conf`
 4. Inside tmux: `tmux source ~/.tmux.conf`, or start a fresh server (see the reload note below).
 5. Check: the status is 2 rows (row 1 the statusline, row 2 the top edge), `Alt-e b` toggles row 2, and with a split
@@ -47,6 +49,7 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
   popup is open through the global option `@popup` (the script sets and unsets it). `display-popup -h` does not take a
   format, so `tmux.conf` has two popup commands, chosen by the terminal height. When you add a key to `tmux.conf`, add
   a row to the list in `which-key.sh` and to `KEY_GUIDE.md`.
+- **The name dialog**: `N`, and `a` / `d` when they open a new window, run `display-popup -E` with `~/.tmux/ask-name.sh <default>`. The script runs fzf over an empty list (`--print-query`), so Enter returns the typed text and Esc returns 130. It sets `@wok` and `@wname` on the server; the binding then does `new-window` and `rename-window` only if `@wok` is set (empty name keeps the auto name). The popup is 50% wide, centred, its bottom edge at 40% of the height + 2.
 - **Known quirk**: tmux colours each stretch of a divider with the style of the pane that owns it, so a tall pane next
   to a stack can leave its divider half dark. Do not try to fix it with a `pane-border-style` format that looks at the
   neighbours: it was tried, and it darkens dividers that are not next to the active pane.

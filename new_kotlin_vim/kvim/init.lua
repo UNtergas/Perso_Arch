@@ -990,12 +990,51 @@ require("lazy").setup({
     cmd = "UndotreeToggle",
     init = function() vim.g.undotree_SetFocusWhenToggle = 1 end, -- SPC s u moves the cursor into the tree
   },
+  { -- ":" as a floating popup (upper middle). Only the command line: messages, notify and LSP UI stay as they were
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    opts = {
+      cmdline = { enabled = true, view = "cmdline_popup" },
+      messages = { enabled = false },
+      popupmenu = { enabled = false },
+      notify = { enabled = false },
+      lsp = {
+        progress = { enabled = false },
+        hover = { enabled = false },
+        signature = { enabled = false },
+        message = { enabled = false },
+      },
+      views = {
+        cmdline_popup = {
+          position = { row = "20%", col = "50%" }, -- percentages centre the popup on that point of the screen
+          size = { width = "60%", height = "auto" },
+          border = { style = "rounded" },
+        },
+      },
+    },
+  },
   {
     "rcarriga/nvim-notify",
     event = "VeryLazy",
     config = function()
       local notify = require("notify")
-      notify.setup({ timeout = 3000, render = "compact", stages = "fade", background_colour = "#ededed" })
+      -- alerts sit in the top-left corner (below the tabline): the stock "fade" stages with anchor NW / col 0 instead of NE / right edge
+      local function left_fade(direction)
+        local stages = require("notify.stages.fade")(direction)
+        for i, stage in ipairs(stages) do
+          stages[i] = function(state)
+            local r = stage(state)
+            if r then
+              if r.anchor then r.anchor = "NW" end
+              if type(r.col) == "number" then r.col = 0 elseif r.col then r.col = { 0 } end
+            end
+            return r
+          end
+        end
+        return stages
+      end
+      notify.setup({ timeout = 3000, render = "compact", stages = left_fade(require("notify.stages.util").DIRECTION.TOP_DOWN), background_colour = "#ededed" })
       vim.notify = notify -- every vim.notify call in this config (and plugins) goes through it
       -- Alabaster-friendly colours (the defaults are neon green / pale yellow); darker than the
       -- diagnostic signs so they stay readable as text on the light grey background
@@ -1791,9 +1830,9 @@ vim.api.nvim_create_autocmd("BufModifiedSet", { callback = function() vim.cmd.re
 vim.opt.showtabline = 2
 vim.opt.tabline = "%{%v:lua.harpoon_tabline()%}"
 
--- cowboy: after LIMIT hjkl/arrow/+/- presses within 2s of the first one (no count), the key is blocked until the window ends.
+-- cowboy: after LIMIT hjkl/arrow/+/- presses within WINDOW ms of the first one (no count), the key is blocked until the window ends.
 -- Use w b f t / } instead. A count (5j) resets it; nofile buffers (Oil, pickers) are exempt.
-local LIMIT = 7
+local LIMIT, WINDOW = 12, 1500
 for _, key in ipairs({ "h", "j", "k", "l", "+", "-", "<Left>", "<Down>", "<Up>", "<Right>" }) do
   local count, timer = 0, assert(vim.uv.new_timer())
   vim.keymap.set("n", key, function()
@@ -1803,7 +1842,7 @@ for _, key in ipairs({ "h", "j", "k", "l", "+", "-", "<Left>", "<Down>", "<Up>",
       vim.schedule(function() vim.notify("Hold it Cowboy! 🤠", vim.log.levels.WARN, { icon = "🤠", id = "cowboy" }) end)
       return ""
     end
-    if count == 0 then timer:start(2000, 0, function() count = 0 end) end -- fixed window from the first press
+    if count == 0 then timer:start(WINDOW, 0, function() count = 0 end) end -- fixed window from the first press
     count = count + 1
     return key
   end, { expr = true, silent = true })
