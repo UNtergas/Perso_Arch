@@ -48,9 +48,12 @@ bottom (ported from the Emacs config).
 ## Lspsaga trial
 
 Lspsaga currently supplies the symbol breadcrumbs (replacing Dropbar), reference finder (`gr`),
-code actions (`SPC c a`, Ctrl-. / Alt-.), and diagnostics (`SPC d`, `[d` / `]d`, `SPC c x`).
+and diagnostic displays (`SPC d`, `SPC c x`).
 Finder: `]f` / `[f` jump between file headers; Enter opens a result; `[w` switches between results and preview; Esc closes.
-Trouble remains installed for Telescope results (`Ctrl-g`) and explicit `:Trouble` commands.
+Trouble has been removed; Telescope can still send results to quickfix with Ctrl-Q.
+`[d` / `]d` only jump, without popups or automatic code-action requests. Use `SPC d` for
+diagnostic details and Ctrl-. / Alt-. / `SPC c a` for the original native LSP code-action
+menu presented through Snacks. Disabled actions are hidden.
 Hover (`K`), symbol rename (`SPC c r` / `SPC r n`), definition peek (`gp`), and document outline
 (`SPC s o`) also use Lspsaga. The outline is a right sidebar: Enter expands/jumps, `o` jumps directly,
 `q` or Esc closes. Ctrl-Shift-T retains the Telescope document-symbol picker.
@@ -62,3 +65,7 @@ Backup for this machine before the trial:
 `~/.config-backups/nvim-before-lspsaga-20261116-130239/` contains both the live `nvim/` config
 and the previous `new_vim-repo/` directory, including plugin locks. To revert, close Neovim,
 restore those files, then run `nvim --headless '+Lazy! restore' +qa`.
+
+Breadcrumbs use `lua/saga_breadcrumb.lua` with Lspsaga symbol data and styling. The renderer
+uses each window's own buffer/cursor, handles unsorted symbols and column ranges, and clears
+outdated scope labels while symbols refresh. Copy the entire config directory when installing.

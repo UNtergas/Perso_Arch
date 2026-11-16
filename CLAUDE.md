@@ -15,7 +15,7 @@ Before applying `new_vim/nvim/` on a machine, tell the user about this and check
 
 An older `lazy-lock.json` brings back a bug: `nvim-lspconfig` at `8a1529e4` (March 2025) has no `lsp/` folder, so no server starts, `gd` and `gr` do nothing, and Ctrl-click gives `E433: No tags file`. `lsp.log` shows `invalid "ts_ls" config ... cmd`. Always copy the lockfile from `new_vim/nvim/`, never from an older machine or backup.
 
-`trouble.nvim` (`gr`, `C-g` in Telescope) and `grug-far.nvim` (`SPC s r`) were added in commit `a7129a36`. Check both are installed after step 4. `SPC s r` needs `ripgrep`.
+`grug-far.nvim` (`SPC s r`) needs `ripgrep`. Trouble has been removed from nvim and kvim; do not reinstall it. Lspsaga provides references and diagnostic displays. Code actions use native LSP through the Snacks picker, not Lspsaga. `[d` / `]d` must jump without popups; use `SPC d` for diagnostic details.
 
 Delete this section once every machine is done.
 

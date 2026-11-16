@@ -90,7 +90,7 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
 - **Lspsaga symbol retry**: `KvimSagaSymbolRetry` retries empty `documentSymbol` results for up to
   300 seconds, without overlapping outstanding requests. This preserves the former Dropbar
   `ttl_init = 300` workaround for Kotlin's slow Gradle indexing. Do not drop it when syncing from nvim.
-- **Definition adapter**: copy the complete `kvim/` directory, including `lua/kotlin_definition.lua`.
+- **Definition adapter**: copy the complete `kvim/` directory, including `lua/kotlin_definition.lua` and `lua/saga_breadcrumb.lua`.
   The Kotlin client wrapper adds fallback locations to standard definition responses; both native
   jumps and Lspsaga previews inherit them. Multiple matches use a location picker. Requests retain
   the source buffer/position, ignore stale fallback results, and support cancellation.

@@ -41,7 +41,7 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `SPC s o` | n | Toggle document outline tree; Enter expands/jumps, o jumps directly, q closes |
 | `C-t` | n | Find symbol in workspace (VSCode) |
 | `M-j` / `M-k` | n x | Scroll half a page down / up (animated, about 150 ms). Not `C-k`: it starts the window chords |
-| `]d` / `[d` | n | Next / previous diagnostic |
+| `]d` / `[d` | n | Next / previous diagnostic, without popups (counts work) |
 | `]g` / `[g` | n | Next / previous git hunk |
 
 ## 3. Search and replace
@@ -55,7 +55,6 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `SPC s w` | n | Search the word under the cursor in the project, whole word only |
 | `SPC s r` | n v | Search and replace in the project, grouped by file (grug-far). `SPC s` syncs all, `SPC l` this line, `SPC n` / `SPC p` this line then next / previous, `SPC v` this file. `dd` drops a result. `g?` lists every key. `SPC r` (Replace) is off |
 | `SPC f g` | n | Search project (live grep, old bind) |
-| `C-g` | Telescope | Show the results grouped by file (Trouble) |
 | `C-q` | Telescope | Send the results to the quickfix list |
 | `Esc` | n | Clear search highlight |
 | `:%s/a/b/g` | n | Replace in buffer (`/gc` asks each) |

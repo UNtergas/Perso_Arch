@@ -553,33 +553,20 @@ require("lazy").setup({
         layout_strategy = "flex",
         layout_config = { width = 0.95, height = 0.95 },
         path_display = { "truncate" },
-        -- C-g: show the results in Trouble, grouped by file (C-q still fills the quickfix list)
+        -- C-q still sends Telescope results to the quickfix list.
         mappings = {
           i = {
             ["<C-t>"] = false,
-            ["<C-g>"] = function(...) return require("trouble.sources.telescope").open(...) end,
           },
           n = {
             ["<C-t>"] = false,
-            ["<C-g>"] = function(...) return require("trouble.sources.telescope").open(...) end,
           },
         },
       },
     },
   },
 
-  -- Trouble: results listed under one header per file
-  {
-    "folke/trouble.nvim",
-    enabled = not vim.g.vscode,
-    cmd = "Trouble",
-    opts = {
-      focus = true,
-      win = { position = "bottom", size = 0.5 },
-    },
-  },
-
-  -- Lspsaga trial: breadcrumbs and focused LSP popups. Trouble remains available for result lists.
+  -- Lspsaga: breadcrumbs and focused LSP popups.
   {
     "nvimdev/lspsaga.nvim",
     enabled = not vim.g.vscode,
@@ -603,11 +590,11 @@ require("lazy").setup({
         default = "ref",
         keys = { toggle_or_open = "<CR>", close = "<Esc>" },
       },
-      code_action = { keys = { quit = { "q", "<Esc>" } } },
       diagnostic = { keys = { quit = { "q", "<Esc>" } } },
     },
     config = function(_, opts)
       require("lspsaga").setup(opts)
+      require("saga_breadcrumb").setup()
       -- Kotlin's first documentSymbol response may be empty while Gradle is indexing.
       -- Preserve the old Dropbar retry window without overlapping outstanding requests.
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -652,13 +639,7 @@ require("lazy").setup({
             { buffer = ev.buf, desc = "Previous reference file" })
         end,
       })
-      -- ts_ls advertises disabled refactorings; preserve our existing usable-actions-only menu.
-      local actions = require("lspsaga.codeaction")
-      local show_actions = actions.action_callback
-      actions.action_callback = function(self, tuples, ctx)
-        tuples = vim.tbl_filter(function(tuple) return not tuple[2].disabled end, tuples)
-        return show_actions(self, tuples, ctx)
-      end
+
     end,
   },
 
@@ -858,7 +839,7 @@ require("lazy").setup({
     lazy = false,
     priority = 900,
     opts = {
-      picker = { enabled = true }, -- also replaces vim.ui.select (code actions, etc.) with a filterable list
+      picker = { enabled = true }, -- also replaces vim.ui.select for code actions with a filterable list
       -- smooth scrolling: any viewport change (Ctrl-J/K half page, search jumps, gg/G, mouse wheel) is animated.
       -- Short on purpose (default total is 250 ms); `vim.g.snacks_scroll = false` turns it off, per buffer: vim.b.snacks_scroll
       scroll = { enabled = true, animate = { duration = { step = 15, total = 60 }, easing = "linear" } },
@@ -1340,8 +1321,8 @@ map({ "n", "x" }, "<M-k>", [[<Cmd>exe "normal! \<C-u>"<CR>]], { desc = "Half pag
 -- <PageDown>/<PageUp> are already full-page scroll natively
 
 -- diagnostics / hunks: ]d [d ]g [g
-map("n", "]d", "<cmd>Lspsaga diagnostic_jump_next<cr>", { desc = "Next diagnostic" })
-map("n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<cr>", { desc = "Prev diagnostic" })
+map("n", "]d", function() vim.diagnostic.jump({ count = vim.v.count1, float = false }) end, { desc = "Next diagnostic (no popup)" })
+map("n", "[d", function() vim.diagnostic.jump({ count = -vim.v.count1, float = false }) end, { desc = "Prev diagnostic (no popup)" })
 map("n", "]g", function() require("gitsigns").nav_hunk("next") end, { desc = "Next hunk" })
 map("n", "[g", function() require("gitsigns").nav_hunk("prev") end, { desc = "Prev hunk" })
 
@@ -1410,7 +1391,7 @@ map("n", "<leader>fR", function() Snacks.rename.rename_file() end, { desc = "Ren
 map({ "n", "v" }, "<leader>cf", function()
   require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "Format (manual)" })
--- SPC c x: Lspsaga workspace diagnostics; Trouble remains available with :Trouble.
+-- SPC c x: Lspsaga workspace diagnostics.
 -- SPC c X: the same diagnostics in a flat Telescope list.
 map("n", "<leader>cx", "<cmd>Lspsaga show_workspace_diagnostics<cr>", { desc = "Diagnostics (Lspsaga)" })
 map("n", "<leader>cX", tb("diagnostics"), { desc = "Diagnostics list (Telescope)" })
@@ -1543,8 +1524,8 @@ map("n", "<leader>ot", toggle_term, { desc = "Toggle terminal" })
 -- Esc Esc leaves terminal mode (a single Esc still goes to the program inside, e.g. vim / fzf)
 map("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Leave terminal mode" })
 
--- Alt-q (or SPC q): close the popups (Trouble, quickfix, help, grug-far, undo tree, floats, bottom terminal), keep the files
-local popup_ft = { trouble = true, qf = true, help = true, checkhealth = true, ["grug-far"] = true, ["grug-far-history"] = true }
+-- Alt-q (or SPC q): close the popups (quickfix, help, grug-far, undo tree, floats, bottom terminal), keep the files
+local popup_ft = { qf = true, help = true, checkhealth = true, ["grug-far"] = true, ["grug-far-history"] = true }
 local function close_popups()
   if vim.fn.mode() == "t" then vim.cmd("stopinsert") end
   if term.win and vim.api.nvim_win_is_valid(term.win) then
@@ -1559,7 +1540,7 @@ local function close_popups()
     end
   end
   for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-    -- closing one popup can take others with it (Trouble closes its preview float), so the window
+    -- closing one popup can take others with it (a results panel can close its preview float), so the window
     -- from the list may already be gone; check each one right before touching it
     if vim.api.nvim_win_is_valid(win) then
       local buf = vim.api.nvim_win_get_buf(win)
@@ -1575,9 +1556,9 @@ map({ "n", "i", "t" }, "<M-q>", close_popups, { desc = "Close popups" })
 map("n", "<leader>q", close_popups, { desc = "Close popups" })
 
 -- ctrl+. (VSCode quick fix) = code action; alt+. as a fallback for terminals that drop the Ctrl
--- Lspsaga filters disabled actions in its setup callback above.
+-- Hide disabled refactorings; the native action list is displayed through Snacks.
 function _G.code_action()
-  vim.cmd("Lspsaga code_action")
+  vim.lsp.buf.code_action({ filter = function(action) return not action.disabled end })
 end
 map({ "n", "i", "v" }, "<C-.>", _G.code_action, { desc = "Code action" })
 map({ "n", "i", "v" }, "<M-.>", _G.code_action, { desc = "Code action" })

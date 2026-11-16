@@ -14,7 +14,7 @@ Status: being tested. Edit `~/.config/kvim/init.lua` first, then sync it here.
 
 ## Lspsaga trial
 
-kvim now uses the same Lspsaga UI as nvim: breadcrumbs, reference Finder (`gr`), code actions,
+kvim now uses the same Lspsaga UI as nvim: breadcrumbs, reference Finder (`gr`),
 diagnostics, hover (`K`), rename (`SPC c r`), editable definition preview (`gp`), and outline tree
 (`SPC s o`). In Finder, `]f` / `[f` jump to the next/previous file; Enter opens a reference, `[w`
 switches to the preview, and Esc closes. Outline: Enter expands/jumps, `o` jumps, q/Esc closes.
@@ -29,3 +29,12 @@ Full pre-trial backup on this machine:
 `~/.config-backups/kvim-before-lspsaga-20261116-135359/` (live config and repository copy).
 Run the definition adapter checks from the repo root:
 `nvim --headless -u NONE -l new_kotlin_vim/tests/definition_fallbacks.lua`.
+
+Trouble is removed. `[d` / `]d` only jump, with no popup or automatic code-action request.
+Use `SPC d` for diagnostic details and Ctrl-. / Alt-. / `SPC c a` for code actions.
+Code actions use the original native LSP menu through Snacks, with disabled actions hidden.
+Telescope Ctrl-Q still sends results to quickfix.
+
+Breadcrumbs use `lua/saga_breadcrumb.lua` with Lspsaga symbol data and styling. The renderer
+uses each window's own buffer/cursor, handles unsorted symbols and column ranges, and clears
+outdated scope labels while symbols refresh. Copy the entire config directory when installing.
