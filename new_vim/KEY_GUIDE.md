@@ -14,7 +14,6 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | Key | Mode | Does |
 |---|---|---|
 | `SPC SPC` | n | Find file in project |
-| `C-p` | n | Find file in project (VSCode) |
 | `SPC .` | n | Find any file (includes hidden) |
 | `SPC ,` / `SPC b b` | n | Switch buffer |
 | `SPC :` | n | Command palette |
@@ -222,7 +221,6 @@ Deleting in Oil sends files to the trash. To get one back: `g\` in the folder it
 |---|---|---|
 | `C-d` | Scroll half page | Multi-cursor |
 | `C-f` | Scroll page | Search in buffer |
-| `C-p` | Previous line | Find file |
 | `C-t` | Tag stack pop | Find symbol |
 | `C-w T` | Move window to a new tab | Disabled |
 | `;` | Repeat `f`/`t` | Same as `:` (normal and visual). To repeat, press `f`/`t` again; `,` goes back |

@@ -793,7 +793,7 @@ require("lazy").setup({
       views = {
         cmdline_popup = {
           position = { row = "20%", col = "50%" }, -- percentages centre the popup on that point of the screen
-          size = { width = "60%", height = "auto" },
+          size = { width = "50%", height = "auto" },
           border = { style = "rounded" },
         },
       },
@@ -1388,7 +1388,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 -- VSCode-style keys, kept alongside the SPC ones
-map("n", "<C-p>", tb("find_files"), { desc = "Find file in project" })
 map("n", "<C-t>", tb("lsp_dynamic_workspace_symbols"), { desc = "Find symbol in workspace" })
 -- Ctrl+V pastes from the system clipboard in insert mode only (elsewhere it keeps its default)
 map("i", "<C-v>", "<C-r><C-p>+", { desc = "Paste" })
