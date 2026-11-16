@@ -1008,7 +1008,7 @@ require("lazy").setup({
       views = {
         cmdline_popup = {
           position = { row = "20%", col = "50%" }, -- percentages centre the popup on that point of the screen
-          size = { width = "50%", height = "auto" },
+          size = { width = "40%", height = "auto" },
           border = { style = "rounded" },
         },
       },
