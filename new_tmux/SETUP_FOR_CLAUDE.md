@@ -11,6 +11,7 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
 | The `Alt-e` key dropdown | `new_tmux/which-key.sh` | `~/.tmux/which-key.sh` (executable) |
 | New-window name dialog (`N`, `a`, `d`) | `new_tmux/ask-name.sh` | `~/.tmux/ask-name.sh` (executable) |
 | Rename/close/command popups | `new_tmux/dialog.sh` | `~/.tmux/dialog.sh` (executable) |
+| Claude Code notifications (`Stop` / `Notification` hooks) | `new_tmux/notify.sh` | `~/.tmux/notify.sh` (executable) |
 | Key guide for the user | `new_tmux/KEY_GUIDE.md` | stays in the repo |
 
 ## 1. Prerequisites (check each, tell the user what is missing)
@@ -53,7 +54,7 @@ An old default server can be replaced after the user has finished and exited all
 ## 2. Install
 
 1. Back up an existing `~/.tmux.conf`.
-2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
+2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh new_tmux/notify.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
 3. `cp new_tmux/tmux.conf ~/.tmux.conf`
 4. Inside tmux: `tmux source ~/.tmux.conf`, or start a fresh server (see the reload note below).
 5. Enable relative line numbers by default: the config must contain `setw -g copy-mode-line-numbers relative`.
@@ -101,3 +102,13 @@ An old default server can be replaced after the user has finished and exited all
 ## Compact action dialogs
 
 Install `dialog.sh` along with the other helpers. It supplies the same popup placement and colours as the new-window name dialog for rename-window/session, kill-pane/window/session, command input, and jump/move/find-window. Targets are stable IDs captured when the popup opens; existing names are read inside the helper and input is passed as a single argument. Confirmation only accepts y/Y; other keys cancel. Test on a separate server before reloading live sessions.
+
+## Window notifications (Claude Code, bell, long commands)
+
+`notify.sh done|wait|bell|fail [label]` uses `$TMUX_PANE` to find the window, does nothing if that window is visible in a focused client, otherwise sets the window option `@claude` and calls `notify-send` (libnotify-bin). Three callers:
+
+- Claude Code hooks in `~/.claude/settings.json`: `Stop` -> `done`, `Notification` -> `wait`. Sessions started before the hooks existed must be restarted.
+- tmux's `alert-bell` hook (`monitor-bell on`, `bell-action other`) -> `bell`. A bell never overwrites an existing dot.
+- zsh: `new_zsh/notify.zsh`, appended once to `~/.zshrc`, calls `done` / `fail` with the command name when a command ran for `TMUX_NOTIFY_SECS` (default 30) or more. It skips interactive programs (nvim, ssh, less, claude, ...) and exit 130.
+
+`tmux.conf` draws the dot on the tab (green done, orange wait, red fail, blue bell) and clears `@claude` on `after-select-window` and `client-focus-in`. Keep `notify.zsh` and the block in `~/.zshrc` identical.

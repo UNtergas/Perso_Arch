@@ -29,3 +29,8 @@ Keys: `Ctrl-R` history, `Ctrl-P` files, `Ctrl-O` cd. The fzf defaults `Ctrl-T` a
 - Never replace `~/.zshrc` with a copy from another machine. Only append the fzf block.
 - Keep `fzf.zsh` and the fzf block in `~/.zshrc` the same. Edit both together.
 - Tell the user if the key overlaps (`Ctrl-P` was `up-line-or-history`, `Ctrl-O` was `accept-line-and-down-history`).
+
+## Long-command notification (tmux)
+
+`notify.zsh` tells tmux when a command that ran 30 s or more finishes in a window you are not looking at (see `new_tmux/SETUP_FOR_CLAUDE.md`). Append it once, same rule as the fzf block: `grep -q _tmux_notify_precmd ~/.zshrc || cat new_zsh/notify.zsh >> ~/.zshrc`. It needs `~/.tmux/notify.sh` and does nothing outside tmux.
+
