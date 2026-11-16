@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # Compact popup prompts. Usage: dialog.sh ACTION TARGET
-# TARGET is a stable tmux window/session/pane ID, never a shell-expanded name.
+# display-popup does not expand #{...} in its command, so the target argument arrives
+# unexpanded. Resolve the stable ID here instead, from the client the popup belongs to.
 set -u
 action=${1:?action required}
-target=${2:-}
+case "$action" in
+  kill-pane|command|find-window) fmt='#{pane_id}' ;;
+  kill-window|rename-window|move-window) fmt='#{window_id}' ;;
+  *) fmt='#{session_id}' ;;
+esac
+target=$(tmux display-message -p "$fmt")
 query= prompt=
 case "$action" in
   rename-window) query=$(tmux display-message -p -t "$target" '#{window_name}'); prompt=' name: ' ;;
