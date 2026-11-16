@@ -214,6 +214,17 @@ require("lazy").setup({
         menu = {
           auto_show = true,
         },
+        documentation = {
+          auto_show = true,
+          auto_show_delay_ms = 200,
+          window = {
+            border = "rounded",
+            direction_priority = {
+              menu_north = { "e", "w", "n", "s" },
+              menu_south = { "e", "w", "s", "n" },
+            },
+          },
+        },
       },
 
       cmdline = {
