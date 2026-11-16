@@ -1,6 +1,6 @@
 # tmux
 
-Config: `tmux.conf` (live copy: `~/.tmux.conf`). Tested on tmux 3.6 in Alacritty.
+Config: `tmux.conf` (live copy: `~/.tmux.conf`). Tested on tmux 3.8 in Alacritty.
 The status bar uses powerline arrows, so it needs a Nerd Font (same as the nvim lualine).
 
 ## Install
@@ -157,6 +157,7 @@ Moving and searching in copy mode:
 | `Ctrl-u` / `Ctrl-d` | Half page up / down |
 | `Ctrl-b` / `Ctrl-f` | Page up / down |
 | `Ctrl-y` / `Ctrl-e` | Scroll one line up / down |
+| `[` / `]` | Scroll down / up one line; hold to repeat (no prefix in copy mode) |
 | `z` | Scroll so the cursor is in the middle |
 | `/` / `?` | Search forward / backward (prompt) |
 | `n` / `N` | Next / previous match |
