@@ -119,9 +119,21 @@ require("lazy").setup({
               vim.api.nvim_set_hl(0, name, vim.tbl_extend("force", hl, { bg = koda_glade_bg }))
             end
           end
-          -- selection: koda's #e2eeee is barely darker than the page (1.07:1); a light blue (#c9dcf2, 1.26:1) shows
-          -- it clearly and still leaves the string green about 3:1. Matches the visual mode colour in lualine.
-          vim.api.nvim_set_hl(0, "Visual", { bg = 0xc9dcf2 })
+          -- selection, multicursor (Ctrl-d) and search matches (* and /): koda's selection #e2eeee is barely darker
+          -- than the page (1.07:1). The indent-block bands (ibl, 6 pale tints at 30%) sit within ~25 of the page
+          -- colour in Lab, so a pale highlight (the old light blue, the pale yellow) disappears on a band of the
+          -- same hue. These yellows stay 40+ (Lab) away from the page and from all six bands, text stays readable.
+          --   Visual / MultiCursorVisual (linked) : #ecd860  yellow
+          --   Search (every other match of *)      : #eedb72  a little lighter, so the selection still wins
+          --   CurSearch / IncSearch (current match): #e8b050  amber, the one you are on
+          --   LspReference (word under cursor)     : #e6e6e6  neutral grey, so it never competes with the others
+          vim.api.nvim_set_hl(0, "Visual", { bg = 0xecd860 })
+          vim.api.nvim_set_hl(0, "Search", { bg = 0xeedb72 })
+          vim.api.nvim_set_hl(0, "CurSearch", { bg = 0xe8b050 })
+          vim.api.nvim_set_hl(0, "IncSearch", { bg = 0xe8b050 })
+          for _, n in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do
+            vim.api.nvim_set_hl(0, n, { bg = 0xe6e6e6 })
+          end
         end,
       })
       vim.cmd.colorscheme("koda-glade")
@@ -1199,11 +1211,8 @@ require("lazy").setup({
     config = function()
       local mc = require("multicursor-nvim")
       mc.setup()
-      -- like VS Code: first press selects the word under the cursor, then each press adds the next match
-      vim.keymap.set("n", "<C-d>", function()
-        vim.cmd("normal! viw")
-        mc.matchAddCursor(1)
-      end, { desc = "Select word, add next match cursor" })
+      -- like VS Code: first press only selects the word under the cursor, then each press adds the next match
+      vim.keymap.set("n", "<C-d>", "viw", { desc = "Select word under cursor" })
       vim.keymap.set("x", "<C-d>", function() mc.matchAddCursor(1) end, { desc = "Add next match cursor" })
       mc.addKeymapLayer(function(layerSet)
         layerSet({ "n", "x" }, "<esc>", function()
