@@ -1070,6 +1070,7 @@ require("lazy").setup({
 -- Keymaps (ported from the Doom Emacs config, see emacs_config/KEY_GUIDE.md)
 -------------------------------------------------------------------------------
 local map = vim.keymap.set
+map("n", "e", "$", { desc = "End of line" })
 local function tb(fn, opts)
   return function() require("telescope.builtin")[fn](opts) end
 end
