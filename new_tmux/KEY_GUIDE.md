@@ -6,12 +6,12 @@ The status bar uses powerline arrows, so it needs a Nerd Font (same as the nvim 
 ## Install
 
 ```sh
-mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh
+mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh
 cp new_tmux/tmux.conf ~/.tmux.conf
 tmux            # or: tmux new -As dev   (attach to "dev", or create it)
 ```
 
-`box.sh` (the top edge and `b`), `pane-col.sh` (`[` / `]`), `which-key.sh` (the `Alt-e` dropdown) and `ask-name.sh` (the new-window name dialog, needs `fzf`) must be in `~/.tmux/`.
+`box.sh` (the top edge and `b`), `pane-col.sh` (`[` / `]`), `which-key.sh` (the `Alt-e` dropdown) `ask-name.sh` (the new-window name dialog, needs `fzf`) and `dialog.sh` (rename, close and command popups) must be in `~/.tmux/`.
 `SETUP_FOR_CLAUDE.md` has the full steps, the checks and the rules for changing the config.
 
 Reload in a running session: `Alt-e r`. A tmux server that is already
@@ -60,7 +60,7 @@ new window instead. It opens the same name dialog first (prefilled `side` for `a
 | `n` | Focus mode, top version: this pane moves to the top (70% of the height), all the other panes sit side by side below it (30%). Again to put everything back exactly as before. Same logic as `m` with its own saved layout |
 | `c` | Make this pane fill its column (full height), again to restore the old split |
 | `C` | Make this pane fill its row (95% of the width), again to restore the old split |
-| `x` | Close this pane |
+| `x` | Close this pane (popup confirmation: y confirms, any other key cancels) |
 | `b` | Turn the active-pane box on / off for this session. On by default: the status becomes 2 rows, row 2 is a top edge that is dark over the active pane (plain line while zoomed). Needs `~/.tmux/box.sh` (copy of `new_tmux/box.sh`) |
 
 `c` does nothing visible on a pane that already fills its column (the big left
@@ -97,8 +97,8 @@ for rows: use it on one of the two bottom terminals of the `d` preset.
 | `o` | Previous window |
 | `p` | Next window |
 | `1`..`9` | Jump to window by number |
-| `,` | Rename window |
-| `&` | Close the whole window (asks y/n) |
+| `,` | Rename window in a popup (current name prefilled) |
+| `&` | Close the whole window (popup: y confirms, any other key cancels) |
 | `w` | Tree of all sessions and windows (`j`/`k`, Enter, `x` kills the highlighted one) |
 | `Alt-n` / `Alt-p` | Next / previous window that has an alert (activity, bell) |
 | `f` | Find a window by the text in its panes |
@@ -117,7 +117,8 @@ A window also closes when its last pane closes (`exit`, `Ctrl-D`, or `x`).
 | `Q` | Detach: leave tmux, everything keeps running |
 | `s` | Session picker |
 | `(` / `)` | Previous / next session |
-| `$` | Rename session |
+| `$` | Rename session in a popup (current name prefilled) |
+| `X` | Close this session (popup confirmation) |
 | `D` | Choose which attached client to detach |
 | `tmux ls` | List sessions |
 | `tmux attach -t NAME` (or `tmux a`) | Resume |
@@ -236,3 +237,7 @@ the statusline in `tmux.conf`).
 | `Space` | cycle layouts | unbound |
 | `b` | (unused) | box on / off |
 | `m` | (unused; `M` clears the marked pane) | focus mode |
+
+### Compact prompts
+
+Rename (`Alt-e ,` / `$`), close (`x` / `&` / `X`), command (`:`), and window jump/move/search (`'` / `.` / `f`) use the same rounded, three-row popup as the new-window dialog. Rename/input accepts Enter and cancels with Esc or Ctrl-C. Close accepts only `y` or `Y`; any other key cancels. `Q` still detaches without closing programs.

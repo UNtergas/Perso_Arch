@@ -1,6 +1,6 @@
 # tmux setup, for a Claude session on a new machine
 
-Tell the user what you are about to do, then follow the steps. The config is `new_tmux/tmux.conf`; it needs two helper
+Tell the user what you are about to do, then follow the steps. The config is `new_tmux/tmux.conf`; it needs the helper
 scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` do nothing or print errors.
 
 | What | From this repo | Goes to |
@@ -10,6 +10,7 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
 | `[` / `]` consume-or-expel panes | `new_tmux/pane-col.sh` | `~/.tmux/pane-col.sh` (executable) |
 | The `Alt-e` key dropdown | `new_tmux/which-key.sh` | `~/.tmux/which-key.sh` (executable) |
 | New-window name dialog (`N`, `a`, `d`) | `new_tmux/ask-name.sh` | `~/.tmux/ask-name.sh` (executable) |
+| Rename/close/command popups | `new_tmux/dialog.sh` | `~/.tmux/dialog.sh` (executable) |
 | Key guide for the user | `new_tmux/KEY_GUIDE.md` | stays in the repo |
 
 ## 1. Prerequisites (check each, tell the user what is missing)
@@ -52,7 +53,7 @@ An old default server can be replaced after the user has finished and exited all
 ## 2. Install
 
 1. Back up an existing `~/.tmux.conf`.
-2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
+2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
 3. `cp new_tmux/tmux.conf ~/.tmux.conf`
 4. Inside tmux: `tmux source ~/.tmux.conf`, or start a fresh server (see the reload note below).
 5. Enable relative line numbers by default: the config must contain `setw -g copy-mode-line-numbers relative`.
@@ -96,3 +97,7 @@ An old default server can be replaced after the user has finished and exited all
   (`tmux -L o -f /dev/null new-session -d "TMUX= tmux -L t attach"`) and read the screen with
   `tmux -L o capture-pane -p -e`. Kill both with `tmux -L t kill-server` / `tmux -L o kill-server`.
 - Keep `new_tmux/` and the live `~/.tmux.conf`, `~/.tmux/*.sh` identical (the user edits live first, then copies here).
+
+## Compact action dialogs
+
+Install `dialog.sh` along with the other helpers. It supplies the same popup placement and colours as the new-window name dialog for rename-window/session, kill-pane/window/session, command input, and jump/move/find-window. Targets are stable IDs captured when the popup opens; existing names are read inside the helper and input is passed as a single argument. Confirmation only accepts y/Y; other keys cancel. Test on a separate server before reloading live sessions.
