@@ -105,8 +105,8 @@ unfolded.
 
 | Key | Mode | Does |
 |---|---|---|
-| `C-d` | n | Select the word under the cursor and add a cursor on its next match (press again for each further match) |
-| `C-d` | v | Add cursor on next match of the selection |
+| `C-d` | n | Select the whole word under the cursor (nothing else yet) |
+| `C-d` | v | Add a cursor on the next match of the selection (press again for each further match) |
 | `Esc` | with cursors | Disable cursors, `Esc` again clears them |
 
 ### Harpoon (jump list)
