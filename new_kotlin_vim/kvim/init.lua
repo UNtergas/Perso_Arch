@@ -1008,8 +1008,8 @@ require("lazy").setup({
       views = {
         cmdline_popup = {
           position = { row = "20%", col = "50%" }, -- percentages centre the popup on that point of the screen
-          size = { width = "40%", height = "auto" },
-          border = { style = "rounded" },
+          size = { width = "60%", height = 1 },
+          border = { style = "rounded", padding = { 0, 1 } },
         },
       },
     },
@@ -1019,22 +1019,8 @@ require("lazy").setup({
     event = "VeryLazy",
     config = function()
       local notify = require("notify")
-      -- alerts sit in the top-left corner (below the tabline): the stock "fade" stages with anchor NW / col 0 instead of NE / right edge
-      local function left_fade(direction)
-        local stages = require("notify.stages.fade")(direction)
-        for i, stage in ipairs(stages) do
-          stages[i] = function(state)
-            local r = stage(state)
-            if r then
-              if r.anchor then r.anchor = "NW" end
-              if type(r.col) == "number" then r.col = 0 elseif r.col then r.col = { 0 } end
-            end
-            return r
-          end
-        end
-        return stages
-      end
-      notify.setup({ timeout = 3000, render = "compact", stages = left_fade(require("notify.stages.util").DIRECTION.TOP_DOWN), background_colour = "#ededed" })
+      -- Notifications stack upward from the bottom-right corner.
+      notify.setup({ timeout = 3000, render = "compact", stages = require("notify.stages.fade")(require("notify.stages.util").DIRECTION.BOTTOM_UP), background_colour = "#ededed" })
       vim.notify = notify -- every vim.notify call in this config (and plugins) goes through it
       -- Alabaster-friendly colours (the defaults are neon green / pale yellow); darker than the
       -- diagnostic signs so they stay readable as text on the light grey background
