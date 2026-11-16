@@ -71,6 +71,9 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `C-w q` | n | Close buffer |
 | `C-w C-w` | n | Close buffer |
 | `C-w a` | n | Close all buffers |
+| `C-w z` | n | Zoom this window to the whole screen, again to restore (like tmux `z`) |
+| `C-w c` | n | This window fills its column (full height), again to restore (like tmux `c`) |
+| `C-w C` | n | This window fills its row (full width), again to restore (like tmux `C`) |
 | `C-w v` / `C-w s` | n | Vertical / horizontal split (Vim default) |
 
 ## 5. Editing
