@@ -27,7 +27,7 @@ When the user asks to set up `kvim` on a machine, or to work on its config, read
 
 ## tmux (`new_tmux/`)
 
-When the user asks to set up tmux on a machine, or to work on its config, read `new_tmux/SETUP_FOR_CLAUDE.md` first. The config needs `~/.tmux/box.sh` and `~/.tmux/pane-col.sh` (copies of the scripts in `new_tmux/`); `new_tmux/KEY_GUIDE.md` lists the keys.
+When the user asks to set up tmux on a machine, or to work on its config, read `new_tmux/SETUP_FOR_CLAUDE.md` first. Require tmux 3.7+ (3.8 tested), upgrade older installations as documented there, and enable relative copy-mode line numbers by default. Check the running server version as well as the binary; never terminate existing sessions to upgrade. The config needs `~/.tmux/box.sh` and `~/.tmux/pane-col.sh` (copies of the scripts in `new_tmux/`); `new_tmux/KEY_GUIDE.md` lists the keys.
 
 ## zsh (`new_zsh/`)
 

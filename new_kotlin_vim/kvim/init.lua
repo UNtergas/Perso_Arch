@@ -1291,6 +1291,7 @@ require("lazy").setup({
 -------------------------------------------------------------------------------
 local map = vim.keymap.set
 map("n", "e", "$", { desc = "End of line" })
+map("n", "w", "e", { desc = "End of word" })
 local function tb(fn, opts)
   return function() require("telescope.builtin")[fn](opts) end
 end

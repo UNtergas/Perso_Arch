@@ -14,12 +14,40 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
 
 ## 1. Prerequisites (check each, tell the user what is missing)
 
-- `tmux -V` is 3.4 or later (`display-popup -b` and `send-keys -K` need it) (built and tested on 3.6). The config uses `status 2` with `status-format[1]`,
-  `#[bg=terminal]`, format maths (`e|+`) and `set -F`; older tmux ignores or rejects them.
+- **tmux 3.7 or later is required; 3.8 is tested on this machine.** Check `command -v tmux` and `tmux -V`.
+  Relative line numbers in copy mode require 3.7+. Do not omit `copy-mode-line-numbers relative` to support an older version:
+  upgrade tmux using the instructions below. The popup bindings also need `display-popup -b` and `send-keys -K`.
 - A Nerd Font in the terminal (the statusline arrows and the OS icon are Nerd Font glyphs).
 - Copy mode yanks to the clipboard with `wl-copy` (Wayland) or `xclip` (X11): one of them must be installed.
 - `fzf` (the name dialog is fzf used as a text box; without it `N`, `a` and `d` open no window).
 - True colour: the config sets `terminal-overrides ",*:RGB"`; the terminal must support it.
+
+### Upgrade tmux when the package manager offers an older version
+
+Check the package manager first (`apt-cache policy tmux` on Ubuntu). On Ubuntu 26.04 it may only offer 3.6a.
+Use the official release tarball to install 3.8 into `/usr/local`, preserving the distro binary in `/usr/bin`:
+
+```sh
+sudo apt update
+sudo apt install build-essential libevent-dev libncurses-dev bison pkg-config curl
+mkdir -p ~/Downloads/tmux-build
+cd ~/Downloads/tmux-build
+curl -fLO https://github.com/tmux/tmux/releases/download/3.8/tmux-3.8.tar.gz
+tar -xzf tmux-3.8.tar.gz
+cd tmux-3.8
+./configure --prefix=/usr/local
+make -j"$(nproc)"
+sudo make install
+```
+
+Refresh shell command lookup (`rehash` in zsh, `hash -r` in bash), then verify `command -v tmux` selects
+`/usr/local/bin/tmux` and `tmux -V` reports 3.8. Official instructions: https://github.com/tmux/tmux/wiki/Installing.
+
+**Installing a new binary does not upgrade a running server.** Check the target server with
+`tmux display-message -p '#{version}'`. Do not kill a user's server or running programs to upgrade it.
+If the server is older than 3.7, keep it running and start a separate upgraded server:
+`tmux -L upgraded new -s coding`. Use `tmux -L upgraded ...` for reloads and checks on that server.
+An old default server can be replaced after the user has finished and exited all its sessions.
 
 ## 2. Install
 
@@ -27,7 +55,11 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
 2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
 3. `cp new_tmux/tmux.conf ~/.tmux.conf`
 4. Inside tmux: `tmux source ~/.tmux.conf`, or start a fresh server (see the reload note below).
-5. Check: the status is 2 rows (row 1 the statusline, row 2 the top edge), `Alt-e b` toggles row 2, and with a split
+5. Enable relative line numbers by default: the config must contain `setw -g copy-mode-line-numbers relative`.
+   On the target server, verify `tmux show-options -gwv copy-mode-line-numbers` prints `relative`.
+   Enter copy mode with **Alt-e then v**: line numbers should be relative to the cursor, making `5k` / `3j` easy.
+   Mouse-entered copy mode keeps line numbers hidden by tmux design.
+6. Check: the status is 2 rows (row 1 the statusline, row 2 the top edge), `Alt-e b` toggles row 2, and with a split
    the part of row 2 over the active pane is dark. The prefix is `Alt-e` (see `KEY_GUIDE.md`).
 
 ## 3. How the pieces fit (so you can change them without breaking them)
@@ -41,7 +73,7 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
 - **Borders**: heavy lines, active `#4a6a6a`, inactive `#dde5e5`. nvim and kvim use the same teal for the active window.
 - **Statusline**: left = OS icon + user, mode label (grey `NORMAL`, yellow `PREFIX`, blue `COPY`, grey `ZOOM`),
   pane n/total, running command. Right (`status-justify right` puts the window tabs there) = tabs, time, then
-  `Session <name>` with an icon on the same dark colour as the user. The key hints are in the `Alt-e` dropdown.
+  `<name>` with an icon on the same dark colour as the user. The key hints are in the `Alt-e` dropdown.
 - **The `Alt-e` dropdown**: the real prefix is off (`set -g prefix None`). `Alt-e` is a root key (`bind -n M-e`) that opens a
   popup running `~/.tmux/which-key.sh`. The script prints the key list, reads one key, closes, and then runs
   `switch-client -T prefix` + `send-keys -K` so the key goes through the normal prefix table (every `bind` in the
