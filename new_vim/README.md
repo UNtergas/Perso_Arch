@@ -52,7 +52,7 @@ and diagnostic displays (`SPC d`, `SPC c x`).
 Finder: `]f` / `[f` jump between file headers; Enter opens a result; `[w` switches between results and preview; Esc closes.
 Trouble has been removed; Telescope can still send results to quickfix with Ctrl-Q.
 `[d` / `]d` only jump, without popups or automatic code-action requests. Use `SPC d` for
-diagnostic details and Ctrl-. / Alt-. / `SPC c a` for the original native LSP code-action
+diagnostic details and Alt-. / `SPC c a` for the original native LSP code-action
 menu presented through Snacks. Disabled actions are hidden.
 Hover (`K`), symbol rename (`SPC c r` / `SPC r n`), definition peek (`gp`), and document outline
 (`SPC s o`) also use Lspsaga. The outline is a right sidebar: Enter expands/jumps, `o` jumps directly,
