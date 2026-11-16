@@ -108,6 +108,14 @@ Install `dialog.sh` along with the other helpers. It supplies the same popup pla
 `notify.sh done|wait|bell|fail [label]` uses `$TMUX_PANE` to find the window, does nothing if that window is visible in a focused client, otherwise sets the window option `@claude` and calls `notify-send` (libnotify-bin). Three callers:
 
 - Claude Code hooks in `~/.claude/settings.json`: `Stop` -> `done`, `Notification` -> `wait`. Sessions started before the hooks existed must be restarted.
+  This file is not in the repo, so add the hooks by hand on each machine. Merge them into an existing `hooks` key instead of overwriting it:
+
+  ```json
+  "hooks": {
+    "Stop": [{"hooks": [{"type": "command", "command": "~/.tmux/notify.sh done"}]}],
+    "Notification": [{"hooks": [{"type": "command", "command": "~/.tmux/notify.sh wait"}]}]
+  }
+  ```
 - tmux's `alert-bell` hook (`monitor-bell on`, `bell-action other`) -> `bell`. A bell never overwrites an existing dot.
 - zsh: `new_zsh/notify.zsh`, appended once to `~/.zshrc`, calls `done` / `fail` with the command name when a command ran for `TMUX_NOTIFY_SECS` (default 30) or more. It skips interactive programs (nvim, ssh, less, claude, ...) and exit 130.
 
