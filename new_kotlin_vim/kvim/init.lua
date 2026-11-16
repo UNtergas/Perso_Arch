@@ -298,7 +298,7 @@ require("lazy").setup({
       -- vim.lsp.util.symbols_to_items drops entries without a range, so Telescope (Ctrl-T) showed nothing.
       -- Fill the range in: find the declaration line (class / fun / val ...) of the symbol in its file.
       local decl_kw = { "class", "interface", "object", "fun", "val", "var", "typealias" }
-      local function fill_symbol_ranges(result)
+      local function fill_symbol_ranges(result, encoding)
         local files = {}
         for i, sym in ipairs(result) do
           local loc = sym.location
@@ -326,14 +326,16 @@ require("lazy").setup({
               end
               if line ~= 0 or col ~= 0 then break end
             end
-            loc.range = { start = { line = line, character = col }, ["end"] = { line = line, character = col + #sym.name } }
+            local text = lines and lines[line + 1] or ""
+            local start = vim.str_utfindex(text, encoding or "utf-16", col, false)
+            loc.range = { start = { line = line, character = start }, ["end"] = { line = line, character = start + vim.str_utfindex(sym.name, encoding or "utf-16") } }
           end
         end
       end
       -- Library sources (kotlin.*, kotlinx.*): the server resolves these imports (hover works) but gives no location
       -- for them, so gd found nothing. Open the declaration from the newest sources jar in Gradle's cache instead
       -- (read-only copy, extracted once under stdpath("cache")/kotlin-sources).
-      local gradle_cache = vim.fn.expand("~/.gradle/caches/modules-2/files-2.1")
+      local gradle_cache = vim.fn.expand((vim.env.GRADLE_USER_HOME or "~/.gradle") .. "/caches/modules-2/files-2.1")
       local function version_newer(a, b)
         local function parts(v) local t = {} for n in v:gmatch("%d+") do t[#t + 1] = tonumber(n) end return t end
         local pa, pb = parts(a), parts(b)
@@ -390,9 +392,9 @@ require("lazy").setup({
         end
         if fallback then return fallback[1], fallback[2] end
       end
-      local function library_definition(word)
+      local function library_definition(word, source_buf, encoding)
         local pkg
-        for _, text in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
+        for _, text in ipairs(vim.api.nvim_buf_get_lines(source_buf, 0, -1, false)) do
           pkg = pkg or text:match("^import%s+([%w_.]+)%." .. word .. "%s*$")
         end
         local group = pkg and ((pkg == "kotlinx" or pkg:match("^kotlinx%.")) and "org.jetbrains.kotlinx"
@@ -413,84 +415,43 @@ require("lazy").setup({
               local line, col
               if in_pkg then line, col = find_declaration(lines, word) end
               if line then
-                vim.cmd(("edit +%d %s"):format(line, vim.fn.fnameescape(file))) -- +line: placed after the read autocmds
-                vim.bo.modifiable, vim.bo.readonly = false, true
-                local buf = vim.api.nvim_get_current_buf()
-                local function place()
-                  if vim.api.nvim_get_current_buf() == buf then
-                    pcall(vim.api.nvim_win_set_cursor, 0, { line, col })
-                    vim.cmd("normal! zz")
-                  end
-                end
-                place()
-                vim.defer_fn(place, 150) -- a freshly loaded buffer can get its cursor reset by autocmds / plugins after :edit
-                return
+                local buf = vim.fn.bufadd(file)
+                vim.b[buf].kvim_library_source = true
+                vim.fn.bufload(buf)
+                vim.bo[buf].modifiable, vim.bo[buf].readonly = false, true
+                local character = vim.str_utfindex(lines[line], encoding, col, false)
+                return { uri = vim.uri_from_fname(file), range = {
+                  start = { line = line - 1, character = character },
+                  ["end"] = { line = line - 1, character = character + vim.str_utfindex(word, encoding) },
+                } }
               end
             end
           end
         end
-        vim.notify("No definition found for " .. word, vim.log.levels.INFO)
       end
-      -- gd for Kotlin buffers. When a module has compiled output in its build/ folder, the server resolves top-level
-      -- functions (isLegacyJWT, getTokenType ...) to the compiled class and textDocument/definition comes back empty,
-      -- while classes still work. Fall back to the server's workspace symbol search for the exact name.
-      local function kotlin_definition()
-        local word = vim.fn.expand("<cword>")
-        local function jump(items)
-          if #items == 1 then
-            local it = items[1]
-            vim.lsp.util.show_document({
-              uri = vim.uri_from_fname(it.filename),
-              range = { start = { line = it.lnum - 1, character = it.col - 1 }, ["end"] = { line = it.lnum - 1, character = it.col - 1 } },
-            }, "utf-16", { focus = true })
-          else
-            vim.fn.setqflist({}, " ", { title = "Definitions of " .. word, items = items })
-            vim.cmd("copen")
-          end
-        end
-        -- raw request: vim.lsp.buf.definition never calls on_list for an empty result, it just says "No locations found"
-        local client = vim.lsp.get_clients({ bufnr = 0, name = "kotlin_language_server" })[1]
-        local enc = client and client.offset_encoding or "utf-16"
-        vim.lsp.buf_request(0, "textDocument/definition", vim.lsp.util.make_position_params(0, enc), function(err, result)
-          local locs = (not err and result) and (vim.islist(result) and result or { result }) or {}
-          if #locs > 0 then return jump(vim.lsp.util.locations_to_items(locs, enc)) end
-          vim.lsp.buf_request(0, "workspace/symbol", { query = word }, function(err2, syms, ctx)
-            local c = ctx and vim.lsp.get_client_by_id(ctx.client_id)
-            local exact = {}
-            for _, sym in ipairs(not err2 and type(syms) == "table" and syms or {}) do
-              if sym.name == word then table.insert(exact, sym) end
-            end
-            local items = #exact > 0 and vim.lsp.util.symbols_to_items(exact, 0, c and c.offset_encoding or enc) or {}
-            if #items == 0 then return library_definition(word) end
-            jump(items)
-          end)
-        end)
-      end
+      -- Both native gd and Lspsaga gp receive the same augmented definition locations.
       vim.lsp.config("kotlin_language_server", {
         cmd_env = { JAVA_HOME = "/usr/lib/jvm/java-21-openjdk-amd64" },
+        root_dir = function(buf, on_dir)
+          if vim.b[buf].kvim_library_source then return end
+          local markers = vim.lsp.config.kotlin_language_server.root_markers
+          on_dir(vim.fs.root(buf, markers) or vim.fs.dirname(vim.api.nvim_buf_get_name(buf)))
+        end,
         -- keep the server's symbol index (kls_database.db) out of the projects: a stale one left in a project root
         -- made `gd` fail on top-level functions (isLegacyJWT, getTokenType) while classes still worked
         before_init = function(params)
           -- one folder per project root, so projects never share an index
-          local root = params.rootPath or (params.rootUri and vim.uri_to_fname(params.rootUri)) or vim.fn.getcwd()
+          local root = type(params.rootPath) == "string" and params.rootPath
+            or (type(params.rootUri) == "string" and vim.uri_to_fname(params.rootUri)) or vim.fn.getcwd()
           local dir = vim.fn.stdpath("cache") .. "/kotlin-language-server/" .. vim.fs.basename(root) .. "-" .. vim.fn.sha256(root):sub(1, 8)
           vim.fn.mkdir(dir, "p")
           params.initializationOptions = vim.tbl_extend("force", params.initializationOptions or {}, { storagePath = dir })
         end,
         on_attach = function(client)
-          if client._kvim_symbol_fix then return end
-          client._kvim_symbol_fix = true
-          local request = client.request
-          client.request = function(self, method, params, handler, bufnr)
-            if method == "workspace/symbol" and handler then
-              local inner = handler
-              handler = function(err, result, ctx, config)
-                if type(result) == "table" then pcall(fill_symbol_ranges, result) end
-                return inner(err, result, ctx, config)
-              end
-            end
-            return request(self, method, params, handler, bufnr)
-          end
+          require("kotlin_definition").attach(client, {
+            fill_ranges = fill_symbol_ranges,
+            library = library_definition,
+          })
         end,
       })
       -- vim.lsp.enable("kotlin_lsp") -- off: its Gradle import fails on AGP 8.13.2 (see snowpack-android); using kotlin_language_server (Mason)
@@ -507,16 +468,16 @@ require("lazy").setup({
           local function m(lhs, rhs, desc, mode)
             vim.keymap.set(mode or "n", lhs, rhs, vim.tbl_extend("force", o, { desc = desc }))
           end
-          local attached = vim.lsp.get_client_by_id(event.data.client_id)
-          m("gd", (attached and attached.name == "kotlin_language_server") and kotlin_definition or vim.lsp.buf.definition, "Go to definition")
+          m("gd", vim.lsp.buf.definition, "Go to definition")
+          m("gp", "<cmd>Lspsaga peek_definition<cr>", "Peek definition (Lspsaga)")
           m("gD", vim.lsp.buf.declaration, "Go to declaration")
-          m("gr", function() require("trouble").open({ mode = "lsp_references", focus = true }) end, "Show references")
+          m("gr", "<cmd>Lspsaga finder ref<cr>", "Show references (Lspsaga)")
           m("gi", vim.lsp.buf.implementation, "Go to implementation")
-          m("K", vim.lsp.buf.hover, "Hover docs")
-          m("<leader>cr", vim.lsp.buf.rename, "Rename symbol")
+          m("K", "<cmd>Lspsaga hover_doc<cr>", "Hover docs (Lspsaga)")
+          m("<leader>cr", "<cmd>Lspsaga rename<cr>", "Rename symbol (Lspsaga)")
           m("<leader>ca", function() _G.code_action() end, "Code action", { "n", "v" })
-          m("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
-          m("<leader>d", vim.diagnostic.open_float, "Line diagnostics")
+          m("<leader>rn", "<cmd>Lspsaga rename<cr>", "Rename symbol (Lspsaga)")
+          m("<leader>d", "<cmd>Lspsaga show_line_diagnostics<cr>", "Line diagnostics (Lspsaga)")
         end,
       })
 
@@ -618,45 +579,87 @@ require("lazy").setup({
     },
   },
 
-  -- Dropbar: winbar with only the symbol breadcrumb of the current file (class > method).
-  -- The file path is in the tabline row above.
+  -- Lspsaga trial: breadcrumbs and focused LSP popups. Trouble remains available for result lists.
   {
-    "Bekaboo/dropbar.nvim",
+    "nvimdev/lspsaga.nvim",
     enabled = not vim.g.vscode,
-    event = "VeryLazy",
+    lazy = false, -- register symbol tracking before the first LspAttach
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
-      -- kotlin_language_server needs 1-2 min after opening a Gradle project before it answers documentSymbol;
-      -- the default (60 retries, 1 s apart) gives up first and leaves the bar on the noisy treesitter fallback
-      sources = { lsp = { request = { ttl_init = 300 } } },
-      bar = {
-        -- the default sources minus `path`
-        sources = function(buf)
-          local sources = require("dropbar.sources")
-          local utils = require("dropbar.utils")
-          if vim.bo[buf].ft == "markdown" then return { sources.markdown } end
-          if vim.bo[buf].buftype == "terminal" then return { sources.terminal } end
-          -- file name first, so the bar is never empty outside a function (full path is in the tabline)
-          local file = {
-            get_symbols = function(b)
-              local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(b), ":t")
-              local icon, hl = require("dropbar.configs").opts.icons.kinds.file_icon(name)
-              return { require("dropbar.bar").dropbar_symbol_t:new({ name = name, icon = icon, icon_hl = hl }) }
-            end,
-          }
-          return { file, utils.source.fallback({ sources.lsp, sources.treesitter }) }
-        end,
-        -- every real file gets the bar (the default only shows it for treesitter / LSP buffers)
-        enable = function(buf, win)
-          return vim.api.nvim_buf_is_valid(buf)
-            and vim.api.nvim_win_is_valid(win)
-            and vim.fn.win_gettype(win) == ""
-            and vim.bo[buf].buftype == ""
-            and vim.api.nvim_buf_get_name(buf) ~= ""
-            and vim.bo[buf].filetype ~= "oil"
-            and vim.wo[win].winbar == ""
-        end,
+      ui = { border = "rounded" },
+      symbol_in_winbar = { enable = true, show_file = true, folder_level = 0 },
+      lightbulb = { enable = false }, -- keep git signs and avoid unsolicited action requests
+      hover = { max_width = 0.7, max_height = 0.6 },
+      rename = { auto_save = false, keys = { quit = "<C-c>" } },
+      definition = { keys = { close = "<Esc>" } },
+      outline = {
+        win_position = "right",
+        win_width = 35,
+        auto_preview = true,
+        close_after_jump = false,
+        keys = { toggle_or_jump = "<CR>", jump = "o", quit = { "q", "<Esc>" } },
       },
+      finder = {
+        default = "ref",
+        keys = { toggle_or_open = "<CR>", close = "<Esc>" },
+      },
+      code_action = { keys = { quit = { "q", "<Esc>" } } },
+      diagnostic = { keys = { quit = { "q", "<Esc>" } } },
     },
+    config = function(_, opts)
+      require("lspsaga").setup(opts)
+      -- Kotlin's first documentSymbol response may be empty while Gradle is indexing.
+      -- Preserve the old Dropbar retry window without overlapping outstanding requests.
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("KvimSagaSymbolRetry", { clear = true }),
+        callback = function(ev)
+          local client = vim.lsp.get_client_by_id(ev.data.client_id)
+          if not client or client.name ~= "kotlin_language_server" then return end
+          local attempts = 0
+          local function retry()
+            if not vim.api.nvim_buf_is_valid(ev.buf) or not vim.lsp.buf_is_attached(ev.buf, client.id) then return end
+            local symbols = require("lspsaga.symbol.head")
+            local state = symbols:get_buf_symbols(ev.buf)
+            if state and state.symbols and #state.symbols > 0 then return end
+            attempts = attempts + 1
+            if not state or not state.pending_request then symbols:do_request(ev.buf, client.id) end
+            if attempts < 300 then vim.defer_fn(retry, 1000) end
+          end
+          vim.defer_fn(retry, 1000)
+        end,
+      })
+      -- Finder file headers have four-space indentation; reference rows have six.
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("SagaFinderFileNavigation", { clear = true }),
+        pattern = "sagafinder",
+        callback = function(ev)
+          local function jump_file(direction)
+            local lines = vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false)
+            local row = vim.api.nvim_win_get_cursor(0)[1]
+            for _ = 1, vim.v.count1 do
+              for next_row = row + direction, direction > 0 and #lines or 1, direction do
+                if lines[next_row]:match("^    %S") then
+                  row = next_row
+                  break
+                end
+              end
+            end
+            vim.api.nvim_win_set_cursor(0, { row, 0 })
+          end
+          vim.keymap.set("n", "]f", function() jump_file(1) end,
+            { buffer = ev.buf, desc = "Next reference file" })
+          vim.keymap.set("n", "[f", function() jump_file(-1) end,
+            { buffer = ev.buf, desc = "Previous reference file" })
+        end,
+      })
+      -- ts_ls advertises disabled refactorings; preserve our existing usable-actions-only menu.
+      local actions = require("lspsaga.codeaction")
+      local show_actions = actions.action_callback
+      actions.action_callback = function(self, tuples, ctx)
+        tuples = vim.tbl_filter(function(tuple) return not tuple[2].disabled end, tuples)
+        return show_actions(self, tuples, ctx)
+      end
+    end,
   },
 
   -- grug-far: project search and replace, live results under one header per file
@@ -1039,7 +1042,7 @@ require("lazy").setup({
     end,
   },
   {
-    -- statusline + tabline (encoding > path > git counts ... harpoon slots); no winbar section, dropbar owns that.
+    -- statusline + tabline (encoding > path > git counts ... harpoon slots); no winbar section, Lspsaga owns that.
     -- Same content as the old hand-written statusline (project, branch, name, flags, diagnostics | macro, search, lang, position), lualine styling
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
@@ -1076,7 +1079,7 @@ require("lazy").setup({
       require("lualine").setup({
         options = {
           theme = theme, -- section a changes colour with the mode
-          globalstatus = true, -- one statusline at the bottom, for the focused window (dropbar names every window at its top)
+          globalstatus = true, -- one statusline at the bottom, for the focused window (Lspsaga shows symbol breadcrumbs at the top)
           component_separators = { left = "\u{e0b1}", right = "\u{e0b3}" },
           section_separators = { left = "\u{e0b0}", right = "\u{e0b2}" },
         },
@@ -1220,7 +1223,7 @@ require("lazy").setup({
       "nvim-tree/nvim-web-devicons",
     },
 
-    -- top row of every Oil window: the full path of the folder it shows (read-only; dropbar skips Oil buffers).
+    -- top row of every Oil window: the full path of the folder it shows (read-only; Lspsaga skips Oil buffers).
     -- Evaluated per window (statusline_winid), so splits each show their own folder. %< cuts a too-long path from its left.
     init = function()
       function _G.oil_winbar()
@@ -1337,8 +1340,8 @@ map({ "n", "x" }, "<M-k>", [[<Cmd>exe "normal! \<C-u>"<CR>]], { desc = "Half pag
 -- <PageDown>/<PageUp> are already full-page scroll natively
 
 -- diagnostics / hunks: ]d [d ]g [g
-map("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "Next diagnostic" })
-map("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "Prev diagnostic" })
+map("n", "]d", "<cmd>Lspsaga diagnostic_jump_next<cr>", { desc = "Next diagnostic" })
+map("n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<cr>", { desc = "Prev diagnostic" })
 map("n", "]g", function() require("gitsigns").nav_hunk("next") end, { desc = "Next hunk" })
 map("n", "[g", function() require("gitsigns").nav_hunk("prev") end, { desc = "Prev hunk" })
 
@@ -1407,9 +1410,9 @@ map("n", "<leader>fR", function() Snacks.rename.rename_file() end, { desc = "Ren
 map({ "n", "v" }, "<leader>cf", function()
   require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "Format (manual)" })
--- SPC c x: Trouble, diagnostics of every open file grouped under one header per file (again closes it).
+-- SPC c x: Lspsaga workspace diagnostics; Trouble remains available with :Trouble.
 -- SPC c X: the same diagnostics in a flat Telescope list.
-map("n", "<leader>cx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (grouped by file)" })
+map("n", "<leader>cx", "<cmd>Lspsaga show_workspace_diagnostics<cr>", { desc = "Diagnostics (Lspsaga)" })
 map("n", "<leader>cX", tb("diagnostics"), { desc = "Diagnostics list (Telescope)" })
 -- merge conflicts
 map("n", "<leader>gm", "<cmd>DiffviewOpen<cr>", { desc = "Merge tool (3-way)" })
@@ -1572,9 +1575,9 @@ map({ "n", "i", "t" }, "<M-q>", close_popups, { desc = "Close popups" })
 map("n", "<leader>q", close_popups, { desc = "Close popups" })
 
 -- ctrl+. (VSCode quick fix) = code action; alt+. as a fallback for terminals that drop the Ctrl
--- ts_ls also lists actions that can't apply here, marked disabled; hide them
+-- Lspsaga filters disabled actions in its setup callback above.
 function _G.code_action()
-  vim.lsp.buf.code_action({ filter = function(a) return not a.disabled end })
+  vim.cmd("Lspsaga code_action")
 end
 map({ "n", "i", "v" }, "<C-.>", _G.code_action, { desc = "Code action" })
 map({ "n", "i", "v" }, "<M-.>", _G.code_action, { desc = "Code action" })
@@ -1611,7 +1614,7 @@ map("n", "<C-t>", tb("lsp_dynamic_workspace_symbols"), { desc = "Find symbol in 
 -- Ctrl+V pastes from the system clipboard in insert mode only (elsewhere it keeps its default)
 map("i", "<C-v>", "<C-r><C-p>+", { desc = "Paste" })
 map("n", "<C-S-t>", tb("lsp_document_symbols"), { desc = "Find symbol in this file" })
-map("n", "<leader>so", tb("lsp_document_symbols"), { desc = "Find symbol in this file" })
+map("n", "<leader>so", "<cmd>Lspsaga outline<cr>", { desc = "Document outline tree" })
 
 -- change directory
 map("n", "<leader>cd", function()
@@ -1725,7 +1728,7 @@ function _G.flags_status()
   local f = vim.api.nvim_eval_statusline("%m%r%h%w", {}).str
   return f == "" and "" or " " .. f
 end
--- the file path and symbol breadcrumb live in the winbar (dropbar.nvim), so the statusline
+-- the file path and symbol breadcrumb live in the winbar (Lspsaga), so the statusline
 -- only names windows that have no winbar: terminal, help, quickfix, Oil...
 -- githist://<hash>/<path/to/file> -> "<hash>/file", nil for any other name
 function _G.githist_label(name)
@@ -1792,7 +1795,7 @@ vim.opt.statusline = "%{%v:lua.project_name()%}%{%v:lua.git_status()%}%{%v:lua.n
 -- top line (own row): the current file's path as plain text on the left, compact harpoon slots on the
 -- right (just the numbers, current file highlighted; SPC 1-4 jump, SPC h h lists the names).
 -- %< cuts a too-long path from its left end, so the slots never get pushed around.
--- The row under it is dropbar's symbol breadcrumb.
+-- The row under it is Lspsaga's symbol breadcrumb.
 function _G.harpoon_tabline()
   local name = vim.api.nvim_buf_get_name(0)
   local current = vim.fn.fnamemodify(name, ":.")

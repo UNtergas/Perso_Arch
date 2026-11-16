@@ -34,8 +34,11 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `s` | n v o | Flash jump (type chars, press label) |
 | `S` | n v o | Flash treesitter select |
 | `gd` / `gD` / `gi` | n | Definition / declaration / implementation |
-| `gr` | n | References, grouped by file (Trouble) |
-| `K` | n | Hover docs |
+| `gr` | n | References with editable preview (Lspsaga Finder) |
+| `]f` / `[f` | Finder | Jump to next / previous file header; counts work (e.g. `2]f`) |
+| `K` | n | Hover docs (Lspsaga); repeat to focus the popup |
+| `gp` | n | Peek definition in an editable popup; Esc closes |
+| `SPC s o` | n | Toggle document outline tree; Enter expands/jumps, o jumps directly, q closes |
 | `C-t` | n | Find symbol in workspace (VSCode) |
 | `M-j` / `M-k` | n x | Scroll half a page down / up (animated, about 150 ms). Not `C-k`: it starts the window chords |
 | `]d` / `[d` | n | Next / previous diagnostic |
@@ -163,10 +166,11 @@ The top row of every Oil window shows the full path of the folder it lists
 
 | Key | Mode | Does |
 |---|---|---|
-| `SPC c r` / `SPC r n` | n | Rename symbol (project wide) |
+| `SPC c r` / `SPC r n` | n | Rename symbol in a popup (project wide); Enter confirms, Ctrl-C cancels |
 | `SPC c a` | n v | Code action |
-| `SPC c x` | n | Diagnostics list (Telescope) |
-| `SPC d` | n | Line diagnostics float |
+| `SPC c x` | n | Workspace diagnostics popup (Lspsaga) |
+| `SPC c X` | n | Diagnostics list (Telescope) |
+| `SPC d` | n | Line diagnostics popup (Lspsaga) |
 | `SPC f R` | n | Rename current file (updates imports) |
 
 ## 8. Git

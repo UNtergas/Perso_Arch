@@ -58,7 +58,8 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
 - In a real Kotlin file in a Gradle project, wait 1 to 2 minutes (the server imports Gradle and indexes), then:
   the **Kotlin icon at the start of the tabline** is **purple** when a server is attached and idle,
   **amber** while it is busy, **grey** when no Kotlin server is attached. Then try `K` (hover),
-  `gd` on an import, `gr` (references in Trouble), `SPC c r` (rename), `Ctrl-T` (workspace symbols).
+  `gd` on an import, `gp` (definition preview), `gr` (Lspsaga references), `SPC c r` (rename),
+  `SPC s o` (outline tree), `Ctrl-T` (workspace symbols).
   Also `:checkhealth vim.lsp`.
 
 ## 4. What is customised for Kotlin, and why (do not "clean up" these)
@@ -74,7 +75,7 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
 - **`storagePath` per project** (`before_init`): the server's `kls_database.db` index lives in
   `~/.cache/kvim/...`, not in the project. A stale `kls_database.db` in a project root had broken `gd`,
   and it also stays out of git status. If a project still has a `kls_database.db` from before, the user may delete it.
-- **`gd` fallback chain** (Kotlin buffers only): server definition, then the server's `workspace/symbol`
+- **Shared `gd` / `gp` fallback chain** (Kotlin buffers only, `kvim/lua/kotlin_definition.lua`): server definition, then the server's `workspace/symbol`
   search for the exact name, then a library source file. Why: when a module has a previous build's
   compiled output in `<module>/build/` (for example `androidapi/build/tmp/kotlin-classes`), the server
   resolves **top-level functions** (`getTokenType`, `isLegacyJWT`) to the compiled class and returns no
@@ -86,8 +87,15 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
 - **`workspace/symbol` range filler** (`on_attach` wraps `client.request`): the server answers symbol search
   with `location = { uri }` and no range; `vim.lsp.util.symbols_to_items` drops those, so Telescope
   (`Ctrl-T`) showed nothing. The filler adds a range by finding the declaration line.
-- **dropbar `ttl_init = 300`**: the server takes 1 to 2 minutes to answer `documentSymbol` after a Gradle
-  project opens; the default 60 one-second retries gave up first and left the noisy treesitter breadcrumb.
+- **Lspsaga symbol retry**: `KvimSagaSymbolRetry` retries empty `documentSymbol` results for up to
+  300 seconds, without overlapping outstanding requests. This preserves the former Dropbar
+  `ttl_init = 300` workaround for Kotlin's slow Gradle indexing. Do not drop it when syncing from nvim.
+- **Definition adapter**: copy the complete `kvim/` directory, including `lua/kotlin_definition.lua`.
+  The Kotlin client wrapper adds fallback locations to standard definition responses; both native
+  jumps and Lspsaga previews inherit them. Multiple matches use a location picker. Requests retain
+  the source buffer/position, ignore stale fallback results, and support cancellation.
+  Source JARs are extracted read-only and marked to skip Kotlin LSP startup. `GRADLE_USER_HOME`
+  is respected (defaults to `~/.gradle`).
 - **Kotlin icon in the tabline** (kvim only), first item; colour shows the LSP state (see Verify).
 - **Theme**: `koda-glade` (koda.nvim, light) is the startup colour scheme, same as `nvim`. Its background is
   dimmed from `#f7f7f7` to `#f3f3f3` by a `ColorScheme` autocmd in the koda block (`koda_glade_bg`), a small
@@ -125,3 +133,11 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
 - Headless tests: `NVIM_APPNAME=kvim nvim --headless -n <file.kt> "+luafile probe.lua" '+qa!'`; use
   `vim.lsp.buf_request_sync` for definition, references, `workspace/symbol`; use `nvim -l` with
   `loadfile` as a syntax check after every edit.
+
+## Definition adapter verification
+
+Run `nvim --headless -u NONE -l new_kotlin_vim/tests/definition_fallbacks.lua` from the repo root.
+It checks direct results, exact workspace fallback and range repair, Unicode identifiers, library
+fallback, original-buffer context, cancellation, location selection, and stale responses.
+Also test on a temporary Kotlin project with one `JAVA_OPTS=-Xmx1g` server: check both `gd` and
+`gp`, especially after an empty server definition response. Cached library previews must be read-only.

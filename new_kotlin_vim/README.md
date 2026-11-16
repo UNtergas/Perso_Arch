@@ -11,3 +11,21 @@ state and never touches the normal `nvim`.
   "set up kvim from `new_kotlin_vim/`".
 
 Status: being tested. Edit `~/.config/kvim/init.lua` first, then sync it here.
+
+## Lspsaga trial
+
+kvim now uses the same Lspsaga UI as nvim: breadcrumbs, reference Finder (`gr`), code actions,
+diagnostics, hover (`K`), rename (`SPC c r`), editable definition preview (`gp`), and outline tree
+(`SPC s o`). In Finder, `]f` / `[f` jump to the next/previous file; Enter opens a reference, `[w`
+switches to the preview, and Esc closes. Outline: Enter expands/jumps, `o` jumps, q/Esc closes.
+
+`lua/kotlin_definition.lua` augments only the Kotlin client's definition responses. Both `gd` and
+`gp` use server definitions, exact workspace symbols, then cached Kotlin/Kotlinx sources. When
+several locations match, a picker lets you choose before jumping or previewing. Library sources
+remain read-only and do not start another Kotlin server. Other language clients are unaffected.
+Existing source-JAR lookup limits remain: explicit imports, downloaded sources, newest cached version.
+
+Full pre-trial backup on this machine:
+`~/.config-backups/kvim-before-lspsaga-20261116-135359/` (live config and repository copy).
+Run the definition adapter checks from the repo root:
+`nvim --headless -u NONE -l new_kotlin_vim/tests/definition_fallbacks.lua`.

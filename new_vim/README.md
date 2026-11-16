@@ -44,3 +44,21 @@ bottom (ported from the Emacs config).
   bright yellow by design (set `vim.g.alabaster_dim_comments = true` to dim).
 - This config is the single file `nvim/init.lua`. The old NvChad files in the
   repo's `nvim/` folder are not used by it.
+
+## Lspsaga trial
+
+Lspsaga currently supplies the symbol breadcrumbs (replacing Dropbar), reference finder (`gr`),
+code actions (`SPC c a`, Ctrl-. / Alt-.), and diagnostics (`SPC d`, `[d` / `]d`, `SPC c x`).
+Finder: `]f` / `[f` jump between file headers; Enter opens a result; `[w` switches between results and preview; Esc closes.
+Trouble remains installed for Telescope results (`Ctrl-g`) and explicit `:Trouble` commands.
+Hover (`K`), symbol rename (`SPC c r` / `SPC r n`), definition peek (`gp`), and document outline
+(`SPC s o`) also use Lspsaga. The outline is a right sidebar: Enter expands/jumps, `o` jumps directly,
+`q` or Esc closes. Ctrl-Shift-T retains the Telescope document-symbol picker.
+Rename: Enter confirms, Ctrl-C cancels; files are not saved automatically.
+Direct definition jumps (`gd`) are unchanged. Automatic lightbulbs are disabled.
+The same UI is now synced to kvim, with its additional Kotlin definition adapter; see `../new_kotlin_vim/README.md`.
+
+Backup for this machine before the trial:
+`~/.config-backups/nvim-before-lspsaga-20261116-130239/` contains both the live `nvim/` config
+and the previous `new_vim-repo/` directory, including plugin locks. To revert, close Neovim,
+restore those files, then run `nvim --headless '+Lazy! restore' +qa`.
