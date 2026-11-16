@@ -587,6 +587,13 @@ require("lazy").setup({
     end,
   },
 
+  -- Buffer manager: the open buffers as an editable list (dd closes one, move a line to reorder, Enter or a line number opens)
+  {
+    "j-morano/buffer_manager.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = { order_buffers = "lastused", short_file_names = true },
+  },
+
   -- Indent guides: light gray everywhere; only the guide of the block the cursor is in gets its level colour
   {
     "lukas-reineke/indent-blankline.nvim",
@@ -1110,7 +1117,7 @@ map({ "n", "v" }, "<C-n>", function()
   if vim.bo.modified then return vim.notify("Oil has unsaved changes: :w to apply, u to undo", vim.log.levels.WARN) end
   require("oil").close()
 end, { desc = "Toggle Oil" })
-map({ "n", "v" }, "<C-b>", tb("buffers"), { desc = "Switch buffer" })
+map({ "n", "v" }, "<C-b>", function() require("buffer_manager.ui").toggle_quick_menu() end, { desc = "Switch buffer" })
 
 -- scroll: <C-d>/<C-f>/<C-b> are taken above, so the native scrolls live on other keys
 -- (normal! ignores mappings, so it reaches the built-in <C-d>/<C-u>).
@@ -1176,7 +1183,7 @@ end, { desc = "New folder" })
 -- leader (SPC) maps, Doom style
 map("n", "<leader><leader>", tb("find_files"), { desc = "Find file in project" })
 map("n", "<leader>.", tb("find_files", { hidden = true }), { desc = "Find any file" })
-map("n", "<leader>,", tb("buffers"), { desc = "Switch buffer" })
+map("n", "<leader>,", function() require("buffer_manager.ui").toggle_quick_menu() end, { desc = "Switch buffer" })
 map("n", "<leader>:", tb("commands"), { desc = "Command palette" })
 map("n", "<leader>ss", tb("current_buffer_fuzzy_find"), { desc = "Search lines in buffer" })
 map("n", "<leader>sp", tb("live_grep"), { desc = "Search project" })
@@ -1185,7 +1192,7 @@ map("n", "<leader>sw", function()
   require("telescope.builtin").live_grep({ default_text = "\\b" .. word .. "\\b", prompt_title = "Whole word: " .. word })
 end, { desc = "Search word under cursor (whole word)" })
 map("n", "<leader>su", "<cmd>UndotreeToggle<cr>", { desc = "Undo tree" })
-map("n", "<leader>bb", tb("buffers"), { desc = "Switch buffer" })
+map("n", "<leader>bb", function() require("buffer_manager.ui").toggle_quick_menu() end, { desc = "Switch buffer" })
 map("n", "<leader>bS", "<cmd>wall<cr>", { desc = "Save all buffers" })
 map("n", "<leader>fR", function() Snacks.rename.rename_file() end, { desc = "Rename file (updates imports)" })
 map({ "n", "v" }, "<leader>cf", function()

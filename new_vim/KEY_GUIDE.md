@@ -17,11 +17,11 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `w` | n | Move to end of word (native `e` motion) |
 | `SPC SPC` | n | Find file in project |
 | `SPC .` | n | Find any file (includes hidden) |
-| `SPC ,` / `SPC b b` | n | Switch buffer |
+| `SPC ,` / `SPC b b` | n | Buffer manager (buffer_manager.nvim): Enter opens, `dd` closes a buffer, `:w` applies edits, `q` / Esc closes |
 | `SPC :` | n | Command palette |
 | `C-n` | n v | Toggle Oil file browser: opens at the current file's folder, again goes back |
 | `SPC e` | n | Oil file browser (edit files as text). It also opens for `nvim .` and `:e .` instead of netrw |
-| `C-b` | n v | List all buffers (same as `SPC b b`) |
+| `C-b` | n v | Buffer manager (same as `SPC b b`) |
 | `C-k a` | n v | New file (creates parent folders) |
 | `C-k A` | n v | New folder |
 | `C-s` | n v i | Save |
