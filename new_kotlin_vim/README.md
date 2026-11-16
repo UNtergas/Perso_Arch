@@ -31,7 +31,7 @@ Run the definition adapter checks from the repo root:
 `nvim --headless -u NONE -l new_kotlin_vim/tests/definition_fallbacks.lua`.
 
 Trouble is removed. `[d` / `]d` only jump, with no popup or automatic code-action request.
-Use `SPC d` for diagnostic details and Ctrl-. / Alt-. / `SPC c a` for code actions.
+Use `SPC d` for diagnostic details and Alt-. / `SPC c a` for code actions.
 Code actions use the original native LSP menu through Snacks, with disabled actions hidden.
 Telescope Ctrl-Q still sends results to quickfix.
 

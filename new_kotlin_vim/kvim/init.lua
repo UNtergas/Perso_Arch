@@ -795,7 +795,7 @@ require("lazy").setup({
   {
     "j-morano/buffer_manager.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
-    opts = { order_buffers = "lastused", short_file_names = true },
+    opts = { short_file_names = true }, -- no order_buffers: the list keeps its order (new buffers go to the end), you reorder it by hand
   },
 
   -- Indent guides: light gray everywhere; only the guide of the block the cursor is in gets its level colour
@@ -808,32 +808,16 @@ require("lazy").setup({
       local hooks = require("ibl.hooks")
       local names = { "IblL1", "IblL2", "IblL3", "IblL4", "IblL5", "IblL6" }
       local colors = { "#d98a8a", "#d9b25f", "#7fae6f", "#5fa8b8", "#7d95d6", "#b58ad6" }
-      -- mix a colour into the background: share = how much of the colour (0..1)
-      local function tint(hex, share)
-        local bg = { 0xf5, 0xf5, 0xf5 }
-        local out = {}
-        for i = 1, 3 do
-          local c = tonumber(hex:sub(2 * i, 2 * i + 1), 16)
-          out[i] = math.floor(bg[i] + (c - bg[i]) * share + 0.5)
-        end
-        return ("#%02x%02x%02x"):format(out[1], out[2], out[3])
-      end
-      local share = 0.3 -- strength of the tint, used by both the band and the active guide
+      -- One palette for everything, as in the ibl README's rainbow-delimiters section: the brackets (rainbow-delimiters,
+      -- see its spec below), the scope guide and the underline on the opening / closing line all take the colour of the
+      -- bracket that opens the scope. ibl draws the underline itself as { underline, sp = guide colour }.
       hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
         vim.api.nvim_set_hl(0, "IblIndent", { fg = "#d6d6d6" })
         for k, name in ipairs(names) do
-          vim.api.nvim_set_hl(0, name, { fg = tint(colors[k], share) }) -- active guide: same colour as the band
+          vim.api.nvim_set_hl(0, name, { fg = colors[k] })
         end
-        -- ibl paints the opening line of the block (from the guide's column to the end of the text) with these
-        -- groups, as a thin terminal underline. A terminal draws that underline itself, thin and detached from the
-        -- guide, so use a tinted band in the level colour instead: a thick bar that starts at the guide.
-        -- ibl creates the groups right after this hook, so replace them one tick later.
-        vim.schedule(function()
-          for k in ipairs(names) do
-            vim.api.nvim_set_hl(0, "@ibl.scope.underline." .. k, { bg = tint(colors[k], share) })
-          end
-        end)
       end)
+      hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
       -- ibl only counts functions and statement blocks as scopes by default, so inside `where: { ... }` it
       -- jumped up to the whole method. Add the other bracket pairs, so the innermost { } [ ] ( ) is the scope.
       local brackets = {
@@ -848,10 +832,10 @@ require("lazy").setup({
         scope = {
           enabled = true,
           highlight = names,
-          -- left three-eighths block: thicker than │ and flush with the left edge of its cell, so it meets
-          -- the band on the opening line, which starts at the same column's left edge.
+          -- left one-eighth block: thin, flush with the left edge of its cell, so it meets
+          -- the underline on the opening line, which starts at the same column.
           -- ▏ 1/8, ▎ 2/8, ▍ 3/8, ▌ 4/8 of the cell width
-          char = "▍",
+          char = "▏",
           show_start = true,
           show_end = true,
           include = { node_type = { typescript = brackets, tsx = brackets, javascript = brackets } },
@@ -986,7 +970,13 @@ require("lazy").setup({
     event = "BufReadPost",
     -- tsx: its default query paints JSX tag names and < > in the bracket-depth colours; "rainbow-parens"
     -- keeps the rainbow on ( ) [ ] { } only, so tag names get Alabaster's blue instead
-    init = function() vim.g.rainbow_delimiters = { query = { tsx = "rainbow-parens" } } end,
+    init = function()
+      -- same six groups as the indent guides (IblL1..6, defined in the ibl spec), so a bracket and its scope match
+      vim.g.rainbow_delimiters = {
+        query = { tsx = "rainbow-parens" },
+        highlight = { "IblL1", "IblL2", "IblL3", "IblL4", "IblL5", "IblL6" },
+      }
+    end,
   },
   { "nvim-treesitter/nvim-treesitter-context", event = "BufReadPost", opts = { max_lines = 3 } },
   {
@@ -1599,12 +1589,11 @@ end
 map({ "n", "i", "t" }, "<M-q>", close_popups, { desc = "Close popups" })
 map("n", "<leader>q", close_popups, { desc = "Close popups" })
 
--- ctrl+. (VSCode quick fix) = code action; alt+. as a fallback for terminals that drop the Ctrl
+-- alt+. = code action (Ctrl-. is not used: tmux does not pass it on)
 -- Hide disabled refactorings; the native action list is displayed through Snacks.
 function _G.code_action()
   vim.lsp.buf.code_action({ filter = function(action) return not action.disabled end })
 end
-map({ "n", "i", "v" }, "<C-.>", _G.code_action, { desc = "Code action" })
 map({ "n", "i", "v" }, "<M-.>", _G.code_action, { desc = "Code action" })
 
 -- markdown: SPC o m renders the file with glow in a buffer (vim motions and / work, q goes back)
