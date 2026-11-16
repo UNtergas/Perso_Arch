@@ -1354,10 +1354,27 @@ map("n", "<C-w>q", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
 map("n", "<C-w>T", "<Nop>", { desc = "Disabled: one tab per nvim" })
--- ctrl+w x closes the current split (the buffer stays open); it replaces the window exchange. ctrl+w c is disabled.
+-- ctrl+w x closes the current split (the buffer stays open); it replaces the window exchange.
 map("n", "<C-w>x", "<cmd>close<cr>", { desc = "Close split" })
 map("n", "<C-w><C-x>", "<cmd>close<cr>", { desc = "Close split" })
-map("n", "<C-w>c", "<Nop>", { desc = "Disabled: use ctrl+w x" })
+-- like tmux: ctrl+w z zooms the window to the whole screen and back, ctrl+w c fills its column (full height),
+-- ctrl+w C fills its row (full width); press again to put the old sizes back
+local function window_toggle(key, grow)
+  return function()
+    local win = vim.api.nvim_get_current_win()
+    local saved = vim.w[win][key]
+    if saved and saved.n == #vim.api.nvim_tabpage_list_wins(0) then
+      vim.cmd(saved.restore)
+      vim.w[win][key] = nil
+      return
+    end
+    vim.w[win][key] = { restore = vim.fn.winrestcmd(), n = #vim.api.nvim_tabpage_list_wins(0) }
+    vim.cmd(grow)
+  end
+end
+map("n", "<C-w>z", window_toggle("saved_zoom", "wincmd _ | wincmd |"), { desc = "Zoom window (toggle)" })
+map("n", "<C-w>c", window_toggle("saved_col", "wincmd _"), { desc = "Window fills its column (toggle)" })
+map("n", "<C-w>C", window_toggle("saved_row", "wincmd |"), { desc = "Window fills its row (toggle)" })
 -- ; is : (this also makes flash leave ; alone in every mode); f/t repeat: press f/t again, , goes back
 map({ "n", "x" }, ";", ":", { desc = "Command line" })
 
@@ -1594,6 +1611,7 @@ vim.api.nvim_create_autocmd("FileType", {
       vim.cmd("enew")
       local view = vim.api.nvim_get_current_buf()
       vim.bo[view].bufhidden = "wipe"
+      vim.bo[view].buflisted = false -- keep it out of the buffer switcher: picking a wiped glow view re-runs it as a new terminal
       vim.fn.jobstart({ "glow", "-s", "light", "-w", tostring(width), file }, {
         term = true,
         on_exit = function()
