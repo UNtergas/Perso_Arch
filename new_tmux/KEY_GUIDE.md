@@ -51,13 +51,14 @@ new window instead. It opens the same name dialog first (prefilled `side` for `a
 |---|---|
 | `h` `j` `k` `l` | Move focus left / down / up / right |
 | `←` `↓` `↑` `→` | Move the pane itself: swaps places with its neighbour in that direction, focus goes with it (repeatable). Wraps around at the edge, and the pane takes the size of the slot it lands in |
-| `H` `J` `K` `L` | Resize (repeatable without pressing the prefix again) |
+| `H` `J` `K` `L` | Resize the pane in steps of 10% of the window (width for `H` / `L`, height for `J` / `K`), repeatable without pressing the prefix again. Same steps as `C-k h/j/k/l` in nvim |
+| `=` | Equal sizes for the whole window, at every level: one big pane on the left and two on the right becomes left 50% and right 50%, with the two right panes 50% of the height each. Same idea as `C-k =` in nvim, but no toggle back. Needs `~/.tmux/equalize.sh` and `python3`. Replaces stock `=` (choose a paste buffer) |
 | `\` | Split side by side |
 | `-` | Split stacked |
 | `z` | Zoom this pane to the whole window, again to restore the layout |
 | `[` / `]` | Like niri's `Mod+[` / `Mod+]` (consume-or-expel): a pane alone in its column is consumed into the column on the left / right (stacked below that pane). A pane in a stack is expelled into its own full-height column at the left / right edge. col1 \| col2, `[` on col2 gives col1 over col2, `[` again gives col2 \| col1, `]` reverses. Other columns keep their width: a consumed pane frees its width to the column it joins, an expelled pane takes half of its old column's width. Does nothing at the edge. Expelling goes to the window edge, so with 3+ columns it does not land next to its old column. Replaces stock `]` (paste buffer) |
-| `m` | Focus mode: this pane moves to the big 65% slot on the left, all the other panes stack on the right (35%). Again to put everything back exactly as before. If you add or close a pane in between, it just applies focus mode again |
-| `n` | Focus mode, top version: this pane moves to the top (70% of the height), all the other panes sit side by side below it (30%). Again to put everything back exactly as before. Same logic as `m` with its own saved layout |
+| `m` | Focus mode: this pane moves to the big 65% slot on the left, all the other panes stack on the right (35%). One way only, no toggle back: use `=` for equal sizes. Only `z`, `c` and `C` toggle |
+| `n` | Focus mode, top version: this pane moves to the top (70% of the height), all the other panes sit side by side below it (30%). One way only, like `m` |
 | `c` | Make this pane fill its column (full height), again to restore the old split |
 | `C` | Make this pane fill its row (95% of the width), again to restore the old split |
 | `x` | Close this pane (popup confirmation: y confirms, any other key cancels) |
@@ -72,7 +73,7 @@ for rows: use it on one of the two bottom terminals of the `d` preset.
 | Keys | Does |
 |---|---|
 | `Ctrl-←` `↓` `↑` `→` | Resize by 1 cell (repeatable) |
-| `Alt-←` `↓` `↑` `→` | Resize by 5 cells (repeatable). `H` `J` `K` `L` above do the same with vim keys |
+| `Alt-←` `↓` `↑` `→` | Resize by 5 cells (repeatable). `H` `J` `K` `L` above resize with vim keys, in 10% steps |
 | `Alt-1` | Layout: even-horizontal (all panes side by side) |
 | `Alt-2` | Layout: even-vertical (all panes stacked) |
 | `Alt-3` / `Alt-4` | Layout: main-horizontal / main-vertical (one big pane, the others in a row / column). They use the sizes set in the config: 70% of the height for `Alt-3`, 65% of the width for `Alt-4` |
