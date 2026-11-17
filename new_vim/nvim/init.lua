@@ -869,6 +869,9 @@ require("lazy").setup({
     end,
     config = function()
       vim.keymap.set("x", "gs", "<Plug>(nvim-surround-visual)", { desc = "Surround selection" })
+      -- ysw = ysiw, ysW = ysiW (the plain "w" motion only wrapped from the cursor to the next word, rarely wanted)
+      vim.keymap.set("n", "ysw", "ysiw", { remap = true, desc = "Surround word" })
+      vim.keymap.set("n", "ysW", "ysiW", { remap = true, desc = "Surround WORD" })
     end,
   },
   {

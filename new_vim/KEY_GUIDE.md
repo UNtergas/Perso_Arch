@@ -85,6 +85,7 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `M-o` | n i v | Outdent |
 | `gc` / `gcc` | n v | Toggle comment (Neovim built in) |
 | `ys` / `ds` / `cs` | n | Surround add / delete / change |
+| `ysw` / `ysW` | n | Surround the word / WORD under the cursor (same as `ysiw` / `ysiW`) |
 | `gs` | v | Surround selection |
 | `SPC s u` | n | Undo tree |
 | `SPC c f` | n v | Format (manual; black, rustfmt, else LSP) |
