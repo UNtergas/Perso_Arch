@@ -12,12 +12,81 @@ vim.opt.signcolumn = "yes:1"
 vim.opt.updatetime = 25
 vim.opt.clipboard = "unnamedplus"
 
--- Indentation
-vim.opt.tabstop = 2
-vim.opt.shiftwidth = 2
-vim.opt.softtabstop = 2
+-- Indentation: 4 spaces by default (easier to read). 2 where the language's convention is 2: TypeScript / JavaScript / JSON
+-- (Prettier's default and the projects' tabWidth), HTML / CSS / SCSS / Less, YAML, Ruby, Scala, Dart, Elixir. Go keeps tabs
+-- (its filetype plugin). A project's .editorconfig overrides all of this.
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.softtabstop = 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {
+    "typescript", "typescriptreact", "javascript", "javascriptreact", "json", "jsonc",
+    "html", "css", "scss", "less", "yaml", "ruby", "scala", "dart", "elixir",
+  },
+  callback = function(ev)
+    vim.bo[ev.buf].tabstop, vim.bo[ev.buf].shiftwidth, vim.bo[ev.buf].softtabstop = 2, 2, 2
+  end,
+})
+
+-- Indent size picker: the "Spaces: 4" segment in the statusline (click it) or SPC t i. It changes the size for every file
+-- of this session (nothing is rewritten, only the options change). A buffer whose .editorconfig sets indent_size /
+-- indent_style / tab_width is left alone, so a project's .editorconfig always wins.
+local function editorconfig_indent(buf)
+  local ec = vim.b[buf].editorconfig
+  return type(ec) == "table" and (ec.indent_size or ec.indent_style or ec.tab_width) ~= nil
+end
+local function set_indent(buf, size, tabs)
+  vim.bo[buf].tabstop, vim.bo[buf].shiftwidth, vim.bo[buf].softtabstop = size, size, size
+  vim.bo[buf].expandtab = not tabs
+end
+function _G.indent_label()
+  local sw = vim.bo.shiftwidth > 0 and vim.bo.shiftwidth or vim.bo.tabstop
+  return (vim.bo.expandtab and "Spaces: " or "Tabs: ") .. sw
+end
+local function each_file_buffer(fn)
+  for _, b in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(b) and vim.bo[b].buftype == "" and not editorconfig_indent(b) then fn(b) end
+  end
+end
+function _G.indent_apply(size, tabs)
+  vim.g.indent_override = { size = size, tabs = tabs }
+  vim.go.tabstop, vim.go.shiftwidth, vim.go.softtabstop, vim.go.expandtab = size, size, size, not tabs -- vim.go: global only, a plain :set would also overwrite the current buffer
+  each_file_buffer(function(b) set_indent(b, size, tabs) end)
+  vim.cmd.redrawstatus()
+end
+function _G.indent_reset() -- back to the defaults: 4 spaces, 2 for the languages in the FileType rule above, filetype plugins (Go tabs)
+  vim.g.indent_override = nil
+  vim.go.tabstop, vim.go.shiftwidth, vim.go.softtabstop, vim.go.expandtab = 4, 4, 4, true
+  each_file_buffer(function(b)
+    vim.api.nvim_buf_call(b, function() -- in the buffer, so the filetype plugins and the TypeScript rule hit this one
+      vim.cmd("setlocal tabstop< shiftwidth< softtabstop< expandtab<")
+      vim.api.nvim_exec_autocmds("FileType", { buffer = b })
+    end)
+  end)
+  vim.cmd.redrawstatus()
+end
+function _G.indent_choose()
+  local items = {
+    { "Spaces: 2", 2, false }, { "Spaces: 4", 4, false }, { "Spaces: 8", 8, false }, { "Tabs: 4", 4, true },
+    { "Default (4, web / TS / YAML / Ruby 2)" },
+  }
+  vim.ui.select(items, {
+    prompt = "Indent size (all files, .editorconfig wins)",
+    format_item = function(i) return i[1] end,
+  }, function(choice)
+    if not choice then return end
+    if choice[2] then _G.indent_apply(choice[2], choice[3]) else _G.indent_reset() end
+  end)
+end
+vim.api.nvim_create_autocmd("FileType", { -- a picked size also applies to files opened later
+  callback = function(ev)
+    local o = vim.g.indent_override
+    if o and vim.bo[ev.buf].buftype == "" and not editorconfig_indent(ev.buf) then set_indent(ev.buf, o.size, o.tabs) end
+  end,
+})
+vim.keymap.set("n", "<leader>ti", function() _G.indent_choose() end, { desc = "Indent size (spaces / tabs)" })
 
 -- Wrapping (Emacs: soft word wrap)
 vim.opt.wrap = true
@@ -1106,6 +1175,7 @@ require("lazy").setup({
             function() local r = vim.fn.reg_recording() return r == "" and "" or "\u{f111} @" .. r end,
             { "searchcount", maxcount = 999, timeout = 100 },
             { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " } }, -- attached server names, no spinner
+            { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end, padding = { left = 1, right = 1 } },
           },
           lualine_y = { "progress" },
           -- language: darkest grey, light text, same in every mode
