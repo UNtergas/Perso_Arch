@@ -35,12 +35,16 @@ case "$kind" in
   *)    title="$label finished";    urgency=normal;   bg='#2f6b3a' ;;
 esac
 
-# Keep it for the notification list (bell in the status bar, Alt-e g): time, kind, text, session:window, window id.
+# Keep it for the notification list (bell in the status bar, Alt-e g): time, kind, text, session:window, window id, unread (1).
+# The bell counts the unread ones; notif-read.sh clears a window's entries when you visit that window.
 log=${TMUX_NOTIFY_LOG:-$HOME/.tmux/notifications.log}
-printf '%s\t%s\t%s\t%s\t%s\n' "$(date +%s)" "$kind" "$(printf %s "$title" | tr '\t\n' '  ')" \
-  "$(printf %s "$sname:$wname" | tr '\t\n' '  ')" "$wid" >> "$log"
-if [ "$(wc -l < "$log")" -gt 300 ]; then tail -n 200 "$log" > "$log.tmp" && mv "$log.tmp" "$log"; fi
-unread=$(tmux show -gqv @notif_n); tmux set -g @notif_n "$(( ${unread:-0} + 1 ))" \; refresh-client -S 2>/dev/null
+(
+  flock 9
+  printf '%s\t%s\t%s\t%s\t%s\t1\n' "$(date +%s)" "$kind" "$(printf %s "$title" | tr '\t\n' '  ')" \
+    "$(printf %s "$sname:$wname" | tr '\t\n' '  ')" "$wid" >> "$log"
+  if [ "$(wc -l < "$log")" -gt 300 ]; then tail -n 200 "$log" > "$log.tmp" && mv "$log.tmp" "$log"; fi
+) 9>"$log.lock"
+"$(dirname "$0")/notif-read.sh" none
 
 if [ "${#focused[@]}" -gt 0 ]; then
   # In tmux, in another window: show it inside tmux (a toast on the message line of the focused clients), no OS popup.

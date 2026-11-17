@@ -13,6 +13,7 @@ scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` 
 | Rename/close/command popups | `new_tmux/dialog.sh` | `~/.tmux/dialog.sh` (executable) |
 | Claude Code notifications (`Stop` / `Notification` hooks) | `new_tmux/notify.sh` | `~/.tmux/notify.sh` (executable) |
 | Notification list (the bell, `Alt-e g`) | `new_tmux/notifications.sh` | `~/.tmux/notifications.sh` (executable) |
+| Marks notifications read (hooks, bell count) | `new_tmux/notif-read.sh` | `~/.tmux/notif-read.sh` (executable) |
 | Key guide for the user | `new_tmux/KEY_GUIDE.md` | stays in the repo |
 
 ## 1. Prerequisites (check each, tell the user what is missing)
@@ -55,7 +56,7 @@ An old default server can be replaced after the user has finished and exited all
 ## 2. Install
 
 1. Back up an existing `~/.tmux.conf`.
-2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh new_tmux/notify.sh new_tmux/notifications.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
+2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh new_tmux/notify.sh new_tmux/notifications.sh new_tmux/notif-read.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
 3. `cp new_tmux/tmux.conf ~/.tmux.conf`
 4. Inside tmux: `tmux source ~/.tmux.conf`, or start a fresh server (see the reload note below).
 5. Enable relative line numbers by default: the config must contain `setw -g copy-mode-line-numbers relative`.
@@ -125,4 +126,4 @@ Install `dialog.sh` along with the other helpers. It supplies the same popup pla
 
 ### Notification list (bell + dropdown)
 
-`notify.sh` also appends every delivered event to `~/.tmux/notifications.log` (tab separated: time, kind, text, `session:window`, window id; trimmed to 200 lines past 300) and adds 1 to the server option `@notif_n` (unread). `tmux.conf` draws the bell at the start of the right side of the status line (a dim bell at 0, an orange bell plus the count otherwise) inside `#[range=user|bell]`. `Alt-e g`, or a click on the bell (`MouseDown1Status` checks `#{mouse_status_range}`; any other click still runs `switch-client -t =`), opens `notifications.sh` in a popup under the status bar. The script resets `@notif_n` to 0 when it opens, lists the log newest first through fzf, and `Enter` jumps to the window (if it still exists), `Ctrl-x` deletes the highlighted line (`sed -i {3}d`), `Ctrl-l` empties the log. The popup command gets no arguments: `display-popup` does not expand `#{...}` in its command (same reason as `dialog.sh`), so the script asks tmux for `#{client_name}` itself; passing `'#{client_name}'` arrived as the literal text and made the jump fail. Testing: `send-keys -K` blocks while a `display-popup -E` is open, so run it in the background or with `timeout`. Set `TMUX_NOTIFY_LOG` to test with a scratch log.
+`notify.sh` also appends every delivered event to `~/.tmux/notifications.log` (tab separated: time, kind, text, `session:window`, window id; trimmed to 200 lines past 300) with a last field `1` (unread). `@notif_n` is the number of unread lines, recomputed by `notif-read.sh`. That script also marks a window's lines read (`0`): `after-select-window` and `client-focus-in` call `notif-read.sh #{window_id}`, so visiting the window that sent a notification removes it from the bell count (the line stays in the list). `flock` on `<log>.lock` keeps appends and rewrites apart. `tmux.conf` draws the bell at the start of the right side of the status line (a dim bell at 0, an orange bell plus the count otherwise) inside `#[range=user|bell]`. `Alt-e g`, or a click on the bell (`MouseDown1Status` checks `#{mouse_status_range}`; any other click still runs `switch-client -t =`), opens `notifications.sh` in a popup under the status bar. The script marks everything read (`notif-read.sh all`) when it opens, lists the log newest first through fzf, and `Enter` jumps to the window (if it still exists), `Ctrl-x` deletes the highlighted line (`sed -i {3}d`), `Ctrl-l` empties the log. The popup command gets no arguments: `display-popup` does not expand `#{...}` in its command (same reason as `dialog.sh`), so the script asks tmux for `#{client_name}` itself; passing `'#{client_name}'` arrived as the literal text and made the jump fail. Testing: `send-keys -K` blocks while a `display-popup -E` is open, so run it in the background or with `timeout`. Set `TMUX_NOTIFY_LOG` to test with a scratch log.

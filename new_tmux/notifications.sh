@@ -23,15 +23,16 @@ if [ "$1" = "--list" ]; then list; exit 0; fi
 
 client=$(tmux display-message -p '#{client_name}')
 # Opening the list counts as reading everything.
-tmux set -g @notif_n 0 \; refresh-client -S 2>/dev/null
+"$(dirname "$0")/notif-read.sh" all
 
 hdr="Enter open   ^x remove   ^l clear all   Esc close"
 self=$(printf '%q' "$0")
+reader=$(printf '%q' "$(dirname "$0")/notif-read.sh")
 sel=$(list | fzf --ansi --no-sort --delimiter $'\t' --with-nth 1 --layout reverse --height 100% \
   --no-info --no-separator --prompt ' search: ' --pointer '▶' --header "$hdr" \
   --color 'bg:#eef1f1,fg:#14201f,bg+:#cbd6d6,fg+:#14201f,pointer:#4a6a6a,prompt:#4a6a6a,header:#5a6e6e,hl:#b25b00,hl+:#b25b00' \
-  --bind "ctrl-x:execute-silent(sed -i {3}d '$log')+reload($self --list)" \
-  --bind "ctrl-l:execute-silent(: > '$log')+reload($self --list)") || exit 0
+  --bind "ctrl-x:execute-silent(sed -i {3}d '$log'; $reader none)+reload($self --list)" \
+  --bind "ctrl-l:execute-silent(: > '$log'; $reader none)+reload($self --list)") || exit 0
 
 wid=$(printf '%s' "$sel" | cut -f2)
 [ -n "$wid" ] || exit 0
