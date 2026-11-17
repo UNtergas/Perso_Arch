@@ -13,8 +13,6 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 
 | Key | Mode | Does |
 |---|---|---|
-| `e` | n | Move to end of line (`$`) |
-| `w` | n | Move to end of word (native `e` motion) |
 | `SPC SPC` | n | Find file in project |
 | `SPC .` | n | Find any file (includes hidden) |
 | `SPC ,` / `SPC b b` | n | Buffer manager (buffer_manager.nvim): Enter opens, `dd` closes a buffer, `:w` applies edits, `q` / Esc closes |
@@ -227,8 +225,6 @@ Deleting in Oil sends files to the trash. To get one back: `g\` in the folder it
 
 | Key | Was | Now |
 |---|---|---|
-| `e` | End of word | End of line (`$`), normal mode only |
-| `w` | Start of next word | End of word, normal mode only |
 | `C-d` | Scroll half page | Multi-cursor |
 | `C-f` | Scroll page | Search in buffer |
 | `C-t` | Tag stack pop | Find symbol |
