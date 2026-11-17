@@ -107,7 +107,21 @@ for rows: use it on one of the two bottom terminals of the `d` preset.
 | `<` / `>` | Menu for the window / pane (swap, kill, rename, mark, ...). The same menus open with a right-click |
 | `i` | Show info about the current window |
 
-A dot after a window name means something happened there while you were not looking, and a desktop notification is sent too. Selecting the window (or refocusing the terminal) clears it. Green: Claude Code finished, or a shell command that ran 30 s or more succeeded. Orange: Claude needs you. Red: a long shell command failed. Blue: a bell (`\a`) rang. A bell never replaces a green, orange or red dot. Needs `~/.tmux/notify.sh`, the Claude Code `Stop` / `Notification` hooks, and for long commands the block from `new_zsh/notify.zsh` in `~/.zshrc` (threshold: `TMUX_NOTIFY_SECS`, default 30; nvim, ssh, less, man, claude and similar are skipped).
+A dot after a window name means something happened there while you were not looking, and you also get a message: a coloured toast on the tmux message line for 5 s if you are in tmux (terminal focused), or a desktop notification if the terminal is not focused. Selecting the window (or refocusing the terminal) clears it. Green: Claude Code finished, or a shell command that ran 30 s or more succeeded. Orange: Claude needs you. Red: a long shell command failed. Blue: a bell (`\a`) rang. A bell never replaces a green, orange or red dot. Needs `~/.tmux/notify.sh`, the Claude Code `Stop` / `Notification` hooks, and for long commands the block from `new_zsh/notify.zsh` in `~/.zshrc` (threshold: `TMUX_NOTIFY_SECS`, default 30; nvim, ssh, less, man, claude and similar are skipped).
+
+### Notification list (the bell)
+
+The bell at the right of the status line keeps every notification. It is dim when you have read everything and orange with a count when something is new. `Alt-e g`, or a click on the bell, opens a list under the status bar, newest first: a coloured dot (same colours as the tab dots), how long ago, the text and `session:window`. Opening the list marks everything as read.
+
+| Key | Does |
+|---|---|
+| `Enter` | Jump to that window |
+| `Ctrl-x` | Remove the highlighted notification |
+| `Ctrl-l` | Clear all |
+| type | Filter the list |
+| `Esc` | Close |
+
+Needs `~/.tmux/notifications.sh` (copy of `new_tmux/notifications.sh`) and `fzf`.
 
 The window name follows the running command (`automatic-rename` is on) until you rename it with `,`.
 A window also closes when its last pane closes (`exit`, `Ctrl-D`, or `x`).
