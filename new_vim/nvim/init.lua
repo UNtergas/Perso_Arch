@@ -108,7 +108,7 @@ require("lazy").setup({
       -- koda-glade: dim the background a little (its #f7f7f7 is too bright). Every group that uses koda's background
       -- gets the new one; the string/type colours are light, so only a small step (#f3f3f3 keeps strings at about
       -- 3.8:1 contrast). Registered before the scheme loads so it also applies at startup.
-      local koda_glade_bg = 0xf3f3f3
+      local koda_glade_bg = 0xfafafa -- was 0xf3f3f3; raised because the window is translucent (niri opacity) and blends with the darker wallpaper
       vim.api.nvim_create_autocmd("ColorScheme", {
         pattern = "koda-glade",
         callback = function()
@@ -134,6 +134,9 @@ require("lazy").setup({
           for _, n in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do
             vim.api.nvim_set_hl(0, n, { bg = 0xe6e6e6 })
           end
+          -- comments: Alabaster's light comment red (#aa3731), a little softer (#b04a45, 5.1:1 on the page) instead of koda's grey
+          vim.api.nvim_set_hl(0, "Comment", { fg = 0xb04a45 })
+          vim.api.nvim_set_hl(0, "@comment", { link = "Comment" })
         end,
       })
       vim.cmd.colorscheme("koda-glade")
