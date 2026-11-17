@@ -62,12 +62,14 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | Key | Mode | Does |
 |---|---|---|
 | `C-k <arrow>` | n v | Move the window to the far left/bottom/top/right |
-| `C-k h/j/k/l` | n v | Resize the window: narrower / shorter / taller / wider, in steps of 10% of the screen (columns for `h` `l`, rows for `j` `k`), so from an even split the sizes land on 50, 40, 30, 20 % |
+| `C-k h/j/k/l` | n v | Resize the window by moving a divider in that direction, in steps of 10% of the screen (columns for `h` `l`, rows for `j` `k`). A window with a neighbour on the right / below grows with `l` / `j` and shrinks with `h` / `k`; the rightmost / bottom-most window has its divider on the left / top, so `h` / `k` grow it and `l` / `j` shrink it. Same as tmux. A window with no neighbour in that direction does nothing |
 | `C-k =` | n v | Equal window sizes; press again to put the previous sizes back (forgotten when the number of windows changes) |
+| `C-k r` | n v | Resize mode, like i3: `h` `j` `k` `l` resize the window in 10% steps, `=` equal sizes (no toggle back), `Esc` / `Enter` / `q` leave (any other key leaves too). The command line shows `-- RESIZE --` while it is on |
 | `C-k -` | n v | Split stacked (new window below) |
 | `C-k \` | n v | Split side by side (new window to the right) |
 | `C-M-<arrows>` | n | Focus window in that direction |
-| `C-w q` | n | Close buffer |
+| `C-w q` | n | Number every window (a big digit in its middle, like tmux's `Alt-e q`); press the number to jump to that window, anything else cancels. Windows are numbered left to right, then top to bottom, up to 9 |
+| `C-w C-w` | n | Close buffer |
 | `C-w C-w` | n | Close buffer |
 | `C-w a` | n | Close all buffers |
 | `C-w z` | n | Zoom this window to the whole screen, again to restore (like tmux `z`) |
@@ -240,7 +242,8 @@ Deleting in Oil sends files to the trash. To get one back: `g\` in the folder it
 | `C-t` | Tag stack pop | Find symbol |
 | `C-w T` | Move window to a new tab | Disabled |
 | `;` | Repeat `f`/`t` | Same as `:` (normal and visual). To repeat, press `f`/`t` again; `,` goes back |
-| `C-w q`, `C-w C-w` | Close window, next window | Close buffer |
+| `C-w q` | Close window | Number the windows, press a number to jump |
+| `C-w C-w` | Next window | Close buffer |
 | `C-b` / `C-n` | Scroll back, next line | List buffers, toggle Oil |
 | `grr`, `gra`, `grn`, `gri`, `grt` | Neovim 0.11 LSP defaults | Removed so `gr` has no delay |
 

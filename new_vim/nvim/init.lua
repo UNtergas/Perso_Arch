@@ -1296,8 +1296,40 @@ for key, dir in pairs({ Left = "h", Down = "j", Up = "k", Right = "l" }) do
   map("n", "<C-M-" .. key .. ">", "<C-w>" .. dir, { desc = "Focus window " .. dir })
 end
 
--- ctrl+w q / ctrl+w ctrl+w: close buffer, ctrl+w a: close all buffers
-map("n", "<C-w>q", function() Snacks.bufdelete() end, { desc = "Close buffer" })
+-- ctrl+w q: number every window (big digit in its middle, like tmux's Alt-e q), press the number to jump there; anything else
+-- cancels. Windows are numbered left to right, top to bottom. Up to 9 windows.
+vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#ffffff", bg = "#4a6a6a", bold = true })
+local function pick_window()
+  local wins = {}
+  for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.api.nvim_win_get_config(w).relative == "" then wins[#wins + 1] = w end
+  end
+  table.sort(wins, function(a, b)
+    local pa, pb = vim.api.nvim_win_get_position(a), vim.api.nvim_win_get_position(b)
+    if pa[2] ~= pb[2] then return pa[2] < pb[2] end
+    return pa[1] < pb[1]
+  end)
+  local labels = {}
+  for i, w in ipairs(wins) do
+    if i > 9 then break end
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "       ", "   " .. i .. "   ", "       " })
+    local width, height = vim.api.nvim_win_get_width(w), vim.api.nvim_win_get_height(w)
+    local label = vim.api.nvim_open_win(buf, false, {
+      relative = "win", win = w, width = 7, height = 3, style = "minimal", focusable = false, zindex = 250,
+      row = math.max(0, math.floor(height / 2) - 1), col = math.max(0, math.floor(width / 2) - 3),
+    })
+    vim.wo[label].winhighlight = "Normal:WindowNumber"
+    labels[#labels + 1] = label
+  end
+  vim.cmd("redraw")
+  local ok, c = pcall(vim.fn.getcharstr)
+  for _, l in ipairs(labels) do pcall(vim.api.nvim_win_close, l, true) end
+  local n = ok and tonumber(c)
+  if n and wins[n] then vim.api.nvim_set_current_win(wins[n]) end
+end
+map("n", "<C-w>q", pick_window, { desc = "Number the windows, press a number to jump" })
+-- ctrl+w ctrl+w: close buffer, ctrl+w a: close all buffers
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
 map("n", "<C-w>T", "<Nop>", { desc = "Disabled: one tab per nvim" })
@@ -1342,10 +1374,19 @@ map(ck, "<C-k><Right>", "<C-w>L", { desc = "Move window right" })
 local function resize_step(dir)
   local dw = math.max(1, math.floor(vim.o.columns * 0.10 + 0.5))
   local dh = math.max(1, math.floor((vim.o.lines - vim.o.cmdheight) * 0.10 + 0.5))
-  if dir == "h" then vim.cmd("vertical resize -" .. dw)
-  elseif dir == "l" then vim.cmd("vertical resize +" .. dw)
-  elseif dir == "j" then vim.cmd("resize -" .. dh)
-  else vim.cmd("resize +" .. dh) end
+  -- The key moves a divider in its direction. A window with a neighbour on the right / below has a divider there, so l / j
+  -- grow it and h / k shrink it. The rightmost / bottom-most window only has a divider on its left / top: h / k move that one
+  -- left / up, which grows the window, and l / j move it right / down, which shrinks it. (Before, h and k always shrank.)
+  local cur = vim.fn.winnr()
+  if dir == "h" or dir == "l" then
+    local has_right = vim.fn.winnr("l") ~= cur
+    if not has_right and vim.fn.winnr("h") == cur then return end -- no divider at all: a resize would only eat the command line
+    vim.cmd("vertical resize " .. (((dir == "l") == has_right) and "+" or "-") .. dw)
+  else
+    local has_below = vim.fn.winnr("j") ~= cur
+    if not has_below and vim.fn.winnr("k") == cur then return end
+    vim.cmd("resize " .. (((dir == "j") == has_below) and "+" or "-") .. dh)
+  end
 end
 map(ck, "<C-k>h", function() resize_step("h") end, { desc = "Window narrower (10%)" })
 map(ck, "<C-k>l", function() resize_step("l") end, { desc = "Window wider (10%)" })
@@ -1361,6 +1402,27 @@ map(ck, "<C-k>=", function()
     vim.cmd("wincmd =")
   end
 end, { desc = "Equal window sizes (again: back to the previous sizes)" })
+-- C-k r: resize mode, like i3. h / j / k / l resize the window in 10% steps (same as C-k h/j/k/l), = equal sizes (no toggle back),
+-- Esc / Enter / q leave; any other key leaves too.
+map(ck, "<C-k>r", function()
+  local function status()
+    vim.api.nvim_echo({ { "-- RESIZE --  h/j/k/l resize   = equal   Esc/Enter/q done", "ModeMsg" } }, false, {})
+  end
+  status()
+  while true do
+    local ok, c = pcall(vim.fn.getcharstr)
+    if not ok then break end
+    if c == "h" or c == "j" or c == "k" or c == "l" then resize_step(c)
+    elseif c == "=" then vim.cmd("wincmd =")
+    else break end
+    -- colorful-winsep redraws its focus border on WinResized, which does not fire while this loop waits for a key, so the old
+    -- border stayed behind until the mode ended: draw it by hand after every step
+    pcall(function() require("colorful-winsep.view").render() end)
+    vim.cmd("redraw")
+    status()
+  end
+  vim.api.nvim_echo({ { "" } }, false, {})
+end, { desc = "Resize mode (h/j/k/l, = equal, Esc)" })
 -- C-w \ splits side by side, C-w - splits stacked (like tmux: \ side by side, - stacked)
 map("n", "<C-w>\\", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
 map("n", "<C-w>-", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })
