@@ -1183,8 +1183,8 @@ require("lazy").setup({
               block("#b8c7c7", "#1c2828", { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " } }), -- attached server names
               block("#a3b5b5", "#1c2828", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
               block("#8da1a1", "#14201f", { "progress" }),
-              block("#2f4443", "#cbd6d6", { "location" }),
-              block("#14201f", "#cbd6d6", { "filetype", colored = false, fmt = function(s) return s:lower() end }),
+              block("#2f4443", "#e6e6e6", { "location", color = { fg = "#e6e6e6", bg = "#2f4443", gui = "bold" } }),
+              block("#14201f", "#e6e6e6", { "filetype", colored = false, fmt = function(s) return s:lower() end, color = { fg = "#e6e6e6", bg = "#14201f", gui = "bold" } }),
             }
           end)(),
           lualine_y = {}, -- lualine fills these with progress / location unless they are set empty: everything is in x
