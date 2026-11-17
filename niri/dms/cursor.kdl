@@ -4,6 +4,7 @@
 // ! PLACE YOUR CUSTOM CONFIGURATION ELSEWHERE !
 
 cursor {
-    xcursor-theme "Yaru"
-    xcursor-size 30
+    xcursor-theme "macOS"
+    xcursor-size 36
+    hide-when-typing
 }

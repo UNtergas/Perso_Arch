@@ -3,16 +3,16 @@
 // Check the wiki for a full description of the configuration:
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Introduction
 config-notification {
-    disable-failed
+disable-failed
 }
 // Outputs from existing configuration
 /-output "eDP-1" {
-    // Uncomment this line to disable this output.
-    // off
+// Uncomment this line to disable this output.
+// off
 
-    // Resolution and, optionally, refresh rate of the output.
-    // The format is "<width>x<height>" or "<width>x<height>@<refresh rate>".
-    // If the refresh rate is omitted, niri will pick the highest refresh rate
+// Resolution and, optionally, refresh rate of the output.
+// The format is "<width>x<height>" or "<width>x<height>@<refresh rate>".
+// If the refresh rate is omitted, niri will pick the highest refresh rate
     // for the resolution.
     // If the mode is omitted altogether or is invalid, niri will pick one automatically.
     // Run `niri msg outputs` while inside a niri instance to list all outputs and their modes.
@@ -189,6 +189,8 @@ overview {
 // See the binds section below for more spawn examples.
 // This line starts waybar, a commonly used bar for Wayland compositors.
 environment {
+  QT_QPA_PLATFORMTHEME "gtk3"
+  QT_QPA_PLATFORMTHEME_QT6 "gtk3"
   XDG_CURRENT_DESKTOP "niri"
 }
 hotkey-overlay {
@@ -282,6 +284,22 @@ window-rule {
     match app-id=r#"org.quickshell$"#
     open-floating true
 }
+
+// Global opacity
+window-rule {
+    opacity 0.88 // 0.0 is fully transparent, 1.0 is fully opaque
+    background-effect{
+        blur true
+    }
+}
+
+blur {
+    passes 1;
+    offset 2;
+    noise 0;
+    saturation 1.0;
+}
+
 debug {
     honor-xdg-activation-with-invalid-serial
 }
@@ -291,8 +309,8 @@ recent-windows {
     binds {
         Alt+Tab         { next-window scope="workspace"; }
         Alt+Shift+Tab   { previous-window scope="output"; }
-        Alt+grave       { next-window filter="app-id"; }
-        Alt+Shift+grave { previous-window filter="app-id"; }
+        // Alt+grave       { next-window filter="app-id"; }
+        // Alt+Shift+grave { previous-window filter="app-id"; }
     }
 }
  
@@ -307,3 +325,5 @@ include "dms/cursor.kdl"
 
 // Auto start 
 spawn-at-startup "fcitx5"
+
+include "dms/windowrules.kdl"
