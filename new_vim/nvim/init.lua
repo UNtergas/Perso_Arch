@@ -975,15 +975,24 @@ require("lazy").setup({
             end,
             function() return vim.trim(_G.flags_status()) end,
           },
-          lualine_x = {
-            function() local r = vim.fn.reg_recording() return r == "" and "" or "\u{f111} @" .. r end,
-            { "searchcount", maxcount = 999, timeout = 100 },
-            { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " } }, -- attached server names, no spinner
-            { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end, padding = { left = 1, right = 1 } },
-          },
-          lualine_y = { "progress" },
-          -- language: darkest grey, light text, same in every mode
-          lualine_z = { "location", { "filetype", colored = false, separator = { left = "\u{e0b2}" }, padding = { left = 1, right = 1 }, fmt = function(s) return s:lower() end, color = { fg = "#e6e6e6", bg = "#3c3c3c", gui = "bold" } } },
+          -- right side: macro / search keep the bar colour, then one coloured block per item with a left arrow, fading from light to
+          -- dark like the right side of the tmux statusline: lsp > indent > percent > line:col > language
+          lualine_x = (function()
+            local function block(bg, fg, extra)
+              return vim.tbl_extend("force", { separator = { left = "\u{e0b2}" }, padding = { left = 1, right = 1 }, color = { fg = fg, bg = bg } }, extra or {})
+            end
+            return {
+              function() local r = vim.fn.reg_recording() return r == "" and "" or "\u{f111} @" .. r end,
+              { "searchcount", maxcount = 999, timeout = 100 },
+              block("#b8c7c7", "#1c2828", { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " } }), -- attached server names
+              block("#a3b5b5", "#1c2828", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
+              block("#8da1a1", "#14201f", { "progress" }),
+              block("#2f4443", "#cbd6d6", { "location" }),
+              block("#14201f", "#cbd6d6", { "filetype", colored = false, fmt = function(s) return s:lower() end }),
+            }
+          end)(),
+          lualine_y = {}, -- lualine fills these with progress / location unless they are set empty: everything is in x
+          lualine_z = {},
         },
         -- top row: encoding > path > git counts ........ harpoon slots (replaces harpoon_tabline once lualine loads)
         tabline = {
@@ -1394,7 +1403,7 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function(a) vim.b[a.buf].snacks_scroll = false end,
 })
 
--- terminal: toggle a bottom terminal (keeps its shell alive when hidden)
+-- terminal: toggle a bottom terminal, 35% of the screen high (keeps its shell alive when hidden)
 local term = { buf = nil, win = nil }
 local function toggle_term()
   if term.win and vim.api.nvim_win_is_valid(term.win) then
@@ -1403,7 +1412,7 @@ local function toggle_term()
     return
   end
   vim.cmd("botright split")
-  vim.api.nvim_win_set_height(0, math.floor(vim.o.lines / 2))
+  vim.api.nvim_win_set_height(0, math.floor(vim.o.lines * 0.35)) -- 35% of the screen
   term.win = vim.api.nvim_get_current_win()
   if term.buf and vim.api.nvim_buf_is_valid(term.buf) then
     vim.api.nvim_win_set_buf(term.win, term.buf)
