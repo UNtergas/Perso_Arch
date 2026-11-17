@@ -14,7 +14,7 @@ tmux            # or: tmux new -As dev   (attach to "dev", or create it)
 `box.sh` (the top edge and `b`), `pane-col.sh` (`[` / `]`), `which-key.sh` (the `Alt-e` dropdown) `ask-name.sh` (the new-window name dialog, needs `fzf`) and `dialog.sh` (rename, close and command popups) must be in `~/.tmux/`.
 `SETUP_FOR_CLAUDE.md` has the full steps, the checks and the rules for changing the config.
 
-Reload in a running session: `Alt-e r`. A tmux server that is already
+Reload in a running session: `Alt-e R`. A tmux server that is already
 running keeps its old config until you reload or `tmux kill-server`.
 
 ## The prefix is Alt-e (it opens a key dropdown)
@@ -210,7 +210,8 @@ The mouse is on.
 
 | Keys | Does |
 |---|---|
-| `r` | Reload `~/.tmux.conf` |
+| `R` | Reload `~/.tmux.conf` (was `r`; `r` is the resize mode now) |
+| `r` | Resize mode, like i3: `h` `j` `k` `l` resize the active pane in 10% steps, `=` equal sizes, `Esc` / `Enter` / `q` leave (any other key leaves too). The status label shows RESIZE while it is on |
 | `:` | tmux command prompt |
 | `?` | List every key binding (searchable) |
 | `/` then a key | Describe what that key does |
