@@ -1080,6 +1080,7 @@ require("lazy").setup({
         ["Goto Prev"] = "<M-N>",
       }
       vim.g.VM_show_warnings = 0
+      vim.g.VM_set_statusline = 0 -- VM info goes to the winbar instead (lua/saga_breadcrumb.lua); the statusline stays lualine
       vim.cmd([[
         function! VMAddAtEdge(dir) abort
           if exists('b:VM_Selection') && !empty(b:VM_Selection) && has_key(b:VM_Selection, 'Regions')

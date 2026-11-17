@@ -112,6 +112,8 @@ unfolded.
 | `Tab` | VM | Switch between cursor mode and extend mode |
 | `Esc` | VM | Leave VM and clear the cursors |
 
+While VM is on, its info (mode, cursor n / total, search pattern) shows in the winbar in place of the breadcrumb, and the statusline stays as it is. The breadcrumb comes back when VM ends.
+
 The multicursor.nvim setup (Alt-d / `SPC m c` cursor mode, no live typing) is disabled in favour of vim-visual-multi; its config is still in `init.lua`.
 
 ### Harpoon (jump list)
