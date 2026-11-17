@@ -1437,6 +1437,21 @@ end, { desc = "cd to git root" })
 map("n", "<leader>hb", tb("keymaps"), { desc = "Search keybinds" })
 map("n", "<leader>hk", tb("keymaps"), { desc = "Search keybinds" })
 
+-- SPC h r / :Reload: apply config changes without closing. lazy.nvim does not support re-sourcing init.lua, so this saves
+-- everything, writes a session, and restarts nvim (:restart, nvim 0.12+) into that session: same files, windows and
+-- cursor, fresh config. It stops if a buffer cannot be saved or a terminal job is still running (nothing is lost then).
+local function reload_config()
+  local session = vim.fn.stdpath("state") .. "/reload-session.vim"
+  local ok, err = pcall(function()
+    vim.cmd("wall")
+    vim.cmd("mksession! " .. vim.fn.fnameescape(session))
+    vim.cmd("restart source " .. vim.fn.fnameescape(session))
+  end)
+  if not ok then vim.notify("Reload cancelled: " .. tostring(err), vim.log.levels.WARN) end
+end
+map("n", "<leader>hr", reload_config, { desc = "Reload the config (restart, keep the session)" })
+vim.api.nvim_create_user_command("Reload", reload_config, { desc = "Reload the config (restart, keep the session)" })
+
 -- rename through oil also updates imports
 vim.api.nvim_create_autocmd("User", {
   pattern = "OilActionsPost",
@@ -1624,19 +1639,21 @@ vim.api.nvim_create_autocmd("BufModifiedSet", { callback = function() vim.cmd.re
 vim.opt.showtabline = 2
 vim.opt.tabline = "%{%v:lua.harpoon_tabline()%}"
 
--- cowboy: after LIMIT hjkl/arrow/+/- presses within WINDOW ms of the first one (no count), the key is blocked until the window ends.
--- Use w b f t / } instead. A count (5j) resets it; nofile buffers (Oil, pickers) are exempt.
-local LIMIT, WINDOW = 12, 1500
+-- cowboy: after LIMIT hjkl/arrow/+/- presses in a row (each less than GAP ms after the previous one, no count), the key is
+-- blocked. Blocked presses count as activity, so holding a key stays blocked until you let go for GAP ms; there is no
+-- periodic release. Use w b f t / } instead. A count (5j) resets it; nofile buffers (Oil, pickers) are exempt.
+local LIMIT, GAP = 8, 300
 for _, key in ipairs({ "h", "j", "k", "l", "+", "-", "<Left>", "<Down>", "<Up>", "<Right>" }) do
-  local count, timer = 0, assert(vim.uv.new_timer())
+  local count, last = 0, 0
   vim.keymap.set("n", key, function()
-    if vim.v.count > 0 then count = 0 end
+    local now = vim.uv.now()
+    if vim.v.count > 0 or now - last > GAP then count = 0 end
+    last = now
     if count >= LIMIT and vim.bo.buftype ~= "nofile" then
       -- expr maps run under textlock: nvim-notify opens a window, so defer it
       vim.schedule(function() vim.notify("Hold it Cowboy! 🤠", vim.log.levels.WARN, { icon = "🤠", id = "cowboy" }) end)
       return ""
     end
-    if count == 0 then timer:start(WINDOW, 0, function() count = 0 end) end -- fixed window from the first press
     count = count + 1
     return key
   end, { expr = true, silent = true })

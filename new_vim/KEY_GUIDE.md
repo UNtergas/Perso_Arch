@@ -215,6 +215,7 @@ Deleting in Oil sends files to the trash. To get one back: `g\` in the folder it
 |---|---|---|
 | `SPC` (wait) | n | which-key popup |
 | `SPC h b` / `SPC h k` | n | Search all keybinds |
+| `SPC h r` / `:Reload` | n | Reload the config without closing: saves all files, writes a session and restarts nvim into it (same files, windows and cursor, fresh config; lazy.nvim does not support re-sourcing `init.lua`). Needs nvim 0.12+. Cancels with a warning if a buffer cannot be saved or a terminal job is running |
 | `SPC f h` | n | Help tags |
 | `:Lazy` | cmd | Plugin manager |
 | `:Mason` | cmd | Language servers |
