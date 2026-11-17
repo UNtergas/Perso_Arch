@@ -38,6 +38,12 @@ function M.render(win)
   if not api.nvim_win_is_valid(win) then return "" end
   local buf = api.nvim_win_get_buf(win)
   if not eligible(win, buf) then return "" end
+  -- vim-visual-multi is on in this window: show its info (mode, cursor n / total, search patterns) here instead of the
+  -- breadcrumb, so the statusline stays as it is (g:VM_set_statusline = 0). The breadcrumb is back when VM exits.
+  if win == api.nvim_get_current_win() and vim.b[buf].visual_multi then
+    local ok, bar = pcall(vim.fn["vm#themes#statusline"])
+    if ok and bar ~= "" then return bar end
+  end
   local filename = vim.fn.fnamemodify(api.nvim_buf_get_name(buf), ":t")
   local icon = require("nvim-web-devicons").get_icon(filename, nil, { default = true }) or ""
   local parts = { "%#SagaFileName#" .. icon .. " " .. escape(filename) .. "%*" }
@@ -95,6 +101,13 @@ function M.setup()
     end,
   })
   api.nvim_create_autocmd("BufWipeout", { group = group, callback = function(ev) ticks[ev.buf] = nil end })
+  -- redraw the bar when VM starts / ends and while it is on (cursor moves, mode changes, typing), so its info stays current
+  api.nvim_create_autocmd("User", {
+    group = group, pattern = { "visual_multi_start", "visual_multi_exit" }, callback = function() vim.cmd("redrawstatus") end,
+  })
+  api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "ModeChanged", "TextChangedI" }, {
+    group = group, callback = function() if vim.b.visual_multi then vim.cmd("redrawstatus") end end,
+  })
   M.install()
 end
 return M
