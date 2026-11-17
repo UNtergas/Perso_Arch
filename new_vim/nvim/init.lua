@@ -480,9 +480,11 @@ require("lazy").setup({
         mappings = {
           i = {
             ["<C-t>"] = false,
+            ["<M-q>"] = "close", -- default is "send to quickfix and open it"; C-q still does that
           },
           n = {
             ["<C-t>"] = false,
+            ["<M-q>"] = "close",
           },
         },
       },
