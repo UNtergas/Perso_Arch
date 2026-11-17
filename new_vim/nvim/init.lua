@@ -1257,11 +1257,31 @@ map(ck, "<C-k><Left>", "<C-w>H", { desc = "Move window left" })
 map(ck, "<C-k><Down>", "<C-w>J", { desc = "Move window down" })
 map(ck, "<C-k><Up>", "<C-w>K", { desc = "Move window up" })
 map(ck, "<C-k><Right>", "<C-w>L", { desc = "Move window right" })
--- C-k h/j/k/l resize the window (what C-w < > - + did): h narrower, l wider, j shorter, k taller
-map(ck, "<C-k>h", "<C-w>2<", { desc = "Window narrower" })
-map(ck, "<C-k>l", "<C-w>2>", { desc = "Window wider" })
-map(ck, "<C-k>j", "<C-w>2-", { desc = "Window shorter" })
-map(ck, "<C-k>k", "<C-w>2+", { desc = "Window taller" })
+-- C-k h/j/k/l resize the window: h narrower, l wider, j shorter, k taller. One step is 10% of the screen (columns for h / l, rows
+-- for j / k), so from an even split the sizes land on 50, 40, 30, 20 %. C-k = equalises every window, and again puts the
+-- previous sizes back (the saved sizes are dropped when the number of windows changes).
+local function resize_step(dir)
+  local dw = math.max(1, math.floor(vim.o.columns * 0.10 + 0.5))
+  local dh = math.max(1, math.floor((vim.o.lines - vim.o.cmdheight) * 0.10 + 0.5))
+  if dir == "h" then vim.cmd("vertical resize -" .. dw)
+  elseif dir == "l" then vim.cmd("vertical resize +" .. dw)
+  elseif dir == "j" then vim.cmd("resize -" .. dh)
+  else vim.cmd("resize +" .. dh) end
+end
+map(ck, "<C-k>h", function() resize_step("h") end, { desc = "Window narrower (10%)" })
+map(ck, "<C-k>l", function() resize_step("l") end, { desc = "Window wider (10%)" })
+map(ck, "<C-k>j", function() resize_step("j") end, { desc = "Window shorter (10%)" })
+map(ck, "<C-k>k", function() resize_step("k") end, { desc = "Window taller (10%)" })
+map(ck, "<C-k>=", function()
+  local saved = vim.t.equal_saved
+  if saved and saved.n == #vim.api.nvim_tabpage_list_wins(0) then
+    vim.cmd(saved.cmd)
+    vim.t.equal_saved = nil
+  else
+    vim.t.equal_saved = { n = #vim.api.nvim_tabpage_list_wins(0), cmd = vim.fn.winrestcmd() }
+    vim.cmd("wincmd =")
+  end
+end, { desc = "Equal window sizes (again: back to the previous sizes)" })
 -- C-w \ splits side by side, C-w - splits stacked (like tmux: \ side by side, - stacked)
 map("n", "<C-w>\\", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
 map("n", "<C-w>-", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })

@@ -62,7 +62,8 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | Key | Mode | Does |
 |---|---|---|
 | `C-k <arrow>` | n v | Move the window to the far left/bottom/top/right |
-| `C-k h/j/k/l` | n v | Nothing (disabled on purpose) |
+| `C-k h/j/k/l` | n v | Resize the window: narrower / shorter / taller / wider, in steps of 10% of the screen (columns for `h` `l`, rows for `j` `k`), so from an even split the sizes land on 50, 40, 30, 20 % |
+| `C-k =` | n v | Equal window sizes; press again to put the previous sizes back (forgotten when the number of windows changes) |
 | `C-k -` | n v | Split stacked (new window below) |
 | `C-k \` | n v | Split side by side (new window to the right) |
 | `C-M-<arrows>` | n | Focus window in that direction |
