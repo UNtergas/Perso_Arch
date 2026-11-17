@@ -872,6 +872,11 @@ require("lazy").setup({
       -- ysw = ysiw, ysW = ysiW (the plain "w" motion only wrapped from the cursor to the next word, rarely wanted)
       vim.keymap.set("n", "ysw", "ysiw", { remap = true, desc = "Surround word" })
       vim.keymap.set("n", "ysW", "ysiW", { remap = true, desc = "Surround WORD" })
+      -- same idea for paragraphs and brackets: ysp = ysip, ys( = ysi(, ys{ = ysi{, ys[ = ysi[, ys< = ysi<
+      -- (yst is NOT remapped: "t{char}" is a motion, ysta, would stop working)
+      for _, k in ipairs({ "p", "(", "{", "[", "<" }) do
+        vim.keymap.set("n", "ys" .. k, "ysi" .. k, { remap = true, desc = "Surround inside " .. k })
+      end
     end,
   },
   {
