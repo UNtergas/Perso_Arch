@@ -113,7 +113,7 @@ A dot after a window name means something happened there while you were not look
 
 ### Notification list (the bell)
 
-The bell at the right of the status line keeps every notification. It is dim when you have read everything and orange with a count when something is new. `Alt-e g`, or a click on the bell, opens a list under the status bar, newest first: a coloured dot (same colours as the tab dots), how long ago, the text and `session:window`. The count only holds what you have not looked at: visiting a window (or returning to the terminal on it) removes that window's notifications from the count, and opening the list marks all as read. Read notifications stay in the list.
+The bell at the right of the status line keeps every notification. It is white when you have read everything and orange with a count when something is new. `Alt-e g`, or a click on the bell, opens a list under the status bar, newest first: a coloured dot (same colours as the tab dots), how long ago, the text and `session:window`. The count only holds what you have not looked at: visiting a window (or returning to the terminal on it) removes that window's notifications from the count, and opening the list marks all as read. Read notifications stay in the list.
 
 | Key | Does |
 |---|---|
