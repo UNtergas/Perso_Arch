@@ -1065,13 +1065,91 @@ require("lazy").setup({
     cmd = "ConformInfo",
     opts = { formatters_by_ft = { python = { "black" }, rust = { "rustfmt" } } },
   },
+  { -- multiple cursors, live in insert mode (the typing shows at every cursor as you type). Replaces multicursor.nvim below.
+    "mg979/vim-visual-multi",
+    branch = "master",
+    init = function()
+      -- keep VM's own keys, and add the ones from before: Ctrl-d selects the word, again for the next match. Ctrl-Shift-Down / Up
+      -- add a cursor below the bottom-most / above the top-most cursor, so the set keeps growing both ways (VM's own
+      -- "add cursor" works from the cursor you are on, so Up after Down went nowhere): select the edge region first, then add.
+      -- VM maps [ and ] (go to previous / next cursor), which clash with maps in this config: they live on Alt-N / Alt-n.
+      vim.g.VM_maps = {
+        ["Find Under"] = "<C-d>",
+        ["Find Subword Under"] = "<C-d>",
+        ["Goto Next"] = "<M-n>",
+        ["Goto Prev"] = "<M-N>",
+      }
+      vim.g.VM_show_warnings = 0
+      vim.cmd([[
+        function! VMAddAtEdge(dir) abort
+          if exists('b:VM_Selection') && !empty(b:VM_Selection) && has_key(b:VM_Selection, 'Regions')
+            let n = len(b:VM_Selection.Regions)
+            if n > 0
+              call b:VM_Selection.Global.select_region(a:dir > 0 ? n - 1 : 0)
+            endif
+          endif
+          if a:dir > 0
+            call vm#commands#add_cursor_down(0, 1)
+          else
+            call vm#commands#add_cursor_up(0, 1)
+          endif
+        endfunction
+        nnoremap <silent> <C-S-Down> :<C-u>call VMAddAtEdge(1)<CR>
+        nnoremap <silent> <C-S-Up> :<C-u>call VMAddAtEdge(-1)<CR>
+      ]])
+    end,
+  },
   {
     "jake-stewart/multicursor.nvim",
+    enabled = false, -- replaced by vim-visual-multi (live insert); the config is kept in case we go back
     branch = "1.0",
     event = "VeryLazy",
     config = function()
       local mc = require("multicursor-nvim")
       mc.setup()
+      -- ctrl+shift+down / up: add a cursor, like VS Code. Down adds one below the bottom-most cursor, up above the top-most one, so
+      -- the set keeps growing both ways (the plugin's own lineAddCursor works from the main cursor, which is the last one
+      -- added, so "up" after "down" went nowhere). Then i / a / A / c... act at every cursor.
+      local function at_edge(direction, fn)
+        mc.action(function(ctx)
+          local edge = direction == 1 and ctx:lastCursor() or ctx:firstCursor()
+          if edge then edge:select() end
+        end)
+        fn(direction)
+      end
+      local function add_cursor(direction) at_edge(direction, mc.lineAddCursor) end
+      local function skip_cursor(direction) at_edge(direction, mc.lineSkipCursor) end
+      vim.keymap.set({ "n", "x" }, "<C-S-Down>", function() add_cursor(1) end, { desc = "Add cursor below the last one" })
+      vim.keymap.set({ "n", "x" }, "<C-S-Up>", function() add_cursor(-1) end, { desc = "Add cursor above the first one" })
+      -- Alt-d or SPC m c: cursor mode. While it is on, j / k add a cursor on the line below / above, and J / K move down / up without
+      -- adding one (skip a line). Any other key ends the mode and does its normal job, so after the last j just press c, A, i... to
+      -- edit at every cursor; SPC m c again ends it quietly; Esc ends it and clears the cursors (the plugin's own Esc).
+      -- The mode is a set of buffer-local maps (they win over your global j / k), removed when it ends.
+      local mode = { on = false, buf = nil, ns = vim.api.nvim_create_namespace("cursor_mode") }
+      local mode_keys = { j = true, k = true, J = true, K = true }
+      local function leave_mode()
+        if not mode.on then return end
+        mode.on = false
+        vim.on_key(nil, mode.ns)
+        for _, k in ipairs({ "j", "k", "J", "K" }) do pcall(vim.keymap.del, { "n", "x" }, k, { buffer = mode.buf }) end
+        vim.api.nvim_echo({ { "" } }, false, {})
+      end
+      local function toggle_cursor_mode()
+        if mode.on then return leave_mode() end
+        mode.on, mode.buf = true, vim.api.nvim_get_current_buf()
+        local o = { buffer = mode.buf, nowait = true, silent = true }
+        local function m(k, fn) vim.keymap.set({ "n", "x" }, k, fn, o) end
+        m("j", function() add_cursor(1) end)
+        m("k", function() add_cursor(-1) end)
+        m("J", function() skip_cursor(1) end)
+        m("K", function() skip_cursor(-1) end)
+        vim.on_key(function(_, typed)
+          if typed ~= "" and not mode_keys[typed] then leave_mode() end
+        end, mode.ns)
+        vim.api.nvim_echo({ { "-- CURSORS --  j/k add   J/K skip   any other key ends", "ModeMsg" } }, false, {})
+      end
+      vim.keymap.set("n", "<leader>mc", toggle_cursor_mode, { desc = "Cursor mode (j/k add cursors)" })
+      vim.keymap.set("n", "<M-d>", toggle_cursor_mode, { desc = "Cursor mode (j/k add cursors)" }) -- alt+d pairs with ctrl+d (select word / next match)
       -- like VS Code: first press only selects the word under the cursor, then each press adds the next match
       vim.keymap.set("n", "<C-d>", "viw", { desc = "Select word under cursor" })
       vim.keymap.set("x", "<C-d>", function() mc.matchAddCursor(1) end, { desc = "Add next match cursor" })

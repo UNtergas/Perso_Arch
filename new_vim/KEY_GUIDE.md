@@ -104,9 +104,15 @@ unfolded.
 
 | Key | Mode | Does |
 |---|---|---|
-| `C-d` | n | Select the whole word under the cursor (nothing else yet) |
-| `C-d` | v | Add a cursor on the next match of the selection (press again for each further match) |
-| `Esc` | with cursors | Disable cursors, `Esc` again clears them |
+| `C-d` | n | Start vim-visual-multi on the word under the cursor; press again for each next match. Typing shows at every cursor live, as you type |
+| `C-S-Down` / `C-S-Up` | n | Add a cursor below the bottom-most / above the top-most cursor, like VS Code: the set keeps growing both ways |
+| `i` `a` `A` `c`... | VM | Act at every cursor, live. In VM's extend mode (words selected) `c` changes every selection |
+| `n` / `N`, `q`, `Q` | VM | Next / previous match, skip the current match, remove the current cursor |
+| `Alt-n` / `Alt-N` | VM | Jump to the next / previous cursor (VM's `]` / `[`, moved because those clash with other maps here) |
+| `Tab` | VM | Switch between cursor mode and extend mode |
+| `Esc` | VM | Leave VM and clear the cursors |
+
+The multicursor.nvim setup (Alt-d / `SPC m c` cursor mode, no live typing) is disabled in favour of vim-visual-multi; its config is still in `init.lua`.
 
 ### Harpoon (jump list)
 
