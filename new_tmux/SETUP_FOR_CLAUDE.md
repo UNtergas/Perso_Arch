@@ -76,7 +76,7 @@ An old default server can be replaced after the user has finished and exited all
   `pane-border-style` / `pane-active-border-style`. The numbers are the pane indexes (`pane-base-index 1`), the same ones
   `Alt-e 1..9` and `Alt-e q` use.
 - **Divider arrow**: `pane-border-indicators` is a window option. It is `colour` globally (half-dark divider for 2 panes); hooks on `window-layout-changed` and `after-new-window` set it to `both` (adds the arrow, drawn by tmux one cell in from the start of the divider, not in the middle; it takes the style of the half it sits on, so it is light when the active pane is the bottom or right one; not configurable, the user chose to leave it) when `#{window_panes}` is 2, and back to `colour` otherwise, because tmux would also draw arrows with 3+ panes. Windows that already had 2 panes before a reload keep `colour` until their layout changes.
-- **Borders**: heavy lines, active `#4a6a6a`, inactive `#dde5e5`. nvim and kvim use the same teal for the active window.
+- **Borders**: heavy lines, active `#4a6a6a`, inactive `#f0f4f4` (the inactive number label is `#f4f7f7` with `#7a8a8a` text). nvim and kvim use the same teal for the active window.
 - **Statusline**: left = OS icon + user, mode label (grey `NORMAL`, yellow `PREFIX`, blue `COPY`, grey `ZOOM`),
   pane n/total, running command. Right (`status-justify right` puts the window tabs there) = tabs, time, then
   `<name>` with an icon on the same dark colour as the user. The key hints are in the `Alt-e` dropdown.
