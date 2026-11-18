@@ -671,7 +671,7 @@ require("lazy").setup({
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       ui = { border = "rounded" },
-      symbol_in_winbar = { enable = true, show_file = true, folder_level = 0 },
+      symbol_in_winbar = { enable = false }, -- the winbar is lua/saga_breadcrumb.lua: path, unsaved dot, git counts, harpoon
       lightbulb = { enable = false }, -- keep git signs and avoid unsolicited action requests
       hover = { max_width = 0.7, max_height = 0.6 },
       rename = { auto_save = false, keys = { quit = "<C-c>" } },
@@ -853,8 +853,8 @@ require("lazy").setup({
         { "<leader>hd", function() h():list():remove(); vim.cmd.redrawstatus() end, desc = "Harpoon: remove current file" },
         { "<leader>hh", function() h().ui:toggle_quick_menu(h():list()) end, desc = "Harpoon: list" },
       }
-      for i = 1, 4 do
-        table.insert(keys, { "<leader>" .. i, function() h():list():select(i) end, desc = "Harpoon: file " .. i })
+      for i = 1, 9 do
+        table.insert(keys, { "<leader>h" .. i, function() h():list():select(i) end, desc = "Harpoon: file " .. i })
       end
       return keys
     end)(),
@@ -1137,9 +1137,13 @@ require("lazy").setup({
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command", "inactive" }) do
         if theme[m] and theme[m].b then theme[m].b = { fg = "#222222", bg = "#b8b8b8" } end
       end
-      -- normal mode: a > b > c fade from darkest to lightest (c stays the theme's #cbd6d6)
+      -- normal mode: a > b > c fade from darkest to lightest (c is the tab row colour, see below)
       theme.normal.a = { fg = "#14201f", bg = "#8da1a1", gui = "bold" }
       theme.normal.b = { fg = "#1c2828", bg = "#adbcbc" }
+      -- the lightest part of the statusline (section c: diagnostics) is the same colour as the tab row (#e2eeee)
+      for _, m in ipairs({ "normal", "insert", "visual", "replace", "command" }) do
+        theme[m].c = { fg = theme[m].c and theme[m].c.fg or "#222222", bg = "#e2eeee" }
+      end
       -- right side mirrors the left: y (percent) = b shade, z (line:col) = a (project) colour, so it fades c > b > a > language
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command" }) do
         theme[m].y = theme.normal.b
@@ -1182,7 +1186,7 @@ require("lazy").setup({
             function() return vim.trim(_G.flags_status()) end,
           },
           -- right side: macro / search keep the bar colour, then one coloured block per item with a left arrow, fading from light to
-          -- dark like the right side of the tmux statusline: lsp > indent > percent > line:col > language
+          -- dark like the right side of the tmux statusline: lsp (plain) > encoding > indent > percent > line:col > language
           lualine_x = (function()
             local function block(bg, fg, extra)
               return vim.tbl_extend("force", { separator = { left = "\u{e0b2}" }, padding = { left = 1, right = 1 }, color = { fg = fg, bg = bg } }, extra or {})
@@ -1190,7 +1194,8 @@ require("lazy").setup({
             return {
               function() local r = vim.fn.reg_recording() return r == "" and "" or "\u{f111} @" .. r end,
               { "searchcount", maxcount = 999, timeout = 100 },
-              block("#b8c7c7", "#1c2828", { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " } }), -- attached server names
+              { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " }, padding = { left = 1, right = 1 } }, -- attached server names, plain on the bar colour
+              block("#b8c7c7", "#1c2828", { "encoding" }), -- utf-8 takes the colour the lsp block had
               block("#a3b5b5", "#1c2828", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
               block("#8da1a1", "#14201f", { "progress" }),
               block("#2f4443", "#e6e6e6", { "location", color = { fg = "#e6e6e6", bg = "#2f4443", gui = "bold" } }),
@@ -1199,83 +1204,6 @@ require("lazy").setup({
           end)(),
           lualine_y = {}, -- lualine fills these with progress / location unless they are set empty: everything is in x
           lualine_z = {},
-        },
-        -- top row: encoding > path > git counts ........ harpoon slots (replaces harpoon_tabline once lualine loads)
-        tabline = {
-          lualine_a = {
-            -- kvim only: Kotlin icon, always first. Its colour is the LSP state:
-            --   grey = no Kotlin server attached to this buffer, amber = attached but busy (importing Gradle / indexing),
-            --   purple = attached and idle (ready)
-            {
-              function() return "\u{e634}" end,
-              separator = "",
-              color = function()
-                local clients = vim.lsp.get_clients({ bufnr = 0, name = "kotlin_language_server" })
-                if #clients == 0 then return { fg = "#8a8a8a" } end
-                if vim.lsp.status() ~= "" then return { fg = "#d98c00" } end
-                return { fg = "#7f52ff" }
-              end,
-            },
-            "encoding",
-          },
-          lualine_b = {
-            {
-              function()
-                local name = vim.api.nvim_buf_get_name(0)
-                local label = _G.githist_label(name)
-                local path = label
-                if not path then
-                  local real = name ~= "" and vim.bo.buftype == "" and vim.bo.filetype ~= "oil"
-                  path = real and vim.fn.fnamemodify(name, ":~:.") or ""
-                end
-                if path == "" then return "" end
-                local max = math.max(20, vim.o.columns - 70) -- cut a too-long path from its left end
-                if vim.fn.strdisplaywidth(path) > max then path = "\u{2026}" .. vim.fn.strcharpart(path, vim.fn.strchars(path) - max + 1) end
-                return path .. (vim.bo.modified and " \u{f444}" or "") -- dark blue dot: unsaved changes
-              end,
-              color = function() return vim.bo.modified and { fg = "#1f4e9c" } or nil end,
-            },
-          },
-          lualine_c = {
-            {
-              "diff", -- from gitsigns (b:gitsigns_status_dict)
-              symbols = { added = "\u{f0fe} ", modified = "\u{f14b} ", removed = "\u{f146} " },
-              diff_color = {
-                added = function() return { fg = _G.hl_hex("Added") } end,
-                modified = function() return { fg = "#a57c00" } end,
-                removed = function() return { fg = _G.hl_hex("Removed") } end,
-              },
-            },
-          },
-          lualine_x = (function()
-            -- harpoon: [󰀱] then one slot each, the current file's slot highlighted (SPC 1-4 jump, SPC h h lists)
-            local parts = {
-              {
-                function()
-                  local ok, harpoon = pcall(require, "harpoon")
-                  return ok and #harpoon:list().items > 0 and "[\u{f0031}]" or ""
-                end,
-                separator = "",
-              },
-            }
-            for i = 1, 9 do
-              table.insert(parts, {
-                function()
-                  local ok, harpoon = pcall(require, "harpoon")
-                  return ok and harpoon:list().items[i] and "[" .. i .. "]" or ""
-                end,
-                separator = "",
-                padding = { left = 1, right = 0 },
-                color = function()
-                  local ok, harpoon = pcall(require, "harpoon")
-                  local item = ok and harpoon:list().items[i]
-                  if item and item.value == vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.") then return "TabLineSel" end
-                  return "TabLine"
-                end,
-              })
-            end
-            return parts
-          end)(),
         },
         inactive_sections = { lualine_c = { "filename" }, lualine_x = { "location" } },
       })
@@ -1671,6 +1599,12 @@ map("n", "<leader>sw", function()
 end, { desc = "Search word under cursor (whole word)" })
 map("n", "<leader>su", "<cmd>UndotreeToggle<cr>", { desc = "Undo tree" })
 map("n", "<leader>bb", function() require("buffer_manager.ui").toggle_quick_menu() end, { desc = "Switch buffer" })
+for i = 1, 9 do
+  map("n", "<leader>" .. i, function() require("buffer_manager.ui").nav_file(i) end, { desc = "Tab " .. i })
+end
+-- SPC [ / SPC ]: scroll the tab bar to the hidden tabs on the left / right without changing buffer
+map("n", "<leader>[", function() _G.buffer_tab_scroll(-3) end, { desc = "Scroll tabs left" })
+map("n", "<leader>]", function() _G.buffer_tab_scroll(3) end, { desc = "Scroll tabs right" })
 map("n", "<leader>bS", "<cmd>wall<cr>", { desc = "Save all buffers" })
 map("n", "<leader>fR", function() Snacks.rename.rename_file() end, { desc = "Rename file (updates imports)" })
 map({ "n", "v" }, "<leader>cf", function()
@@ -2038,8 +1972,8 @@ diff_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = diff_colors })
 -- lines added / changed / removed in the current buffer (from gitsigns), each with an icon
 -- (plus / pencil / minus square) and colored; zeros are left out
-function _G.diff_status()
-  local d = vim.b.gitsigns_status_dict
+function _G.diff_status(buf)
+  local d = vim.b[buf or 0].gitsigns_status_dict
   if not d then return "" end
   local out = ""
   for _, x in ipairs({
@@ -2073,33 +2007,101 @@ vim.api.nvim_create_autocmd("User", {
 })
 vim.opt.statusline = "%{%v:lua.project_name()%}%{%v:lua.git_status()%}%{%v:lua.name_status()%}%{%v:lua.flags_status()%} %#NonText#•%* %{%v:lua.diag_status()%}%#NonText#•%*%=%{%v:lua.macro_status()%}%{v:lua.search_status()}%l:%c %P%{%v:lua.lang_status()%}"
 
--- top line (own row): the current file's path as plain text on the left, compact harpoon slots on the
--- right (just the numbers, current file highlighted; SPC 1-4 jump, SPC h h lists the names).
--- %< cuts a too-long path from its left end, so the slots never get pushed around.
--- The row under it is Lspsaga's symbol breadcrumb.
-function _G.harpoon_tabline()
-  local name = vim.api.nvim_buf_get_name(0)
-  local current = vim.fn.fnamemodify(name, ":.")
-  local parts = { "%#TabLineFill# [󰀱]" } -- then one bracketed slot each: [󰀱] [1] [2]
-  local ok, harpoon = pcall(require, "harpoon")
-  if ok then
-    for i, item in ipairs(harpoon:list().items) do
-      table.insert(parts, "%#TabLineFill# " .. (item.value == current and "%#TabLineSel#" or "%#TabLine#") .. "[" .. i .. "]")
+-- Top row (tabline): the open buffers as tabs, like VSCode, in the Buffer manager's order (SPC b b to reorder by hand).
+-- SPC 1-9 jump to the Nth tab. The file path, unsaved dot and git counts are in each window's winbar (lua/saga_breadcrumb.lua).
+local function tab_colors()
+  local fill = vim.api.nvim_get_hl(0, { name = "TabLineFill", link = false })
+  local bg = fill.bg or 0xe2eeee
+  vim.api.nvim_set_hl(0, "BufTab", { fg = 0x6a6a6a, bg = bg })
+  vim.api.nvim_set_hl(0, "BufTabMod", { fg = 0x1f4e9c, bg = bg })
+  vim.api.nvim_set_hl(0, "BufTabSel", { fg = 0x1d2b2a, bg = 0xfafafa, bold = true })
+  vim.api.nvim_set_hl(0, "BufTabSelMod", { fg = 0x1f4e9c, bg = 0xfafafa, bold = true })
+  vim.api.nvim_set_hl(0, "BufTabFill", { fg = 0x6a6a6a, bg = bg })
+  local err = vim.api.nvim_get_hl(0, { name = "DiagnosticError", link = false }).fg or 0xb3261e
+  vim.api.nvim_set_hl(0, "BufTabErr", { fg = err, bg = bg })
+  vim.api.nvim_set_hl(0, "BufTabSelErr", { fg = err, bg = 0xfafafa, bold = true })
+end
+tab_colors()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = tab_colors })
+function _G.buffer_tab_click(n) pcall(function() require("buffer_manager.ui").nav_file(n) end) end
+-- scroll the bar by d tabs without changing buffer; any buffer switch goes back to following the current tab
+function _G.buffer_tab_scroll(d)
+  _G.tab_first = math.max(1, math.min((_G.tab_first or _G.tab_lo or 1) + d, math.max(1, _G.tab_count or 1)))
+  vim.cmd.redrawtabline()
+end
+function _G.buffer_tab_arrow(n) _G.buffer_tab_scroll(n == 1 and -3 or 3) end
+vim.api.nvim_create_autocmd("BufEnter", { callback = function() _G.tab_first = nil end })
+function _G.buffer_tabline()
+  local ok, ui = pcall(require, "buffer_manager.ui")
+  if not ok then return "" end
+  pcall(ui.update_marks)
+  local marks = require("buffer_manager").marks
+  local cur = vim.api.nvim_get_current_buf()
+  local seen = {}
+  for _, m in ipairs(marks) do
+    local t = vim.fn.fnamemodify(m.buf_name, ":t")
+    seen[t] = (seen[t] or 0) + 1
+  end
+  local items, curi = {}, 1
+  for i, m in ipairs(marks) do
+    local t = vim.fn.fnamemodify(m.buf_name, ":t")
+    if seen[t] > 1 then t = vim.fn.fnamemodify(m.buf_name, ":h:t") .. "/" .. t end -- two tabs with one name: add the folder
+    local active = m.buf_id == cur
+    if active then curi = i end
+    local mod = vim.api.nvim_buf_is_valid(m.buf_id) and vim.bo[m.buf_id].modified
+    local errs = vim.api.nvim_buf_is_valid(m.buf_id) and vim.diagnostic.count(m.buf_id, { severity = vim.diagnostic.severity.ERROR })[vim.diagnostic.severity.ERROR] or 0
+    local plain = " " .. i .. " " .. t .. (errs > 0 and " \u{f057} " .. errs or "") .. (mod and " \u{f444}" or "") .. " "
+    items[i] = { i = i, name = t:gsub("%%", "%%%%"), active = active, mod = mod, errs = errs, w = vim.fn.strdisplaywidth(plain) }
+  end
+  -- the logo block comes first: white Kotlin logo on purple (nvim has the Linux logo on dark red). The background shows the
+  -- LSP state: grey = no Kotlin server attached to this buffer, amber = attached but busy (importing Gradle / indexing),
+  -- dark purple = attached and idle (ready)
+  local logo = "\u{e634}"
+  local kt = 0x8a8a8a
+  if #vim.lsp.get_clients({ bufnr = 0, name = "kotlin_language_server" }) > 0 then
+    kt = vim.lsp.status() ~= "" and 0xd98c00 or 0x4b2e95
+  end
+  vim.api.nvim_set_hl(0, "BufTabLogo", { fg = 0xffffff, bg = kt })
+  local function arrow(active)
+    local fill = vim.api.nvim_get_hl(0, { name = "BufTabFill", link = false }).bg
+    local lg = vim.api.nvim_get_hl(0, { name = "BufTabLogo", link = false })
+    vim.api.nvim_set_hl(0, "BufTabLogoArrow", { fg = lg.bg, bg = active and 0xfafafa or fill })
+    return "%#BufTabLogo# " .. logo .. " %#BufTabLogoArrow#\u{e0b0}%#BufTabFill#"
+  end
+  if #items == 0 then return arrow(false) .. "%=" end -- no tab yet (a new project on Oil): the logo is still there
+  -- too many tabs for the width: keep the current one and as many neighbours as fit, with < > at the cut ends
+  local lo, hi, used = curi, curi, items[curi] and items[curi].w or 0
+  local avail = vim.o.columns - 8
+  if _G.tab_first then
+    -- scrolled by hand (SPC [ / ], or a click on ‹ ›): start at that tab and fill to the right; switching buffer follows again
+    lo = math.max(1, math.min(_G.tab_first, #items))
+    hi, used = lo, items[lo].w
+    while items[hi + 1] and used + items[hi + 1].w <= avail do hi, used = hi + 1, used + items[hi + 1].w end
+  else
+    local grew = true
+    while grew do
+      grew = false
+      if items[hi + 1] and used + items[hi + 1].w <= avail then hi, used, grew = hi + 1, used + items[hi + 1].w, true end
+      if items[lo - 1] and used + items[lo - 1].w <= avail then lo, used, grew = lo - 1, used + items[lo - 1].w, true end
     end
   end
-  local real = name ~= "" and vim.bo.buftype == "" and vim.bo.filetype ~= "oil"
-  local path = real and vim.fn.fnamemodify(name, ":~:."):gsub("%%", "%%%%") or ""
-  local label = _G.githist_label(name)
-  if label then path = label:gsub("%%", "%%%%") end
-  -- git diff counts of this file (+added ~changed -removed) sit right after the path
-  -- unsaved changes: path and a small dot turn dark blue (like VSCode's dot)
-  local mod = vim.bo.modified
-  local left = path == "" and "" or " %<" .. (mod and "%#TabModified#" or "") .. path .. (mod and " \u{f444}" or "") .. "%#TabLineFill#" .. _G.diff_status() .. "%#TabLineFill#"
-  return "%#TabLineFill#" .. left .. "%=" .. table.concat(parts) .. "%#TabLineFill# "
+  _G.tab_lo, _G.tab_count = lo, #items
+  local out = { arrow(items[lo].active) .. (lo > 1 and "%1@v:lua.buffer_tab_arrow@ \u{2039}%X" or "") }
+  for i = lo, hi do
+    local it = items[i]
+    local base = it.active and "%#BufTabSel#" or "%#BufTab#"
+    local dot = it.mod and ((it.active and "%#BufTabSelMod#" or "%#BufTabMod#") .. " \u{f444}") or ""
+    local err = it.errs > 0 and ((it.active and "%#BufTabSelErr#" or "%#BufTabErr#") .. " \u{f057} " .. it.errs) or "" -- errors in this buffer
+    out[#out + 1] = "%" .. it.i .. "@v:lua.buffer_tab_click@" .. base .. " " .. it.i .. " " .. it.name .. err .. dot .. base .. " %X"
+  end
+  out[#out + 1] = "%#BufTabFill#" .. (hi < #items and "%2@v:lua.buffer_tab_arrow@ \u{203a}%X" or "") .. "%="
+  return table.concat(out)
 end
-vim.api.nvim_create_autocmd("BufModifiedSet", { callback = function() vim.cmd.redrawtabline() end })
+vim.api.nvim_create_autocmd({ "BufEnter", "BufAdd", "BufDelete", "BufWipeout", "BufModifiedSet", "BufFilePost", "VimResized", "DiagnosticChanged" }, {
+  callback = function() vim.schedule(function() vim.cmd.redrawtabline() end) end,
+})
 vim.opt.showtabline = 2
-vim.opt.tabline = "%{%v:lua.harpoon_tabline()%}"
+vim.opt.tabline = "%{%v:lua.buffer_tabline()%}"
 
 -- cowboy: after LIMIT hjkl/arrow/+/- presses in a row (each less than GAP ms after the previous one, no count), the key is
 -- blocked. Blocked presses count as activity, so holding a key stays blocked until you let go for GAP ms; there is no

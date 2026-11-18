@@ -1,67 +1,60 @@
--- Keep Lspsaga's symbols and styling, but render for each window's actual buffer and cursor.
+-- The winbar of every file window: icon, path, unsaved dot and the file's own git counts on the left; on the focused
+-- window the harpoon slots on the right. (The name is historic: it used to be Lspsaga's symbol breadcrumb, now gone.)
+-- While vim-visual-multi is on in the window, VM's info (mode, cursor n / total, patterns) takes the bar instead.
+-- It still replaces Lspsaga's winbar functions so Lspsaga never writes its own.
 local M = {}
 local api = vim.api
 local expression = "%!v:lua.saga_breadcrumb()"
-local ticks = {}
-
-local function contains(range, row, col)
-  local first, last = range.start, range["end"]
-  return (row > first.line or row == first.line and col >= first.character)
-    and (row < last.line or row == last.line and col < last.character)
-end
-
--- Servers may return unsorted siblings. Compare complete ranges, including columns and exclusive ends.
-function M.path(symbols, row, col, uri)
-  local best, best_span = {}, math.huge
-  for _, node in ipairs(symbols or {}) do
-    local range = node.range or node.location and node.location.range
-    if range and (not node.location or not node.location.uri or node.location.uri == uri)
-      and contains(range, row, col) then
-      local path = { node }
-      vim.list_extend(path, M.path(node.children, row, col, uri))
-      local span = (range["end"].line - range.start.line) * 1000000
-        + range["end"].character - range.start.character
-      if #path > #best or #path == #best and span < best_span then best, best_span = path, span end
-    end
-  end
-  return best
-end
 
 local function eligible(win, buf)
-  return api.nvim_win_get_config(win).relative == "" and vim.bo[buf].buftype == ""
-    and vim.bo[buf].filetype ~= "oil" and api.nvim_buf_get_name(buf) ~= ""
+  if api.nvim_win_get_config(win).relative ~= "" then return false end
+  local name = api.nvim_buf_get_name(buf)
+  if name == "" then return false end
+  if vim.bo[buf].buftype == "" then return vim.bo[buf].filetype ~= "oil" end
+  return _G.githist_label ~= nil and _G.githist_label(name) ~= nil -- old file versions (githist://)
 end
 local function escape(s) return s:gsub("%%", "%%%%"):gsub("[\r\n]", " ") end
+
+local function colors()
+  local bar = api.nvim_get_hl(0, { name = "WinBar", link = false })
+  local bg = bar.bg or 0xfafafa
+  api.nvim_set_hl(0, "HarpSlot", { fg = 0x6a6a6a, bg = bg })
+  api.nvim_set_hl(0, "HarpSlotSel", { fg = 0x1d2b2a, bg = bg, bold = true, underline = true })
+  api.nvim_set_hl(0, "BarModified", { fg = 0x1f4e9c, bg = bg })
+  api.nvim_set_hl(0, "BarPath", { link = "Comment" }) -- the path takes the theme's comment colour
+end
+
+local function harpoon_slots(buf)
+  local ok, harpoon = pcall(require, "harpoon")
+  if not ok then return "" end
+  local items = harpoon:list().items
+  if #items == 0 then return "" end
+  local current = vim.fn.fnamemodify(api.nvim_buf_get_name(buf), ":.")
+  local parts = { "%#HarpSlot#[\u{f0031}]" } -- [󰀱] then one slot each, the current file's slot highlighted
+  for i, item in ipairs(items) do
+    parts[#parts + 1] = (item.value == current and "%#HarpSlotSel#" or "%#HarpSlot#") .. "[" .. i .. "]"
+  end
+  return table.concat(parts, " ") .. "%#WinBar# "
+end
 
 function M.render(win)
   win = win or tonumber(vim.g.statusline_winid) or api.nvim_get_current_win()
   if not api.nvim_win_is_valid(win) then return "" end
   local buf = api.nvim_win_get_buf(win)
   if not eligible(win, buf) then return "" end
-  -- vim-visual-multi is on in this window: show its info (mode, cursor n / total, search patterns) here instead of the
-  -- breadcrumb, so the statusline stays as it is (g:VM_set_statusline = 0). The breadcrumb is back when VM exits.
-  if win == api.nvim_get_current_win() and vim.b[buf].visual_multi then
+  local focused = win == api.nvim_get_current_win()
+  if focused and vim.b[buf].visual_multi then
     local ok, bar = pcall(vim.fn["vm#themes#statusline"])
     if ok and bar ~= "" then return bar end
   end
-  local filename = vim.fn.fnamemodify(api.nvim_buf_get_name(buf), ":t")
-  local icon = require("nvim-web-devicons").get_icon(filename, nil, { default = true }) or ""
-  local parts = { "%#SagaFileName#" .. icon .. " " .. escape(filename) .. "%*" }
-  local symbol = require("lspsaga.symbol.head")
-  local state = symbol:get_buf_symbols(buf)
-  if state and state.symbols and ticks[buf] == api.nvim_buf_get_changedtick(buf) then
-    local cursor = api.nvim_win_get_cursor(win)
-    local owner = symbol[buf] and vim.lsp.get_client_by_id(symbol[buf].client_id)
-    local encoding = owner and owner.offset_encoding or "utf-16"
-    local line = api.nvim_buf_get_lines(buf, cursor[1] - 1, cursor[1], false)[1] or ""
-    local col = vim.str_utfindex(line, encoding, cursor[2], false)
-    for _, node in ipairs(M.path(state.symbols, cursor[1] - 1, col, vim.uri_from_bufnr(buf))) do
-      local kind = require("lspsaga.lspkind").get_kind_icon(node.kind)
-      if node.containerName then parts[#parts + 1] = "%#SagaClass#" .. escape(node.containerName) .. "%*" end
-      parts[#parts + 1] = "%#Saga" .. kind[1] .. "#" .. kind[2] .. escape(node.name) .. "%*"
-    end
-  end
-  return "%<" .. table.concat(parts, "%#SagaSep# › %*")
+  local name = api.nvim_buf_get_name(buf)
+  local label = _G.githist_label and _G.githist_label(name)
+  local path = label or vim.fn.fnamemodify(name, ":~:.")
+  local icon = require("nvim-web-devicons").get_icon(vim.fn.fnamemodify(name, ":t"), nil, { default = true }) or ""
+  local mod = vim.bo[buf].modified
+  local left = "%#SagaFileName# " .. icon .. " %<" .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
+    .. (mod and " \u{f444}" or "") .. "%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
+  return left .. "%=" .. (focused and harpoon_slots(buf) or "")
 end
 
 function M.install(buf)
@@ -86,21 +79,15 @@ function M.setup()
     vim.w.saga_breadcrumb_hidden = not vim.w.saga_breadcrumb_hidden
     M.install(api.nvim_get_current_buf())
   end
+  colors()
   local group = api.nvim_create_augroup("SagaBreadcrumbRefresh", { clear = true })
+  api.nvim_create_autocmd("ColorScheme", { group = group, callback = colors })
   api.nvim_create_autocmd({ "BufWinEnter", "WinEnter", "BufFilePost", "FileType" }, {
     group = group, callback = function() M.install() end,
   })
-  api.nvim_create_autocmd("User", {
-    group = group, pattern = "SagaSymbolUpdate", callback = function(ev)
-      local buf = ev.data and ev.data.bufnr
-      if buf and api.nvim_buf_is_valid(buf) then
-        ticks[buf] = api.nvim_buf_get_changedtick(buf)
-        M.install(buf)
-        vim.cmd("redrawstatus")
-      end
-    end,
-  })
-  api.nvim_create_autocmd("BufWipeout", { group = group, callback = function(ev) ticks[ev.buf] = nil end })
+  -- the path, dot and counts follow the buffer: redraw when it is edited or saved, when git signs update and when the
+  -- harpoon list changes (those two already redraw the status area; BufModifiedSet is the new one)
+  api.nvim_create_autocmd("BufModifiedSet", { group = group, callback = function() vim.cmd.redrawstatus() end })
   -- redraw the bar when VM starts / ends and while it is on (cursor moves, mode changes, typing), so its info stays current
   api.nvim_create_autocmd("User", {
     group = group, pattern = { "visual_multi_start", "visual_multi_exit" }, callback = function() vim.cmd("redrawstatus") end,

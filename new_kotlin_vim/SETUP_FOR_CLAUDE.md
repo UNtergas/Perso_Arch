@@ -56,7 +56,7 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
   prints `koda-glade light`.
 - `ls ~/.local/share/kvim/mason/bin/kotlin-language-server` exists.
 - In a real Kotlin file in a Gradle project, wait 1 to 2 minutes (the server imports Gradle and indexes), then:
-  the **Kotlin icon at the start of the tabline** is **purple** when a server is attached and idle,
+  the **Kotlin logo block at the left end of the tab row** (white logo on a coloured block) is **dark purple** when a server is attached and idle,
   **amber** while it is busy, **grey** when no Kotlin server is attached. Then try `K` (hover),
   `gd` on an import, `gp` (definition preview), `gr` (Lspsaga references), `SPC c r` (rename),
   `SPC s o` (outline tree), `Ctrl-T` (workspace symbols).
@@ -96,7 +96,7 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
   the source buffer/position, ignore stale fallback results, and support cancellation.
   Source JARs are extracted read-only and marked to skip Kotlin LSP startup. `GRADLE_USER_HOME`
   is respected (defaults to `~/.gradle`).
-- **Kotlin icon in the tabline** (kvim only), first item; colour shows the LSP state (see Verify).
+- **Kotlin logo block in the tab row** (kvim only), first block on the left; its background shows the LSP state (see Verify). nvim has a white Linux logo on dark red there.
 - **Theme**: `koda-glade` (koda.nvim, light) is the startup colour scheme, same as `nvim`. Its background is
   dimmed from `#f7f7f7` to `#f3f3f3` by a `ColorScheme` autocmd in the koda block (`koda_glade_bg`), a small
   step because the string and type colours are light. Alabaster stays installed with its own default colours;

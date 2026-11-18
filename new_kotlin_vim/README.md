@@ -14,7 +14,7 @@ Status: being tested. Edit `~/.config/kvim/init.lua` first, then sync it here.
 
 ## Lspsaga trial
 
-kvim now uses the same Lspsaga UI as nvim: breadcrumbs, reference Finder (`gr`),
+kvim now uses the same Lspsaga UI as nvim: reference Finder (`gr`),
 diagnostics, hover (`K`), rename (`SPC c r`), editable definition preview (`gp`), and outline tree
 (`SPC s o`). In Finder, `]f` / `[f` jump to the next/previous file; Enter opens a reference, `[w`
 switches to the preview, and Esc closes. Outline: Enter expands/jumps, `o` jumps, q/Esc closes.
@@ -35,6 +35,4 @@ Use `SPC d` for diagnostic details and Alt-. / `SPC c a` for code actions.
 Code actions use the original native LSP menu through Snacks, with disabled actions hidden.
 Telescope Ctrl-Q still sends results to quickfix.
 
-Breadcrumbs use `lua/saga_breadcrumb.lua` with Lspsaga symbol data and styling. The renderer
-uses each window's own buffer/cursor, handles unsorted symbols and column ranges, and clears
-outdated scope labels while symbols refresh. Copy the entire config directory when installing.
+The winbar (`lua/saga_breadcrumb.lua`, same file as nvim) shows each window's file path, unsaved dot and git counts, and the harpoon slots at the right of the focused window; the symbol breadcrumb is gone. The tab row on top lists the open buffers (the Kotlin LSP icon first). Copy the entire config directory when installing.
