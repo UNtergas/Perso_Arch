@@ -783,11 +783,12 @@ require("lazy").setup({
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
-    opts = {},
+    -- keys that are switched off on purpose (desc "Disabled: ...") are not listed: they only add noise
+    opts = { filter = function(mapping) return not (mapping.desc or ""):match("^Disabled") end },
     config = function(_, opts)
       local wk = require("which-key")
       wk.setup(opts)
-      wk.add({ { "<C-w>T", hidden = true } }) -- C-w T (break out into a new tab) is disabled below: one tab per nvim; keep it out of the C-w list
+      wk.add({ { "<C-w>T", hidden = true }, { "<C-w><", hidden = true }, { "<C-w>>", hidden = true }, { "<C-w>+", hidden = true }, { "<C-w>_", hidden = true }, { "<C-w>|", hidden = true }, { "<C-w>s", hidden = true }, { "<C-w>v", hidden = true }, { "<C-w>S", hidden = true } }) -- C-w T (break out into a new tab) is disabled below: one tab per nvim; keep it out of the C-w list
     end,
   },
   { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = { sign_priority = 20 } }, -- above diagnostics so git marks always show
@@ -1295,6 +1296,12 @@ map("n", "<C-w>q", pick_window, { desc = "Number the windows, press a number to 
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
 map("n", "<C-w>T", "<Nop>", { desc = "Disabled: one tab per nvim" })
+-- C-w < > + (window width / height by one step) are off: resizing is C-k h/j/k/l, C-w r and C-w =
+for _, k in ipairs({ "<", ">", "+" }) do map("n", "<C-w>" .. k, "<Nop>", { desc = "Disabled: use C-k h/j/k/l or C-w r" }) end
+-- C-w _ and C-w | (maximise the height / width) are off too: C-w c / C / z are the toggles that fill a column / row / the screen
+for _, k in ipairs({ "_", "|" }) do map("n", "<C-w>" .. k, "<Nop>", { desc = "Disabled: use C-w c / C / z" }) end
+-- C-w s / v (and C-w S, C-w Ctrl-s / Ctrl-v) are off: C-w - splits stacked, C-w \ splits side by side (the :split commands still work)
+for _, k in ipairs({ "s", "v", "S", "<C-s>", "<C-v>" }) do map("n", "<C-w>" .. k, "<Nop>", { desc = "Disabled: use C-w - and C-w \\" }) end
 -- ctrl+w x closes the current split (the buffer stays open); it replaces the window exchange.
 map("n", "<C-w>x", "<cmd>close<cr>", { desc = "Close split" })
 map("n", "<C-w><C-x>", "<cmd>close<cr>", { desc = "Close split" })
@@ -1325,13 +1332,13 @@ local function mk_parent(p)
   if dir ~= "" and dir ~= "." then vim.fn.mkdir(dir, "p") end
 end
 local ck = { "n", "v" }
--- C-k arrows move the window
-map(ck, "<C-k><Left>", "<C-w>H", { desc = "Move window left" })
-map(ck, "<C-k><Down>", "<C-w>J", { desc = "Move window down" })
-map(ck, "<C-k><Up>", "<C-w>K", { desc = "Move window up" })
-map(ck, "<C-k><Right>", "<C-w>L", { desc = "Move window right" })
+-- C-w arrows move the window (they replace the built-in C-w arrows, which only focus a window: C-M-hjkl focus)
+map(ck, "<C-w><Left>", "<C-w>H", { desc = "Move window left" })
+map(ck, "<C-w><Down>", "<C-w>J", { desc = "Move window down" })
+map(ck, "<C-w><Up>", "<C-w>K", { desc = "Move window up" })
+map(ck, "<C-w><Right>", "<C-w>L", { desc = "Move window right" })
 -- C-k h/j/k/l resize the window: h narrower, l wider, j shorter, k taller. One step is 10% of the screen (columns for h / l, rows
--- for j / k), so from an even split the sizes land on 50, 40, 30, 20 %. C-k = equalises every window, and again puts the
+-- for j / k), so from an even split the sizes land on 50, 40, 30, 20 %. C-w = equalises every window, and again puts the
 -- previous sizes back (the saved sizes are dropped when the number of windows changes).
 local function resize_step(dir)
   local dw = math.max(1, math.floor(vim.o.columns * 0.10 + 0.5))
@@ -1354,7 +1361,7 @@ map(ck, "<C-k>h", function() resize_step("h") end, { desc = "Window narrower (10
 map(ck, "<C-k>l", function() resize_step("l") end, { desc = "Window wider (10%)" })
 map(ck, "<C-k>j", function() resize_step("j") end, { desc = "Window shorter (10%)" })
 map(ck, "<C-k>k", function() resize_step("k") end, { desc = "Window taller (10%)" })
-map(ck, "<C-k>=", function()
+map(ck, "<C-w>=", function()
   local saved = vim.t.equal_saved
   if saved and saved.n == #vim.api.nvim_tabpage_list_wins(0) then
     vim.cmd(saved.cmd)
@@ -1364,9 +1371,9 @@ map(ck, "<C-k>=", function()
     vim.cmd("wincmd =")
   end
 end, { desc = "Equal window sizes (again: back to the previous sizes)" })
--- C-k r: resize mode, like i3. h / j / k / l resize the window in 10% steps (same as C-k h/j/k/l), = equal sizes (no toggle back),
+-- C-w r: resize mode, like i3 (replaces the built-in C-w r, rotate). h / j / k / l resize the window in 10% steps (same as C-k h/j/k/l), = equal sizes (no toggle back),
 -- Esc / Enter / q leave; any other key leaves too.
-map(ck, "<C-k>r", function()
+map(ck, "<C-w>r", function()
   local function status()
     vim.api.nvim_echo({ { "-- RESIZE --  h/j/k/l resize   = equal   Esc/Enter/q done", "ModeMsg" } }, false, {})
   end

@@ -61,12 +61,12 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 
 | Key | Mode | Does |
 |---|---|---|
-| `C-k <arrow>` | n v | Move the window to the far left/bottom/top/right |
+| `C-w <arrow>` | n v | Move the window to the far left/bottom/top/right (replaces the built-in C-w arrows, which only focus; use `C-M-h/j/k/l` to focus) |
 | `C-k h/j/k/l` | n v | Resize the window by moving a divider in that direction, in steps of 10% of the screen (columns for `h` `l`, rows for `j` `k`). A window with a neighbour on the right / below grows with `l` / `j` and shrinks with `h` / `k`; the rightmost / bottom-most window has its divider on the left / top, so `h` / `k` grow it and `l` / `j` shrink it. Same as tmux. A window with no neighbour in that direction does nothing |
-| `C-k =` | n v | Equal window sizes; press again to put the previous sizes back (forgotten when the number of windows changes) |
-| `C-k r` | n v | Resize mode, like i3: `h` `j` `k` `l` resize the window in 10% steps, `=` equal sizes (no toggle back), `Esc` / `Enter` / `q` leave (any other key leaves too). The command line shows `-- RESIZE --` while it is on |
-| `C-k -` | n v | Split stacked (new window below) |
-| `C-k \` | n v | Split side by side (new window to the right) |
+| `C-w =` | n v | Equal window sizes; press again to put the previous sizes back (forgotten when the number of windows changes) |
+| `C-w r` | n v | Resize mode, like i3 (replaces the built-in C-w r, rotate): `h` `j` `k` `l` resize the window in 10% steps, `=` equal sizes (no toggle back), `Esc` / `Enter` / `q` leave (any other key leaves too). The command line shows `-- RESIZE --` while it is on |
+| `C-w -` | n | Split stacked (new window below) |
+| `C-w \` | n | Split side by side (new window to the right) |
 | `C-M-<arrows>` | n | Focus window in that direction |
 | `C-w q` | n | Number every window (a big digit in its middle, like tmux's `Alt-e q`); press the number to jump to that window, anything else cancels. Windows are numbered left to right, then top to bottom, up to 9 |
 | `C-w C-w` | n | Close buffer |
