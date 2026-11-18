@@ -50,9 +50,11 @@ function M.render(win)
   local name = api.nvim_buf_get_name(buf)
   local label = _G.githist_label and _G.githist_label(name)
   local path = label or vim.fn.fnamemodify(name, ":~:.")
-  local icon = require("nvim-web-devicons").get_icon(vim.fn.fnamemodify(name, ":t"), nil, { default = true }) or ""
+  -- the icon has its own devicons colour, the same as in Oil and Telescope
+  local icon, icon_hl = require("nvim-web-devicons").get_icon(vim.fn.fnamemodify(name, ":t"), nil, { default = true })
+  icon = icon or ""
   local mod = vim.bo[buf].modified
-  local left = "%#SagaFileName# " .. icon .. " %<" .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
+  local left = " %#" .. (icon_hl or "SagaFileName") .. "#" .. icon .. " %<" .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
     .. (mod and " \u{f444}" or "") .. "%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
   return left .. "%=" .. (focused and harpoon_slots(buf) or "")
 end
