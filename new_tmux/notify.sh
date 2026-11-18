@@ -7,22 +7,28 @@
 # - you are in tmux (a focused client): a floating dialog pane in its top right corner (never takes keys), no OS popup; terminal not focused: notify-send
 # - every event is also logged to ~/.tmux/notifications.log and counted on the status-bar bell (@notif_n)
 # - the desktop popup is closed again when you come back to that window (notif-read.sh)
-# - nothing at all if you are already looking at that window
+# - nothing at all if you are already looking at that window and its pane is visible (zoomed away / squeezed by c, C = not)
 kind=${1:-done} label=${2:-Claude}
 [ -n "$TMUX_PANE" ] || exit 0
 [ -t 0 ] || cat >/dev/null 2>&1   # drain the hook's JSON from stdin
 
-IFS='|' read -r wid wname sname < <(tmux display-message -p -t "$TMUX_PANE" '#{window_id}|#{window_name}|#{session_name}')
+IFS='|' read -r wid wname sname zoomed pact pw ph < <(tmux display-message -p -t "$TMUX_PANE" \
+  '#{window_id}|#{window_name}|#{session_name}|#{window_zoomed_flag}|#{pane_active}|#{pane_width}|#{pane_height}')
 [ -n "$wid" ] || exit 0
+# Is the pane that sent this really on screen? Not when the window is zoomed on another pane (z), and not when it was
+# squeezed to a sliver by c / C (fill the column / row): then you are "in" the window but cannot see the pane.
+visible=1
+{ [ "$zoomed" = 1 ] && [ "$pact" != 1 ]; } && visible=0
+{ [ "${pw:-99}" -lt 10 ] || [ "${ph:-99}" -lt 4 ]; } && visible=0
 
 # Clients whose terminal has focus (needs focus-events on): you are using tmux right now.
 # For list-clients the window format is the window that client is showing.
 focused=() focused_win=() looking=0
 while IFS='|' read -r cname flags cwid; do
-  case "$flags" in *focused*) focused+=("$cname"); focused_win+=("$cwid"); [ "$cwid" = "$wid" ] && looking=1 ;; esac
+  case "$flags" in *focused*) focused+=("$cname"); focused_win+=("$cwid"); [ "$cwid" = "$wid" ] && [ "$visible" = 1 ] && looking=1 ;; esac
 done < <(tmux list-clients -F '#{client_name}|#{client_flags}|#{window_id}' 2>/dev/null)
 
-# Looking at that very window: nothing to tell.
+# Looking at that very window (and the pane is visible there): nothing to tell.
 [ "$looking" = 1 ] && exit 0
 
 # A bare bell must not hide a more useful dot (done / wait / fail); every other event overwrites.
