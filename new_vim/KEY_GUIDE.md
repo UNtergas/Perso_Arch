@@ -182,7 +182,8 @@ The top row of every Oil window shows the full path of the folder it lists
 | `SPC c r` / `SPC r n` | n | Rename symbol in a popup (project wide); Enter confirms, Ctrl-C cancels |
 | `SPC c a` | n v | Code action |
 | `SPC c x` | n | Workspace diagnostics popup (Lspsaga) |
-| `SPC c X` | n | Diagnostics list (Telescope) |
+| `SPC c X` | n | Diagnostics list for the whole project (Telescope) |
+| `C-w d` / `C-w Ctrl-d` | n | Diagnostics of the current buffer only (Lspsaga window); replaces the built-in float with the diagnostics under the cursor |
 | `SPC d` | n | Line diagnostics popup (Lspsaga) |
 | `SPC f R` | n | Rename current file (updates imports) |
 

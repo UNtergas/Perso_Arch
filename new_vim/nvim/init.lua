@@ -1434,6 +1434,9 @@ end, { desc = "Format (manual)" })
 -- SPC c X: the same diagnostics in a flat Telescope list.
 map("n", "<leader>cx", "<cmd>Lspsaga show_workspace_diagnostics<cr>", { desc = "Diagnostics (Lspsaga)" })
 map("n", "<leader>cX", tb("diagnostics"), { desc = "Diagnostics list (Telescope)" })
+-- C-w d / C-w Ctrl-d: the Lspsaga diagnostics of the current buffer only (replaces the built-in C-w d, a float with the cursor's diagnostics)
+map("n", "<C-w>d", "<cmd>Lspsaga show_buf_diagnostics<cr>", { desc = "Buffer diagnostics (Lspsaga)" })
+map("n", "<C-w><C-d>", "<cmd>Lspsaga show_buf_diagnostics<cr>", { desc = "Buffer diagnostics (Lspsaga)" })
 -- merge conflicts
 map("n", "<leader>gm", "<cmd>DiffviewOpen<cr>", { desc = "Merge tool (3-way)" })
 map("n", "<leader>gq", "<cmd>DiffviewClose<cr>", { desc = "Close merge tool" })
