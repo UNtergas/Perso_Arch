@@ -226,7 +226,7 @@ The mouse is on.
 Far left, on the darkest colour: the OS icon (Nerd Font, picked from
 `/etc/os-release`) and the current user.
 Then: the mode label. Grey `NORMAL`, yellow `PREFIX` while the prefix is pressed,
-blue `COPY` in copy mode, `ZOOM` when a pane is zoomed (same idea as the nvim mode
+blue `COPY` in copy mode, lilac `ZOOM` when a pane is zoomed (same idea as the nvim mode
 colours). Next to it, joined: `pane/total` and what the current pane is running
 (`nvim`, `zsh`, ...).
 Right side: the window tabs (the current one as a darker block, `Z` marks a zoomed

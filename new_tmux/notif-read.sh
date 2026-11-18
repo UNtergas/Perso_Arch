@@ -12,6 +12,14 @@ if [ -s "$log" ]; then
 else
   n=0
 fi
+# Close the in-tmux toast panes (floating panes tagged @toast_src = the window that sent the notification) of the window you
+# reached, or all of them.
+if [ "$target" != none ]; then
+  tmux list-panes -a -F '#{pane_id} #{@toast_src}' 2>/dev/null | while read -r tp src; do
+    [ -n "$src" ] || continue
+    if [ "$target" = all ] || [ "$src" = "$target" ]; then tmux kill-pane -t "$tp" 2>/dev/null; fi
+  done
+fi
 # Close the desktop popups (notify.sh keeps "window id <TAB> popup id" lines) of the window you reached, or all of them.
 osf=${TMUX_NOTIFY_OS:-$HOME/.tmux/notifications.os}
 if [ "$target" != none ] && [ -s "$osf" ] && command -v gdbus >/dev/null; then
