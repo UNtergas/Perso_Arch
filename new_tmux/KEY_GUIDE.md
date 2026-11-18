@@ -37,13 +37,13 @@ and hands it to tmux's prefix table. So every "prefix + key" binding is unchange
 
 | Keys | Does |
 |---|---|
-| `a` | 3 terminals: one big terminal on the left (65%), 2 stacked on the right (35%) |
-| `d` | 3 terminals: one on top (70% of the height), 2 side by side below it (30%) |
+| `a` then `1` | 3 terminals: one big terminal on the left (65%), 2 stacked on the right (35%) |
+| `a` then `2` | 3 terminals: one on top (70% of the height), 2 side by side below it (30%) |
 
 If the current window has a single pane, the preset turns that window into the layout: the pane you are in
 stays and 2 more are added. If the window already has several panes, it is not touched and the preset opens a
-new window instead. It opens the same name dialog first (prefilled `side` for `a`, `stacked` for `d`; Esc cancels). Panes start in the current pane's directory;
-`a` focuses the left terminal, `d` the top one.
+new window instead. It opens the same name dialog first (prefilled `side` for `a 1`, `stacked` for `a 2`; Esc cancels). Panes start in the current pane's directory;
+`a 1` focuses the left terminal, `a 2` the top one. `a` opens a small "layout" dialog first; any key other than 1 or 2 closes it. `d` is unbound now (detach is `Q`).
 
 ## Panes
 
@@ -65,8 +65,8 @@ new window instead. It opens the same name dialog first (prefilled `side` for `a
 | `b` | Turn the pane numbers on / off for this window. On by default: every pane has its number (the one `1`..`9` and `q` use) on its top border, dark on the active pane |
 
 `c` does nothing visible on a pane that already fills its column (the big left
-terminal of the `a` preset): use it on one of the two right terminals. `C` is the same
-for rows: use it on one of the two bottom terminals of the `d` preset.
+terminal of the `a 1` preset): use it on one of the two right terminals. `C` is the same
+for rows: use it on one of the two bottom terminals of the `a 2` preset.
 
 ### Resize and layouts (stock tmux keys that still work)
 
@@ -243,8 +243,8 @@ the statusline in `tmux.conf`).
 | Key | Stock | Here |
 |---|---|---|
 | prefix | `Ctrl-b` | `Alt-e` (opens the key dropdown) |
-| `d` | detach | `stacked` preset: 3 terminals, 1 on top (detach is `Q`) |
-| `a` | (unused) | `side` preset: 3 terminals, 65 / 35 |
+| `d` | detach | unbound (the `stacked` preset is now `a` then `2`; detach is `Q`) |
+| `a` | (unused) | opens the layout dialog: `1` = `side` preset (3 terminals, 65 / 35), `2` = `stacked` |
 | `C` | customize mode | fill the row |
 | `o` | next pane | previous window |
 | `p` | previous window | next window |

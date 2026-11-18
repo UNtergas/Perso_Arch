@@ -12,8 +12,8 @@ row() { printf '  %s%-13s%s %s\n' "$K" "$1" "$D" "$2"; }
 sec() { printf ' %s%s%s\n' "$H" "$1" "$D"; }
 printf ' %sAlt-e%s  %s(press a key, Esc closes)%s\n' "$B" "$D" "$G" "$D"
 sec "Presets (here if 1 pane, else new window)"
-row "a"          "big one left 65% | 2 stacked right 35%"
-row "d"          "one on top 70% | 2 side by side below"
+row "a  1"       "big one left 65% | 2 stacked right 35%"
+row "a  2"       "one on top 70% | 2 side by side below"
 sec "Panes"
 row "h j k l"    "focus left / down / up / right"
 row "arrows"     "move the pane (swap with its neighbour)"

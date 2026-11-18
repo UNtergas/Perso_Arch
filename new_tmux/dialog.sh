@@ -24,6 +24,11 @@ case "$action" in
     IFS= read -rsn1 key || exit 0
     case "$key" in [0-9]) tmux select-window -t "${target}:$key" ;; esac
     exit 0 ;;
+  preset)
+    printf ' layout: 1 = left + right   2 = top + bottom '
+    IFS= read -rsn1 key || exit 0
+    case "$key" in 1|2) tmux set -g @preset "$key" ;; esac
+    exit 0 ;;
   command) prompt=' : ' ;;
   jump-window) prompt=' window: ' ;;
   move-window) prompt=' index: ' ;;
