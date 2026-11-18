@@ -99,7 +99,8 @@ Divider arrow: in a window with exactly **two** panes only the half of the divid
 | `N` | New window in the current directory. A floating name dialog opens first (Enter on an empty name keeps the automatic name, Esc cancels) |
 | `o` | Previous window |
 | `p` | Next window |
-| `1`..`9` | Jump to window by number |
+| `1`..`9` | Jump to the pane with that number (the same numbers `q` shows) |
+| `e` then `1`..`9` | Jump to window by number (`Alt-e e 3`) |
 | `,` | Rename window in a popup (current name prefilled) |
 | `&` | Close the whole window (popup: y confirms, any other key cancels) |
 | `w` | Tree of all sessions and windows (`j`/`k`, Enter, `x` kills the highlighted one) |
