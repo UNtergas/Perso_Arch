@@ -116,7 +116,7 @@ unfolded.
 | `Tab` | VM | Switch between cursor mode and extend mode |
 | `Esc` | VM | Leave VM and clear the cursors |
 
-While VM is on, its info (mode, cursor n / total, search pattern) shows in the winbar in place of the breadcrumb, and the statusline stays as it is. The breadcrumb comes back when VM ends.
+While VM is on, its info (mode, cursor n / total, search pattern) shows in the winbar in place of the file path, and the statusline stays as it is. The path comes back when VM ends.
 
 The multicursor.nvim setup (Alt-d / `SPC m c` cursor mode, no live typing) is disabled in favour of vim-visual-multi; its config is still in `init.lua`.
 
@@ -125,11 +125,11 @@ The multicursor.nvim setup (Alt-d / `SPC m c` cursor mode, no live typing) is di
 | Key | Mode | Does |
 |---|---|---|
 | `SPC h a` | n | Add the current file to the harpoon list |
-| `SPC 1` … `SPC 4` | n | Jump to the file in slot 1 to 4 |
+| `SPC h 1` … `SPC h 9` | n | Jump to the file in harpoon slot 1 to 9 |
 | `SPC h d` | n | Remove the current file from the list |
 | `SPC h h` | n | Open the list. `dd` deletes a line, `dd` then `p` moves one, Enter jumps. Close the menu with `q` or `Esc` to save |
 
-The bottom statusline starts with the current directory name in brackets (e.g. `[snowpack-android]`, follows `:cd`), then the git branch when inside a repo (e.g. `[main]`, updates on its own after a checkout, short commit when detached), then shows error (`E2`, red), warning (`W1`, yellow), info (`I1`) and hint (`H1`, e.g. "declared but never read") counts after the file name. The harpoon slots have their own row at the top, e.g. ` 1:a.ts  2:b.ts `, with the current file highlighted.
+The bottom statusline starts with the current directory name in brackets (e.g. `[snowpack-android]`, follows `:cd`), then the git branch when inside a repo (e.g. `[main]`, updates on its own after a checkout, short commit when detached), then shows error (`E2`, red), warning (`W1`, yellow), info (`I1`) and hint (`H1`, e.g. "declared but never read") counts after the file name. The top row is the tab bar: every open buffer as a tab (` 1 a.ts  2 b.ts `, in the Buffer manager order, the current one highlighted, a red error count when the file has errors, a blue dot when unsaved, click to switch, `‹ ›` when they do not all fit). `SPC 1` … `SPC 9` jump to tab 1 to 9, the bar follows the current tab, and `SPC [` / `SPC ]` (or a click on `‹` / `›`) scroll it to the hidden tabs without changing buffer (switching buffer makes it follow again); `[b` / `]b` move to the previous / next buffer. Each window's winbar shows its file path, the unsaved dot and that file's git counts; the focused window also shows the harpoon slots at the right end (`[󰀱] [1] [2]`, the current file's slot underlined).
 
 ## Start screen
 
