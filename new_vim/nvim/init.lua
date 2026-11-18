@@ -780,7 +780,16 @@ require("lazy").setup({
       },
     },
   },
-  { "folke/which-key.nvim", event = "VeryLazy", opts = {} },
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = {},
+    config = function(_, opts)
+      local wk = require("which-key")
+      wk.setup(opts)
+      wk.add({ { "<C-w>T", hidden = true } }) -- C-w T (break out into a new tab) is disabled below: one tab per nvim; keep it out of the C-w list
+    end,
+  },
   { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = { sign_priority = 20 } }, -- above diagnostics so git marks always show
   { -- colors conflict blocks (ours / theirs) in the file
     "akinsho/git-conflict.nvim",
