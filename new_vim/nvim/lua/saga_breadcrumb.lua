@@ -1,4 +1,4 @@
--- The winbar of every file window: icon, path, unsaved dot and the file's own git counts on the left; on the focused
+-- The winbar of every file window: path, unsaved dot and the file's own git counts on the left; on the focused
 -- window the harpoon slots on the right. (The name is historic: it used to be Lspsaga's symbol breadcrumb, now gone.)
 -- While vim-visual-multi is on in the window, VM's info (mode, cursor n / total, patterns) takes the bar instead.
 -- It still replaces Lspsaga's winbar functions so Lspsaga never writes its own.
@@ -50,11 +50,8 @@ function M.render(win)
   local name = api.nvim_buf_get_name(buf)
   local label = _G.githist_label and _G.githist_label(name)
   local path = label or vim.fn.fnamemodify(name, ":~:.")
-  -- the icon has its own devicons colour, the same as in Oil and Telescope
-  local icon, icon_hl = require("nvim-web-devicons").get_icon(vim.fn.fnamemodify(name, ":t"), nil, { default = true })
-  icon = icon or ""
   local mod = vim.bo[buf].modified
-  local left = " %#" .. (icon_hl or "SagaFileName") .. "#" .. icon .. " %<" .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
+  local left = " %<" .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
     .. (mod and " \u{f444}" or "") .. "%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
   return left .. "%=" .. (focused and harpoon_slots(buf) or "")
 end
