@@ -1,12 +1,11 @@
 # tmux setup, for a Claude session on a new machine
 
 Tell the user what you are about to do, then follow the steps. The config is `new_tmux/tmux.conf`; it needs the helper
-scripts next to it in `~/.tmux/`. Without them the box (top edge) and `[` / `]` do nothing or print errors.
+scripts next to it in `~/.tmux/`. Without them `[` / `]` do nothing or print errors.
 
 | What | From this repo | Goes to |
 |---|---|---|
 | Config | `new_tmux/tmux.conf` | `~/.tmux.conf` |
-| Top edge of the box, and the `Alt-e b` toggle | `new_tmux/box.sh` | `~/.tmux/box.sh` (executable) |
 | `[` / `]` consume-or-expel panes | `new_tmux/pane-col.sh` | `~/.tmux/pane-col.sh` (executable) |
 | The `Alt-e` key dropdown | `new_tmux/which-key.sh` | `~/.tmux/which-key.sh` (executable) |
 | New-window name dialog (`N`, `a`, `d`) | `new_tmux/ask-name.sh` | `~/.tmux/ask-name.sh` (executable) |
@@ -57,7 +56,7 @@ An old default server can be replaced after the user has finished and exited all
 ## 2. Install
 
 1. Back up an existing `~/.tmux.conf`.
-2. `mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh new_tmux/notify.sh new_tmux/notifications.sh new_tmux/notif-read.sh new_tmux/equalize.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
+2. `mkdir -p ~/.tmux && cp new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh new_tmux/notify.sh new_tmux/notifications.sh new_tmux/notif-read.sh new_tmux/equalize.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
 3. `cp new_tmux/tmux.conf ~/.tmux.conf`
 4. Inside tmux: `tmux source ~/.tmux.conf`, or start a fresh server (see the reload note below).
 5. Enable relative line numbers by default: the config must contain `setw -g copy-mode-line-numbers relative`.
@@ -69,12 +68,13 @@ An old default server can be replaced after the user has finished and exited all
 
 ## 3. How the pieces fit (so you can change them without breaking them)
 
-- **The box** is only a second status row. `status 2` and `@box 1` in `tmux.conf` turn it on by default;
-  `status-format[1]` just prints the window option `@topedge`. `~/.tmux/box.sh edge` builds that string from the real
-  pane positions (dark over the active pane, light over the others, `┳` at each divider, one plain line while zoomed).
-  Hooks (`after-select-pane`, `window-layout-changed`, `after-new-window`, `after-new-session`, `after-select-window`)
-  call it. `Alt-e b` runs `box.sh toggle` (sets `@box` to 0 and `status on`, or back). The colours are at the top of
-  `box.sh` (`D` active, `L` inactive) and must match `pane-border-style` / `pane-active-border-style` in `tmux.conf`.
+- **Pane numbers** are tmux's own `pane-border-status top` with `pane-border-format` (` #{pane_index} `, a dark block on the
+  active pane, light on the others; empty for the notification toast panes, which carry `@toast_src`). The label line is the
+  divider that already exists for a pane with another pane above it, and for the top row of panes it replaces the old "box"
+  (a second status row drawn by a script, `box.sh`, now deleted), so the status is a single row and no space is lost.
+  `Alt-e b` toggles `pane-border-status` between `top` and `off` for the current window. The colours must match
+  `pane-border-style` / `pane-active-border-style`. The numbers are the pane indexes (`pane-base-index 1`), the same ones
+  `Alt-e 1..9` and `Alt-e q` use.
 - **Divider arrow**: `pane-border-indicators` is a window option. It is `colour` globally (half-dark divider for 2 panes); hooks on `window-layout-changed` and `after-new-window` set it to `both` (adds the arrow, drawn by tmux one cell in from the start of the divider, not in the middle; it takes the style of the half it sits on, so it is light when the active pane is the bottom or right one; not configurable, the user chose to leave it) when `#{window_panes}` is 2, and back to `colour` otherwise, because tmux would also draw arrows with 3+ panes. Windows that already had 2 panes before a reload keep `colour` until their layout changes.
 - **Borders**: heavy lines, active `#4a6a6a`, inactive `#dde5e5`. nvim and kvim use the same teal for the active window.
 - **Statusline**: left = OS icon + user, mode label (grey `NORMAL`, yellow `PREFIX`, blue `COPY`, grey `ZOOM`),

@@ -19,6 +19,11 @@ case "$action" in
     IFS= read -rsn1 answer || exit 0
     case "$answer" in y|Y) tmux "$action" -t "$target" ;; esac
     exit 0 ;;
+  window-number)
+    printf ' window (1-9): '
+    IFS= read -rsn1 key || exit 0
+    case "$key" in [0-9]) tmux select-window -t "${target}:$key" ;; esac
+    exit 0 ;;
   command) prompt=' : ' ;;
   jump-window) prompt=' window: ' ;;
   move-window) prompt=' index: ' ;;

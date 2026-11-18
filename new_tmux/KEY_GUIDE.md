@@ -6,12 +6,12 @@ The status bar uses powerline arrows, so it needs a Nerd Font (same as the nvim 
 ## Install
 
 ```sh
-mkdir -p ~/.tmux && cp new_tmux/box.sh new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh
+mkdir -p ~/.tmux && cp new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh
 cp new_tmux/tmux.conf ~/.tmux.conf
 tmux            # or: tmux new -As dev   (attach to "dev", or create it)
 ```
 
-`box.sh` (the top edge and `b`), `pane-col.sh` (`[` / `]`), `which-key.sh` (the `Alt-e` dropdown) `ask-name.sh` (the new-window name dialog, needs `fzf`) and `dialog.sh` (rename, close and command popups) must be in `~/.tmux/`.
+`pane-col.sh` (`[` / `]`), `which-key.sh` (the `Alt-e` dropdown) `ask-name.sh` (the new-window name dialog, needs `fzf`) and `dialog.sh` (rename, close and command popups) must be in `~/.tmux/`.
 `SETUP_FOR_CLAUDE.md` has the full steps, the checks and the rules for changing the config.
 
 Reload in a running session: `Alt-e R`. A tmux server that is already
@@ -62,7 +62,7 @@ new window instead. It opens the same name dialog first (prefilled `side` for `a
 | `c` | Make this pane fill its column (full height), again to restore the old split |
 | `C` | Make this pane fill its row (95% of the width), again to restore the old split |
 | `x` | Close this pane (popup confirmation: y confirms, any other key cancels) |
-| `b` | Turn the active-pane box on / off for this session. On by default: the status becomes 2 rows, row 2 is a top edge that is dark over the active pane (plain line while zoomed). Needs `~/.tmux/box.sh` (copy of `new_tmux/box.sh`) |
+| `b` | Turn the pane numbers on / off for this window. On by default: every pane has its number (the one `1`..`9` and `q` use) on its top border, dark on the active pane |
 
 `c` does nothing visible on a pane that already fills its column (the big left
 terminal of the `a` preset): use it on one of the two right terminals. `C` is the same
@@ -100,7 +100,7 @@ Divider arrow: in a window with exactly **two** panes only the half of the divid
 | `o` | Previous window |
 | `p` | Next window |
 | `1`..`9` | Jump to the pane with that number (the same numbers `q` shows) |
-| `e` then `1`..`9` | Jump to window by number (`Alt-e e 3`) |
+| `e` then `1`..`9` | Jump to window by number (`Alt-e e 3`): a small "go to window" dialog like `N` and `&`, any other key closes it |
 | `,` | Rename window in a popup (current name prefilled) |
 | `&` | Close the whole window (popup: y confirms, any other key cancels) |
 | `w` | Tree of all sessions and windows (`j`/`k`, Enter, `x` kills the highlighted one) |
