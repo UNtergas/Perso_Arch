@@ -17,7 +17,7 @@ local function escape(s) return s:gsub("%%", "%%%%"):gsub("[\r\n]", " ") end
 
 -- The project block takes the colour of the mode block of the statusline (insert green, visual blue, replace yellow, command
 -- purple); in normal mode it keeps the lighter utf-8 grey-teal.
-local PATH_BG = "#e0eaea" -- the path block: a touch lighter than the tab row (#d4dfdf), darker than the bar (#fafafa)
+local PATH_BG = "#dbe6e6" -- the path block: a touch lighter than the tab row (#d4dfdf), darker than the bar (#fafafa)
 local mode_key = { n = "normal", i = "insert", v = "visual", V = "visual", ["\22"] = "visual", s = "visual", S = "visual", R = "replace", c = "command", t = "insert" }
 function M.project_colors()
   local key = mode_key[api.nvim_get_mode().mode:sub(1, 1)] or "normal"
