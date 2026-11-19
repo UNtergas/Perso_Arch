@@ -336,6 +336,15 @@ require("lazy").setup({
 	    "accept",
 	    "fallback",
 	  },
+
+	  ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+	  ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+
+	  -- shift+enter acts as enter (accepts a selected item, else a newline)
+	  ["<S-CR>"] = {
+	    "accept",
+	    function() vim.api.nvim_feedkeys(vim.keycode("<CR>"), "n", false) return true end,
+	  },
 	},
 
       completion = {
@@ -1300,7 +1309,9 @@ local function tb(fn, opts)
 end
 
 -- ctrl+s save, ctrl+f search in buffer, esc clears highlight
-map({ "n", "v", "i" }, "<C-s>", "<cmd>write<cr>", { desc = "Save" })
+map({ "n", "v" }, "<C-s>", "<cmd>write<cr>", { desc = "Save" })
+map("i", "<C-s>", "<cmd>write<cr><esc>", { desc = "Save and back to normal mode" })
+map({ "n", "v" }, "<S-CR>", "<CR>", { remap = true, desc = "Same as Enter" })
 map({ "n", "v" }, "<C-f>", "/", { desc = "Search in buffer" })
 map("n", "<Esc>", "<cmd>nohlsearch<bar>redrawstatus<cr>", { desc = "Clear highlight" })
 

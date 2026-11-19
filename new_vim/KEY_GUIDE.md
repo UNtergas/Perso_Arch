@@ -22,7 +22,10 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `C-b` | n v | Buffer manager (same as `SPC b b`) |
 | `C-k a` | n v | New file (creates parent folders) |
 | `C-k A` | n v | New folder |
-| `C-s` | n v i | Save |
+| `C-s` | n v | Save |
+| `C-s` | i | Save and back to normal mode |
+| `S-CR` | n v i | Same as Enter |
+| `Tab` / `S-Tab` | i (completion) | Next / previous item |
 | `SPC b S` | n | Save all buffers |
 
 ## 2. Jumping around
