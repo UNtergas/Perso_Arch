@@ -1171,6 +1171,9 @@ require("lazy").setup({
       -- normal mode: a > b > c fade from darkest to lightest (c is the tab row colour, see below)
       theme.normal.a = { fg = "#14201f", bg = "#8da1a1", gui = "bold" }
       theme.normal.b = { fg = "#1c2828", bg = "#adbcbc" }
+      -- the branch text takes the mode colour (a darker shade of the first block's colour, so it stays readable on section b)
+      local branch_fg = { normal = "#3f5959", insert = "#2e6b14", visual = "#2455a3", replace = "#8a6500", command = "#6b3fa0" }
+      for m, fg in pairs(branch_fg) do theme[m].b = { fg = fg, bg = theme[m].b and theme[m].b.bg or "#adbcbc", gui = "bold" } end
       -- the lightest part of the statusline (section c: diagnostics) is the same colour as the tab row (#e2eeee)
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command" }) do
         theme[m].c = { fg = theme[m].c and theme[m].c.fg or "#222222", bg = "#e2eeee" }
