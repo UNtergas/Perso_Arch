@@ -598,6 +598,15 @@ require("lazy").setup({
           local dir = vim.fn.stdpath("cache") .. "/kotlin-language-server/" .. vim.fs.basename(root) .. "-" .. vim.fn.sha256(root):sub(1, 8)
           vim.fn.mkdir(dir, "p")
           params.initializationOptions = vim.tbl_extend("force", params.initializationOptions or {}, { storagePath = dir })
+          -- view/data binding classes (ActivityMainBinding...) are generated Java under <module>/build/generated; the server only
+          -- reads Java sources from its workspace folders, so hand it the debug variant of each module as an extra folder
+          -- (needs one Gradle build; without it nothing is added and the import stays "Unresolved reference")
+          params.workspaceFolders = params.workspaceFolders or {}
+          for _, out in ipairs(vim.fn.glob(root .. "/*/build/generated/data_binding_base_class_source_out/*/out", false, true)) do
+            if vim.fs.basename(vim.fs.dirname(out)):lower() == "debug" then
+              table.insert(params.workspaceFolders, { uri = vim.uri_from_fname(out), name = "generated-binding:" .. out })
+            end
+          end
         end,
         on_attach = function(client)
           require("kotlin_definition").attach(client, {

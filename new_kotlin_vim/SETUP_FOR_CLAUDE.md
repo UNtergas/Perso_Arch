@@ -75,6 +75,11 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
 - **`storagePath` per project** (`before_init`): the server's `kls_database.db` index lives in
   `~/.cache/kvim/...`, not in the project. A stale `kls_database.db` in a project root had broken `gd`,
   and it also stays out of git status. If a project still has a `kls_database.db` from before, the user may delete it.
+- **Generated binding classes** (`before_init`): view/data binding classes (`ActivityMainBinding`...) are generated Java under
+  `<module>/build/generated/data_binding_base_class_source_out/debug/out`. The server only reads Java sources from its workspace
+  folders (adding one later with `add_workspace_folder` has no effect), so `before_init` appends the `debug` folder of each module to
+  `params.workspaceFolders`. Without it the import shows "Unresolved reference: databinding" (Android Studio shows none). Needs one
+  Gradle build, and a server restart after layout changes. Tested on a copy of snowpack-android: 33 diagnostics down to 1, `gd` opens the generated file.
 - **Shared `gd` / `gp` fallback chain** (Kotlin buffers only, `kvim/lua/kotlin_definition.lua`): server definition, then the server's `workspace/symbol`
   search for the exact name, then a library source file. Why: when a module has a previous build's
   compiled output in `<module>/build/` (for example `androidapi/build/tmp/kotlin-classes`), the server
