@@ -88,6 +88,43 @@ vim.api.nvim_create_autocmd("FileType", { -- a picked size also applies to files
 })
 vim.keymap.set("n", "<leader>ti", function() _G.indent_choose() end, { desc = "Indent size (spaces / tabs)" })
 vim.keymap.set("n", "<leader>tc", function() vim.o.cmdheight = vim.o.cmdheight == 0 and 1 or 0 end, { desc = "Command-line row on / off" })
+-- SPC t b: git blame of the current line, as a gray note at the end of the line (author, date, message); again to hide it
+vim.keymap.set("n", "<leader>tb", function()
+  require("gitsigns").toggle_current_line_blame()
+  local on = require("gitsigns.config").config.current_line_blame
+  vim.notify("Git blame on the line: " .. (on and "on" or "off"))
+end, { desc = "Git blame of the current line on / off" })
+-- The blame note is virtual text and Neovim does not wrap it: what does not fit in the window is cut off. So the text is built to
+-- fit: the room left after the line itself, with the commit message cut short and ended with an ellipsis.
+local function relative_time(t)
+  local d = os.time() - t
+  local units = { { 31536000, "year" }, { 2592000, "month" }, { 604800, "week" }, { 86400, "day" }, { 3600, "hour" }, { 60, "minute" } }
+  for _, u in ipairs(units) do
+    if d >= u[1] then
+      local n = math.floor(d / u[1])
+      return n .. " " .. u[2] .. (n > 1 and "s" or "") .. " ago"
+    end
+  end
+  return "just now"
+end
+function _G.git_blame_format(name, info) -- name is "You" for your own commits
+  local info_w = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
+  local room = info_w.width - info_w.textoff - (vim.fn.virtcol("$") - 1) - 3 -- 3: the space before the note and a margin
+  local text
+  if info.sha and info.sha:match("^0+$") then
+    text = "You, not committed yet"
+  else
+    text = name .. ", " .. relative_time(info.author_time) .. " - " .. (info.summary or "")
+  end
+  if room < 12 then return {} end -- no room at all: show nothing instead of a stub
+  if vim.fn.strdisplaywidth(text) > room then
+    text = vim.fn.strcharpart(text, 0, room - 1) .. "\u{2026}"
+  end
+  return { { " " .. text, "GitSignsCurrentLineBlame" } }
+end
+local function blame_colors() vim.api.nvim_set_hl(0, "GitSignsCurrentLineBlame", { fg = "#9a9a9a", italic = true }) end
+blame_colors()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.schedule(blame_colors) end })
 
 -- Wrapping (Emacs: soft word wrap)
 vim.opt.wrap = true
@@ -802,7 +839,7 @@ require("lazy").setup({
       wk.add({ { "<C-w>T", hidden = true }, { "<C-w><", hidden = true }, { "<C-w>>", hidden = true }, { "<C-w>+", hidden = true }, { "<C-w>_", hidden = true }, { "<C-w>|", hidden = true }, { "<C-w>s", hidden = true }, { "<C-w>v", hidden = true }, { "<C-w>S", hidden = true } }) -- C-w T (break out into a new tab) is disabled below: one tab per nvim; keep it out of the C-w list
     end,
   },
-  { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = { sign_priority = 20 } }, -- above diagnostics so git marks always show
+  { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = { sign_priority = 20, current_line_blame_opts = { delay = 250, virt_text_pos = "eol" }, current_line_blame_formatter = function(...) return _G.git_blame_format(...) end } }, -- above diagnostics so git marks always show; blame is toggled with SPC t b
   { -- colors conflict blocks (ours / theirs) in the file
     "akinsho/git-conflict.nvim",
     event = "BufReadPost",
@@ -1927,8 +1964,18 @@ vim.api.nvim_create_autocmd("BufEnter", { callback = function() _G.tab_first = n
 function _G.buffer_tabline()
   local ok, ui = pcall(require, "buffer_manager.ui")
   if not ok then return "" end
-  pcall(ui.update_marks)
-  local marks = require("buffer_manager").marks
+  -- Read the Buffer manager's list without touching it. (This used to call its update_marks, which adds every listed buffer to
+  -- the list: a redraw in the middle of closing the C-b menu put the buffer you had just removed with dd back, the menu then
+  -- re-created it, and dd did not close anything.) Buffers it does not know yet go at the end, which is what update_marks does too,
+  -- so SPC 1..9 and the tab numbers agree.
+  local marks, known = {}, {}
+  for _, m in ipairs(require("buffer_manager").marks) do
+    if vim.fn.buflisted(m.buf_id) == 1 and m.buf_name ~= "" then marks[#marks + 1], known[m.buf_id] = m, true end
+  end
+  for _, b in ipairs(vim.api.nvim_list_bufs()) do
+    local name = vim.api.nvim_buf_get_name(b)
+    if not known[b] and vim.fn.buflisted(b) == 1 and name ~= "" then marks[#marks + 1] = { buf_id = b, buf_name = name } end
+  end
   local cur = vim.api.nvim_get_current_buf()
   local seen = {}
   for _, m in ipairs(marks) do

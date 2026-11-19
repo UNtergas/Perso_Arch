@@ -196,6 +196,7 @@ The top row of every Oil window shows the full path of the folder it lists
 | `]x` / `[x` | n | Next / previous conflict block |
 | `SPC g o` / `g t` / `g b` / `g 0` | n | Conflict under cursor: keep ours / theirs / both / none |
 | `SPC g r` | n | Revert hunk |
+| `SPC t b` | n | Toggle git blame of the current line: a gray note at the end of the line with the author, the date and the commit message (appears after a short pause on the line) |
 | `]g` / `[g` | n | Next / previous hunk |
 
 ## 9. Terminal
