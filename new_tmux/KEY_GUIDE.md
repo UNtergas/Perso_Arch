@@ -180,10 +180,10 @@ Moving and searching in copy mode:
 | `Ctrl-y` / `Ctrl-e` | Scroll one line up / down |
 | `[` / `]` | Scroll down / up one line; hold to repeat (no prefix in copy mode) |
 | `z` | Scroll so the cursor is in the middle |
-| `/` / `?` | Search forward / backward (prompt) |
+| `/` / `?` | Search forward / backward (a small "search" dialog, Enter runs it) |
 | `n` / `N` | Next / previous match |
 | `*` / `#` | Search forward / backward for the word under the cursor |
-| `f` `F` `t` `T` + a character | Jump to / before that character on the line. `;` repeats, `,` repeats the other way |
+| `f` `F` `t` `T` + a character | Jump to / before that character on the line (a small dialog that reads one key). `;` repeats, `,` repeats the other way |
 | `X` / `Alt-x` | Set a mark / jump to it |
 | `1`..`9` | Count prefix (for example `5j`) |
 | `:` | Go to a line number |
@@ -215,7 +215,7 @@ The mouse is on.
 | `r` | Resize mode, like i3: `h` `j` `k` `l` resize the active pane in 10% steps, `=` equal sizes, `Esc` / `Enter` / `q` leave (any other key leaves too). The status label shows RESIZE while it is on |
 | `:` | tmux command prompt |
 | `?` | List every key binding (searchable) |
-| `/` then a key | Describe what that key does |
+| `T` | Set the pane title (a small dialog, prefilled with the current title) |
 | `t` | Clock (any key leaves) |
 | `~` | Show the last messages |
 
@@ -226,7 +226,7 @@ The mouse is on.
 
 Far left, on the darkest colour: the OS icon (Nerd Font, picked from
 `/etc/os-release`) and the current user.
-Then: the mode label. Grey `NORMAL`, yellow `PREFIX` while the prefix is pressed,
+Then: the mode label. Grey `NORMAL`, dark purple `COMMAND` while a dialog is open (new window, rename, close, go to window, layout, search, goto line, jump...), yellow `PREFIX` while the prefix is pressed,
 blue `COPY` in copy mode, lilac `ZOOM` when a pane is zoomed (same idea as the nvim mode
 colours). Next to it, joined: `pane/total` and what the current pane is running
 (`nvim`, `zsh`, ...).
@@ -260,5 +260,7 @@ the statusline in `tmux.conf`).
 | `m` | (unused; `M` clears the marked pane) | focus mode |
 
 ### Compact prompts
+
+Nothing asks you on the status line any more: every prompt is a small dialog, and while it is open the mode label reads `COMMAND` in dark purple. In copy mode `/` `?` (search), `:` (goto line), `f` `F` `t` `T` (jump to a character) and the count prefix `1`..`9` (digits, then the key to repeat) open dialogs too. `Alt-e /` (describe key) is unbound.
 
 Rename (`Alt-e ,` / `$`), close (`x` / `&` / `X`), command (`:`), and window jump/move/search (`'` / `.` / `f`) use the same rounded, three-row popup as the new-window dialog. Rename/input accepts Enter and cancels with Esc or Ctrl-C. Close accepts only `y` or `Y`; any other key cancels. `Q` still detaches without closing programs.
