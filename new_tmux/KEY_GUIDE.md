@@ -6,7 +6,7 @@ The status bar uses powerline arrows, so it needs a Nerd Font (same as the nvim 
 ## Install
 
 ```sh
-mkdir -p ~/.tmux && cp new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh
+mkdir -p ~/.tmux && cp new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh new_tmux/flash.py ~/.tmux/ && chmod +x ~/.tmux/*.sh ~/.tmux/flash.py
 cp new_tmux/tmux.conf ~/.tmux.conf
 tmux            # or: tmux new -As dev   (attach to "dev", or create it)
 ```
@@ -181,6 +181,7 @@ Moving and searching in copy mode:
 | `[` / `]` | Scroll down / up one line; hold to repeat (no prefix in copy mode) |
 | `z` | Scroll so the cursor is in the middle |
 | `/` / `?` | Search forward / backward (a small "search" dialog, Enter runs it) |
+| `s` | Flash jump, like `s` in nvim: the pane's text turns gray, type one or more characters, every match is highlighted and gets a label right after it; press a label to move the cursor there (Enter = the nearest match, Backspace edits, Esc cancels). A selection started with `v` is extended. Needs `python3` and `~/.tmux/flash.py` |
 | `n` / `N` | Next / previous match |
 | `*` / `#` | Search forward / backward for the word under the cursor |
 | `f` `F` `t` `T` + a character | Jump to / before that character on the line (a small dialog that reads one key). `;` repeats, `,` repeats the other way |

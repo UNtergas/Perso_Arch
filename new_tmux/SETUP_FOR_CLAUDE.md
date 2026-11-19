@@ -7,6 +7,7 @@ scripts next to it in `~/.tmux/`. Without them `[` / `]` do nothing or print err
 |---|---|---|
 | Config | `new_tmux/tmux.conf` | `~/.tmux.conf` |
 | `[` / `]` consume-or-expel panes | `new_tmux/pane-col.sh` | `~/.tmux/pane-col.sh` (executable) |
+| copy-mode `s` flash jump (needs `python3`) | `new_tmux/flash.py` | `~/.tmux/flash.py` (executable) |
 | The `Alt-e` key dropdown | `new_tmux/which-key.sh` | `~/.tmux/which-key.sh` (executable) |
 | New-window name dialog (`N`, `a`, `d`) | `new_tmux/ask-name.sh` | `~/.tmux/ask-name.sh` (executable) |
 | Rename/close/command popups | `new_tmux/dialog.sh` | `~/.tmux/dialog.sh` (executable) |
@@ -56,7 +57,7 @@ An old default server can be replaced after the user has finished and exited all
 ## 2. Install
 
 1. Back up an existing `~/.tmux.conf`.
-2. `mkdir -p ~/.tmux && cp new_tmux/pane-col.sh new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh new_tmux/notify.sh new_tmux/notifications.sh new_tmux/notif-read.sh new_tmux/equalize.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
+2. `mkdir -p ~/.tmux && cp new_tmux/pane-col.sh new_tmux/flash.py new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh new_tmux/notify.sh new_tmux/notifications.sh new_tmux/notif-read.sh new_tmux/equalize.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
 3. `cp new_tmux/tmux.conf ~/.tmux.conf`
 4. Inside tmux: `tmux source ~/.tmux.conf`, or start a fresh server (see the reload note below).
 5. Enable relative line numbers by default: the config must contain `setw -g copy-mode-line-numbers relative`.
@@ -138,3 +139,6 @@ Install `dialog.sh` along with the other helpers. It supplies the same popup pla
 `r` switches the client to the key table `resize` (`bind r switch-client -T resize`). In that table `h` `j` `k` `l` run the same 10% `resize-pane` commands as `H` `J` `K` `L`, `=` runs `equalize.sh`, and each binding ends with `switch-client -T resize` so the mode stays on; `Escape`, `Enter` and `q` switch back to `root`, and any key not in the table also drops back to root (tmux discards it). The status label shows RESIZE (peach) while `#{client_key_table}` is `resize`. Reload moved from `r` to `R`.
 
 **No status-line prompts.** The stock `command-prompt` / `confirm-before` bindings are replaced by dialogs in `dialog.sh` (same rounded three-row popup as N and &): prefix `T` (`pane-title`), and in `copy-mode-vi` `/` `?` (`copy-search-down` / `-up`), `:` (`copy-goto-line`), `f` `F` `t` `T` (`copy-jump-*`, one key) and `1`..`9` (`copy-repeat N`, digits then the key; sent with `send-keys -N`). prefix `/` (describe-key) is unbound. `dialog.sh` and `ask-name.sh` set the global option `@dialog` while they run (EXIT trap clears it), and `status-left` / `@right` show `COMMAND` on dark purple (`#5b2d91`, text `#f3eaff`) when it is set; it is the first branch of the mode label chain, before resize, prefix, copy and zoom. The `emacs` copy-mode table is untouched (the config uses `mode-keys vi`).
+
+**Flash jump (`s` in copy mode).** `copy-mode-vi s` runs `tmux display-popup -c <client> -t <pane> -E -B -x P -y P -w <pane_width> -h <pane_height>` through `run-shell -b` (display-popup does not expand formats in `-w` / `-h`, the error is "height invalid"; run-shell does expand them). `-y P` puts the popup's bottom edge on the pane's bottom, so a borderless popup of the pane's size covers exactly that pane. `flash.py` captures the lines copy mode shows (`capture-pane -S -scroll_position -E ...`), redraws them in gray after a four-column gutter with the same relative line numbers copy mode shows (`%3d `, dim gray; `copy-mode-line-numbers relative`; the copy-mode `[n/m]` indicator is not reproduced), highlights matches (smartcase, literal) with labels placed right after each match (never a label that equals the character after a match), and moves the cursor with `send-keys -X top-line`, `-N <row> -X cursor-down`, `-X start-of-line`, `-N <col> -X cursor-right`. Matches are ordered by distance from the cursor, so the nearest ones get the first labels. A crash is logged to `~/.tmux/flash.log` (a popup that dies shows nothing). Wide characters are counted as one column.
+
