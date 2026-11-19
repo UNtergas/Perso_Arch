@@ -1,4 +1,4 @@
--- The winbar of every file window: path, unsaved dot and the file's own git counts on the left; on the focused
+-- The winbar of every file window: the project block, then the path, unsaved dot and the file's own git counts on the left; on the focused
 -- window the harpoon slots on the right. (The name is historic: it used to be Lspsaga's symbol breadcrumb, now gone.)
 -- While vim-visual-multi is on in the window, VM's info (mode, cursor n / total, patterns) takes the bar instead.
 -- It still replaces Lspsaga's winbar functions so Lspsaga never writes its own.
@@ -22,6 +22,8 @@ local function colors()
   api.nvim_set_hl(0, "HarpSlotSel", { fg = 0x1d2b2a, bg = bg, bold = true, underline = true })
   api.nvim_set_hl(0, "BarModified", { fg = 0x1f4e9c, bg = bg })
   api.nvim_set_hl(0, "BarPath", { link = "Comment" }) -- the path takes the theme's comment colour
+  api.nvim_set_hl(0, "BarProject", { fg = 0x14201f, bg = 0xb8c7c7, bold = true }) -- the utf-8 block colour of the statusline
+  api.nvim_set_hl(0, "BarProjectArrow", { fg = 0xb8c7c7, bg = bg })
 end
 
 local function harpoon_slots(buf)
@@ -51,7 +53,9 @@ function M.render(win)
   local label = _G.githist_label and _G.githist_label(name)
   local path = label or vim.fn.fnamemodify(name, ":~:.")
   local mod = vim.bo[buf].modified
-  local left = " %<" .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
+  -- [ project]>path : the project (folder name of the window's cwd) is a block with a folder icon, then the path
+  local project = vim.fn.fnamemodify(vim.fn.getcwd(vim.fn.win_id2win(win)), ":t")
+  local left = "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%#WinBar# %<" .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
     .. (mod and " \u{f444}" or "") .. "%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
   return left .. "%=" .. (focused and harpoon_slots(buf) or "")
 end
