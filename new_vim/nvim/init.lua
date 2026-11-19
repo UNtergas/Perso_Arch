@@ -996,6 +996,9 @@ require("lazy").setup({
       theme.visual.a = { fg = "#1a2f55", bg = "#b8d0f0", gui = "bold" }
       theme.replace.a = { fg = "#4a3800", bg = "#ecd98f", gui = "bold" } -- replace = light yellow (command stays purple)
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command" }) do theme[m].z = theme[m].a end
+      -- the first block's colours per mode, for the project block of the winbar (lua/saga_breadcrumb.lua)
+      _G.mode_a = {}
+      for _, m in ipairs({ "normal", "insert", "visual", "replace", "command" }) do _G.mode_a[m] = theme[m].a end
       -- "#rrggbb" foreground of a highlight group (lualine wants a hex string, not the number nvim returns)
       _G.hl_hex = function(name)
         local fg = vim.api.nvim_get_hl(0, { name = name, link = false }).fg
@@ -1046,16 +1049,7 @@ require("lazy").setup({
                 symbols = { error = "\u{f057} ", warn = "\u{f071} ", hint = "\u{f0eb} " } },
               { "diagnostics", sections = { "info" }, symbols = { info = "\u{f05a} " }, padding = { left = 0, right = 1 }, separator = "" },
               block("#b8c7c7", "#1c2828", { "encoding" }), -- utf-8 takes the colour the lsp block had
-              -- the indent block has the colour of the mode block at the far left: the same fade-in as the mode changes
-              block("#a3b5b5", "#1c2828", {
-                function() return _G.indent_label() end,
-                on_click = function() _G.indent_choose() end,
-                color = function()
-                  local key = ({ n = "normal", i = "insert", v = "visual", V = "visual", ["\22"] = "visual", s = "visual", S = "visual", R = "replace", c = "command", t = "insert" })[vim.fn.mode():sub(1, 1)] or "normal"
-                  local a = theme[key] and theme[key].a or theme.normal.a
-                  return { fg = a.fg, bg = a.bg }
-                end,
-              }),
+              block("#a3b5b5", "#1c2828", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
               -- line:column | percentage of the file (Top / Bot at the ends), one block: 76:42 | 5%
               block("#2f4443", "#e6e6e6", {
                 function()
@@ -1189,11 +1183,8 @@ require("lazy").setup({
     -- top row of every Oil window: the full path of the folder it shows (read-only; Lspsaga skips Oil buffers).
     -- Evaluated per window (statusline_winid), so splits each show their own folder. %< cuts a too-long path from its left.
     init = function()
-      function _G.oil_winbar()
-        local buf = vim.api.nvim_win_get_buf(vim.g.statusline_winid)
-        local dir = require("oil").get_current_dir(buf)
-        local path = dir and vim.fn.fnamemodify(dir, ":~") or vim.api.nvim_buf_get_name(buf) -- trash / ssh: the buffer name
-        return "%< \u{f07c} " .. path:gsub("%%", "%%%%")
+      function _G.oil_winbar() -- project block (mode coloured) and the folder, built in lua/saga_breadcrumb.lua
+        return require("saga_breadcrumb").oil_bar(vim.g.statusline_winid)
       end
     end,
 
