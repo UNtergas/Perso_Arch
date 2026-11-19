@@ -678,7 +678,7 @@ require("lazy").setup({
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       ui = { border = "rounded" },
-      symbol_in_winbar = { enable = false }, -- the winbar is lua/saga_breadcrumb.lua: path, unsaved dot, git counts, harpoon
+      symbol_in_winbar = { enable = false }, -- the winbar is lua/saga_breadcrumb.lua: project, path, unsaved dot, git counts, harpoon
       lightbulb = { enable = false }, -- keep git signs and avoid unsolicited action requests
       hover = { max_width = 0.7, max_height = 0.6 },
       rename = { auto_save = false, keys = { quit = "<C-c>" } },
@@ -1166,14 +1166,14 @@ require("lazy").setup({
       -- arrow between them (folder > branch > diagnostics): give b its own, in between a and c
       local theme = require("lualine.themes.auto")
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command", "inactive" }) do
-        if theme[m] and theme[m].b then theme[m].b = { fg = "#222222", bg = "#b8b8b8" } end
+        if theme[m] and theme[m].b then theme[m].b = { fg = "#222222", bg = "#cacaca" } end
       end
       -- normal mode: a > b > c fade from darkest to lightest (c is the tab row colour, see below)
       theme.normal.a = { fg = "#14201f", bg = "#8da1a1", gui = "bold" }
-      theme.normal.b = { fg = "#1c2828", bg = "#adbcbc" }
+      theme.normal.b = { fg = "#1c2828", bg = "#c3d0d0" }
       -- the branch text takes the mode colour (a darker shade of the first block's colour, so it stays readable on section b)
-      local branch_fg = { normal = "#3f5959", insert = "#2e6b14", visual = "#2455a3", replace = "#8a6500", command = "#6b3fa0" }
-      for m, fg in pairs(branch_fg) do theme[m].b = { fg = fg, bg = theme[m].b and theme[m].b.bg or "#adbcbc", gui = "bold" } end
+      local branch_fg = { normal = "#1d4747", insert = "#1b5a05", visual = "#123f94", replace = "#755200", command = "#5a2a96" }
+      for m, fg in pairs(branch_fg) do theme[m].b = { fg = fg, bg = theme[m].b and theme[m].b.bg or "#c3d0d0", gui = "bold" } end
       -- the lightest part of the statusline (section c: diagnostics) is the same colour as the tab row (#e2eeee)
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command" }) do
         theme[m].c = { fg = theme[m].c and theme[m].c.fg or "#222222", bg = "#e2eeee" }
@@ -1219,10 +1219,6 @@ require("lazy").setup({
             },
           },
           lualine_c = {
-            -- error / warn / hint always show (zeros too); info only when there is one
-            { "diagnostics", sections = { "error", "warn", "hint" }, always_visible = true,
-              symbols = { error = "\u{f057} ", warn = "\u{f071} ", hint = "\u{f0eb} " } },
-            { "diagnostics", sections = { "info" }, symbols = { info = "\u{f05a} " } },
             -- terminal / help / quickfix / Oil have no winbar, so the statusline names them
             function()
               if _G.githist_label(vim.api.nvim_buf_get_name(0)) then return "" end
@@ -1237,12 +1233,25 @@ require("lazy").setup({
               return vim.tbl_extend("force", { separator = { left = "\u{e0b2}" }, padding = { left = 1, right = 1 }, color = { fg = fg, bg = bg } }, extra or {})
             end
             return {
-              function() return "%S" end, -- keys typed so far in a pending command (d, 2, "a ...), from showcmdloc = statusline
-              function() local r = vim.fn.reg_recording() return r == "" and "" or "\u{f111} @" .. r end,
-              { "searchcount", maxcount = 999, timeout = 100 },
-              { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " }, padding = { left = 1, right = 1 } }, -- attached server names, plain on the bar colour
+              { function() return "%S" end, separator = "" }, -- keys typed so far in a pending command (d, 2, "a ...), from showcmdloc = statusline
+              { function() local r = vim.fn.reg_recording() return r == "" and "" or "\u{f111} @" .. r end, separator = "" },
+              { "searchcount", maxcount = 999, timeout = 100, separator = "" },
+              { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " }, padding = { left = 1, right = 1 }, separator = "" }, -- attached server names, plain on the bar colour
+              -- error / warn / hint always show (zeros too); info only when there is one; plain on the bar colour, before utf-8
+              { "diagnostics", sections = { "error", "warn", "hint" }, always_visible = true, padding = { left = 1, right = 1 }, separator = "",
+                symbols = { error = "\u{f057} ", warn = "\u{f071} ", hint = "\u{f0eb} " } },
+              { "diagnostics", sections = { "info" }, symbols = { info = "\u{f05a} " }, padding = { left = 0, right = 1 }, separator = "" },
               block("#b8c7c7", "#1c2828", { "encoding" }), -- utf-8 takes the colour the lsp block had
-              block("#a3b5b5", "#1c2828", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
+              -- the indent block has the colour of the mode block at the far left: the same fade-in as the mode changes
+              block("#a3b5b5", "#1c2828", {
+                function() return _G.indent_label() end,
+                on_click = function() _G.indent_choose() end,
+                color = function()
+                  local key = ({ n = "normal", i = "insert", v = "visual", V = "visual", ["\22"] = "visual", s = "visual", S = "visual", R = "replace", c = "command", t = "insert" })[vim.fn.mode():sub(1, 1)] or "normal"
+                  local a = theme[key] and theme[key].a or theme.normal.a
+                  return { fg = a.fg, bg = a.bg }
+                end,
+              }),
               -- line:column | percentage of the file (Top / Bot at the ends), one block: 76:42 | 5%
               block("#2f4443", "#e6e6e6", {
                 function()
@@ -2082,6 +2091,10 @@ local function tab_colors()
   local err = vim.api.nvim_get_hl(0, { name = "DiagnosticError", link = false }).fg or 0xb3261e
   vim.api.nvim_set_hl(0, "BufTabErr", { fg = err, bg = bg })
   vim.api.nvim_set_hl(0, "BufTabSelErr", { fg = err, bg = 0xfafafa, bold = true })
+  -- the strip on the left of the current tab: the theme's function colour (blue in koda-glade)
+  local fn = vim.api.nvim_get_hl(0, { name = "Function", link = false }).fg or 0x325cc0
+  local function darker(c, k) return math.floor(bit.rshift(c, 16) % 256 * k) * 65536 + math.floor(bit.rshift(c, 8) % 256 * k) * 256 + math.floor(c % 256 * k) end
+  vim.api.nvim_set_hl(0, "BufTabStrip", { fg = darker(fn, 0.7), bg = 0xfafafa })
 end
 tab_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = tab_colors })
@@ -2127,7 +2140,7 @@ function _G.buffer_tabline()
   local function arrow(active)
     local fill = vim.api.nvim_get_hl(0, { name = "BufTabFill", link = false }).bg
     local lg = vim.api.nvim_get_hl(0, { name = "BufTabLogo", link = false })
-    vim.api.nvim_set_hl(0, "BufTabLogoArrow", { fg = lg.bg, bg = active and 0xfafafa or fill })
+    vim.api.nvim_set_hl(0, "BufTabLogoArrow", { fg = lg.bg, bg = fill }) -- always the grey: the white of the current tab must not reach into the arrow
     return "%#BufTabLogo# " .. logo .. " %#BufTabLogoArrow#\u{e0b0}%#BufTabFill#"
   end
   if #items == 0 then return arrow(false) .. "%=" end -- no tab yet (a new project on Oil): the logo is still there
@@ -2154,7 +2167,9 @@ function _G.buffer_tabline()
     local base = it.active and "%#BufTabSel#" or "%#BufTab#"
     local dot = it.mod and ((it.active and "%#BufTabSelMod#" or "%#BufTabMod#") .. " \u{f444}") or ""
     local err = it.errs > 0 and ((it.active and "%#BufTabSelErr#" or "%#BufTabErr#") .. " \u{f057} " .. it.errs) or "" -- errors in this buffer
-    out[#out + 1] = "%" .. it.i .. "@v:lua.buffer_tab_click@" .. base .. " " .. it.i .. " " .. it.name .. err .. dot .. base .. " %X"
+    -- the current tab starts with a strip (a left half block, darker shade of the theme's function colour) where the others have a space
+    local lead = it.active and "%#BufTabStrip#\u{258c}" .. base or " "
+    out[#out + 1] = "%" .. it.i .. "@v:lua.buffer_tab_click@" .. base .. lead .. it.i .. " " .. it.name .. err .. dot .. base .. " %X"
   end
   out[#out + 1] = "%#BufTabFill#" .. (hi < #items and "%2@v:lua.buffer_tab_arrow@ \u{203a}%X" or "") .. "%="
   return table.concat(out)
