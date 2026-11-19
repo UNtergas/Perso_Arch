@@ -1012,7 +1012,13 @@ require("lazy").setup({
           section_separators = { left = "\u{e0b0}", right = "\u{e0b2}" },
         },
         sections = {
-          lualine_a = { "mode" }, -- NORMAL / INSERT / VISUAL ... (the project name is in the winbar now)
+          lualine_a = {
+            {
+              "mode", -- NORMAL / INSERT / VISUAL ... (the project name is in the winbar now); RESIZE while C-w r is on
+              fmt = function(name) return vim.g.resize_mode and "RESIZE" or name end,
+              color = function() if vim.g.resize_mode then return { fg = "#4a2a00", bg = "#f0c4a0", gui = "bold" } end end,
+            },
+          },
           lualine_b = {
             {
               "branch",
@@ -1040,7 +1046,8 @@ require("lazy").setup({
               return vim.tbl_extend("force", { separator = { left = "\u{e0b2}" }, padding = { left = 1, right = 1 }, color = { fg = fg, bg = bg } }, extra or {})
             end
             return {
-              { function() return "%S" end, separator = "" }, -- keys typed so far in a pending command (d, 2, "a ...), from showcmdloc = statusline
+              { function() return vim.g.resize_mode and "h j k l resize   = equal   Esc done" or "" end, separator = "" },
+              { function() return vim.g.resize_mode and "" or "%S" end, separator = "" }, -- (hidden in resize mode: getcharstr leaves a raw key there) -- keys typed so far in a pending command (d, 2, "a ...), from showcmdloc = statusline
               { function() local r = vim.fn.reg_recording() return r == "" and "" or "\u{f111} @" .. r end, separator = "" },
               { "searchcount", maxcount = 999, timeout = 100, separator = "" },
               { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " }, padding = { left = 1, right = 1 }, separator = "" }, -- attached server names, plain on the bar colour
@@ -1417,8 +1424,15 @@ end, { desc = "Equal window sizes (again: back to the previous sizes)" })
 -- C-w r: resize mode, like i3 (replaces the built-in C-w r, rotate). h / j / k / l resize the window in 10% steps (same as C-k h/j/k/l), = equal sizes (no toggle back),
 -- Esc / Enter / q leave; any other key leaves too.
 map(ck, "<C-w>r", function()
+  -- the mode is shown in the statusline (RESIZE in the mode block, the keys next to it), not as a message
   local function status()
-    vim.api.nvim_echo({ { "-- RESIZE --  h/j/k/l resize   = equal   Esc/Enter/q done", "ModeMsg" } }, false, {})
+    vim.g.resize_mode = true
+    pcall(function() require("saga_breadcrumb").project_colors() end)
+    pcall(function() require("lualine").refresh({ place = { "statusline" } }) end)
+    vim.wait(30) -- lualine recomputes its bar from a scheduled callback; let it run before the loop blocks on a key
+    vim.cmd("redrawstatus")
+    -- getcharstr blocks, so draw now: the bar shows RESIZE before the first key
+    pcall(vim.api.nvim__redraw, { statusline = true, winbar = true, tabline = true, flush = true })
   end
   status()
   while true do
@@ -1433,7 +1447,9 @@ map(ck, "<C-w>r", function()
     vim.cmd("redraw")
     status()
   end
-  vim.api.nvim_echo({ { "" } }, false, {})
+  vim.g.resize_mode = false
+  pcall(function() require("saga_breadcrumb").project_colors() end)
+  vim.cmd("redrawstatus")
 end, { desc = "Resize mode (h/j/k/l, = equal, Esc)" })
 -- C-w \ splits side by side, C-w - splits stacked (like tmux: \ side by side, - stacked)
 map("n", "<C-w>\\", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
@@ -1959,8 +1975,8 @@ function _G.buffer_tabline()
     local base = it.active and "%#BufTabSel#" or "%#BufTab#"
     local dot = it.mod and ((it.active and "%#BufTabSelMod#" or "%#BufTabMod#") .. " \u{f444}") or ""
     local err = it.errs > 0 and ((it.active and "%#BufTabSelErr#" or "%#BufTabErr#") .. " \u{f057} " .. it.errs) or "" -- errors in this buffer
-    -- the current tab starts with a strip (a left half block, darker shade of the theme's function colour) where the others have a space
-    local lead = it.active and "%#BufTabStrip#\u{258c}" .. base or " "
+    -- the current tab starts with a strip (a three-eighths block, darker shade of the theme's function colour) where the others have a space
+    local lead = it.active and "%#BufTabStrip#\u{258d}" .. base or " "
     out[#out + 1] = "%" .. it.i .. "@v:lua.buffer_tab_click@" .. base .. lead .. it.i .. " " .. it.name .. err .. dot .. base .. " %X"
   end
   out[#out + 1] = "%#BufTabFill#" .. (hi < #items and "%2@v:lua.buffer_tab_arrow@ \u{203a}%X" or "") .. "%="
