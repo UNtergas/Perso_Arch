@@ -43,7 +43,7 @@ local function set_indent(buf, size, tabs)
 end
 function _G.indent_label()
   local sw = vim.bo.shiftwidth > 0 and vim.bo.shiftwidth or vim.bo.tabstop
-  return (vim.bo.expandtab and "Spaces: " or "Tabs: ") .. sw
+  return (vim.bo.expandtab and "SPC:" or "TAB:") .. sw
 end
 local function each_file_buffer(fn)
   for _, b in ipairs(vim.api.nvim_list_bufs()) do
@@ -87,6 +87,7 @@ vim.api.nvim_create_autocmd("FileType", { -- a picked size also applies to files
   end,
 })
 vim.keymap.set("n", "<leader>ti", function() _G.indent_choose() end, { desc = "Indent size (spaces / tabs)" })
+vim.keymap.set("n", "<leader>tc", function() vim.o.cmdheight = vim.o.cmdheight == 0 and 1 or 0 end, { desc = "Command-line row on / off" })
 
 -- Wrapping (Emacs: soft word wrap)
 vim.opt.wrap = true
@@ -122,6 +123,12 @@ vim.opt.statuscolumn = "%@v:lua.fold_click@%{v:lua.fold_icon()}%X %s%=%l "
 -- keep the cursor a few lines from the edge: the sticky function header
 -- (treesitter-context) needs room above the cursor to show
 vim.opt.scrolloff = 5
+-- No command-line row: the mode word, pending keys and the macro indicator are in lualine, messages are toasts (noice -> nvim-notify),
+-- ":" and "/" are the noice popup. SPC t c brings the row back (and takes it away again).
+vim.opt.cmdheight = 0
+vim.opt.showmode = false
+vim.opt.showcmd = true
+vim.opt.showcmdloc = "statusline" -- pending keys (d, 2, "a ...) are drawn where %S is in the statusline: a lualine component below
 vim.opt.laststatus = 3 -- global statusline (lualine globalstatus = true); set early so the bar does not jump when lualine loads
 
 -- Light theme
@@ -1092,7 +1099,21 @@ require("lazy").setup({
     dependencies = { "MunifTanjim/nui.nvim" },
     opts = {
       cmdline = { enabled = true, view = "cmdline_popup" },
-      messages = { enabled = false },
+      -- every message ("written", errors, warnings, echo) is a toast through nvim-notify; the search count (lualine has it), the
+      -- recording notice (lualine has it) and the pending keys (lualine has them) are not shown a second time
+      messages = { enabled = true, view = "notify", view_error = "notify", view_warn = "notify", view_history = "messages", view_search = false },
+      routes = {
+        -- plain messages ("written", "N substitutions", "N lines yanked" ...): without noice's replace / merge options these are shown
+        { filter = { event = "msg_show", kind = { "", "list_cmd" } }, view = "notify" },
+        -- saving sends two messages, the bare file name and then the "written" line: only the second one is shown
+        { filter = { event = "msg_show", kind = "bufwrite", find = "written" }, view = "notify" },
+        { filter = { event = "msg_show", kind = "bufwrite" }, opts = { skip = true } },
+        { filter = { event = "msg_show", kind = { "empty", "search_cmd" } }, opts = { skip = true } }, -- clear-the-line and the echoed /pattern
+        { filter = { event = "msg_show", kind = { "undo", "quickfix", "shell_out", "shell_err", "shell_cmd" } }, view = "notify" },
+        { filter = { event = "msg_showmode" }, opts = { skip = true } },
+        { filter = { event = "msg_showcmd" }, opts = { skip = true } },
+        { filter = { event = "msg_show", kind = "search_count" }, opts = { skip = true } },
+      },
       popupmenu = { enabled = false },
       notify = { enabled = false },
       lsp = {
@@ -1181,8 +1202,19 @@ require("lazy").setup({
           section_separators = { left = "\u{e0b0}", right = "\u{e0b2}" },
         },
         sections = {
-          lualine_a = { function() return vim.fn.fnamemodify(vim.fn.getcwd(), ":t") end },
-          lualine_b = { { "branch", icon = "\u{f418}" } },
+          lualine_a = { "mode" }, -- NORMAL / INSERT / VISUAL ... (the project name is in the winbar now)
+          lualine_b = {
+            {
+              "branch",
+              icon = "\u{f418}",
+              -- a long branch (JIRA-1234-some-long-title) is cut to 18 characters from the start, the rest becomes …
+              fmt = function(name)
+                local max = 18
+                if vim.fn.strchars(name) > max then return vim.fn.strcharpart(name, 0, max - 1) .. "\u{2026}" end
+                return name
+              end,
+            },
+          },
           lualine_c = {
             -- error / warn / hint always show (zeros too); info only when there is one
             { "diagnostics", sections = { "error", "warn", "hint" }, always_visible = true,
@@ -1202,13 +1234,21 @@ require("lazy").setup({
               return vim.tbl_extend("force", { separator = { left = "\u{e0b2}" }, padding = { left = 1, right = 1 }, color = { fg = fg, bg = bg } }, extra or {})
             end
             return {
+              function() return "%S" end, -- keys typed so far in a pending command (d, 2, "a ...), from showcmdloc = statusline
               function() local r = vim.fn.reg_recording() return r == "" and "" or "\u{f111} @" .. r end,
               { "searchcount", maxcount = 999, timeout = 100 },
               { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " }, padding = { left = 1, right = 1 } }, -- attached server names, plain on the bar colour
               block("#b8c7c7", "#1c2828", { "encoding" }), -- utf-8 takes the colour the lsp block had
               block("#a3b5b5", "#1c2828", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
-              block("#8da1a1", "#14201f", { "progress" }),
-              block("#2f4443", "#e6e6e6", { "location", color = { fg = "#e6e6e6", bg = "#2f4443", gui = "bold" } }),
+              -- line:column | percentage of the file (Top / Bot at the ends), one block: 76:42 | 5%
+              block("#2f4443", "#e6e6e6", {
+                function()
+                  local cur, total = vim.fn.line("."), vim.fn.line("$")
+                  local pct = cur == 1 and "Top" or (cur == total and "Bot" or math.floor(cur / total * 100) .. "%%") -- %% : a lone % would be read as a statusline item
+                  return string.format("%d:%d | %s", cur, vim.fn.col("."), pct)
+                end,
+                color = { fg = "#e6e6e6", bg = "#2f4443", gui = "bold" },
+              }),
               block("#14201f", "#e6e6e6", { "filetype", colored = false, fmt = function(s) return s:lower() end, color = { fg = "#e6e6e6", bg = "#14201f", gui = "bold" } }),
             }
           end)(),
