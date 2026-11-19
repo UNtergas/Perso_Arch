@@ -17,15 +17,18 @@ local function escape(s) return s:gsub("%%", "%%%%"):gsub("[\r\n]", " ") end
 
 -- The project block takes the colour of the mode block of the statusline (insert green, visual blue, replace yellow, command
 -- purple); in normal mode it keeps the lighter utf-8 grey-teal.
+local PATH_BG = "#e8f0f0" -- the path block: a touch lighter than the tab row (#e2eeee), darker than the bar (#fafafa)
 local mode_key = { n = "normal", i = "insert", v = "visual", V = "visual", ["\22"] = "visual", s = "visual", S = "visual", R = "replace", c = "command", t = "insert" }
 function M.project_colors()
   local key = mode_key[api.nvim_get_mode().mode:sub(1, 1)] or "normal"
   local a = _G.mode_a and _G.mode_a[key]
   local bg = (key ~= "normal" and a and a.bg) or "#b8c7c7"
   local fg = (key ~= "normal" and a and a.fg) or "#14201f"
+  if vim.g.resize_mode then bg, fg = "#f0c4a0", "#4a2a00" end -- C-w r: the peach of tmux's RESIZE label
   local bar = api.nvim_get_hl(0, { name = "WinBar", link = false }).bg
   api.nvim_set_hl(0, "BarProject", { fg = fg, bg = bg, bold = true })
-  api.nvim_set_hl(0, "BarProjectArrow", { fg = bg, bg = bar })
+  api.nvim_set_hl(0, "BarProjectArrow", { fg = bg, bg = PATH_BG }) -- project block > path block
+  api.nvim_set_hl(0, "BarProjectArrowEnd", { fg = bg, bg = bar }) -- project block > bar (nothing after it)
 end
 
 local function colors()
@@ -33,8 +36,10 @@ local function colors()
   local bg = bar.bg or 0xfafafa
   api.nvim_set_hl(0, "HarpSlot", { fg = 0x6a6a6a, bg = bg })
   api.nvim_set_hl(0, "HarpSlotSel", { fg = 0x1d2b2a, bg = bg, bold = true, underline = true })
-  api.nvim_set_hl(0, "BarModified", { fg = 0x1f4e9c, bg = bg })
-  api.nvim_set_hl(0, "BarPath", { link = "Comment" }) -- the path takes the theme's comment colour
+  api.nvim_set_hl(0, "BarModified", { fg = 0x1f4e9c, bg = PATH_BG })
+  -- the path takes the theme's comment colour, on its own light background, ending with an arrow into the bar
+  api.nvim_set_hl(0, "BarPath", { fg = api.nvim_get_hl(0, { name = "Comment", link = false }).fg, bg = PATH_BG })
+  api.nvim_set_hl(0, "BarPathArrow", { fg = PATH_BG, bg = bg })
   M.project_colors()
 end
 
@@ -67,8 +72,8 @@ function M.render(win)
   local mod = vim.bo[buf].modified
   -- [ project]>path : the project (folder name of the window's cwd) is a block with a folder icon, then the path
   local project = vim.fn.fnamemodify(vim.fn.getcwd(vim.fn.win_id2win(win)), ":t")
-  local left = "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%#WinBar#%<" .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
-    .. (mod and " \u{f444}" or "") .. "%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
+  local left = "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<" .. (mod and "%#BarModified#" or "%#BarPath#") .. " " .. escape(path)
+    .. (mod and " \u{f444}" or "") .. " %#BarPathArrow#\u{e0b0}%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
   return left .. "%=" .. (focused and harpoon_slots(buf) or "")
 end
 
@@ -87,7 +92,8 @@ function M.oil_bar(win)
   else
     path = api.nvim_buf_get_name(buf) -- trash / ssh: the buffer name
   end
-  return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%#WinBar#%<%#BarPath#" .. escape(path)
+  if path == "" then return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrowEnd#\u{e0b0}" end
+  return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<%#BarPath# " .. escape(path) .. " %#BarPathArrow#\u{e0b0}"
 end
 
 function M.install(buf)
@@ -114,7 +120,7 @@ function M.setup()
   end
   colors()
   local group = api.nvim_create_augroup("SagaBreadcrumbRefresh", { clear = true })
-  api.nvim_create_autocmd("ColorScheme", { group = group, callback = colors })
+  api.nvim_create_autocmd("ColorScheme", { group = group, callback = function() vim.schedule(colors) end }) -- after the theme hooks set Comment
   api.nvim_create_autocmd("ModeChanged", { group = group, callback = function() M.project_colors(); vim.cmd("redrawstatus") end })
   api.nvim_create_autocmd({ "BufWinEnter", "WinEnter", "BufFilePost", "FileType" }, {
     group = group, callback = function() M.install() end,
