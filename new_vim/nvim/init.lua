@@ -982,9 +982,9 @@ require("lazy").setup({
       -- the branch text takes the mode colour (a darker shade of the first block's colour, so it stays readable on section b)
       local branch_fg = { normal = "#1d4747", insert = "#1b5a05", visual = "#123f94", replace = "#755200", command = "#5a2a96" }
       for m, fg in pairs(branch_fg) do theme[m].b = { fg = fg, bg = theme[m].b and theme[m].b.bg or "#c3d0d0", gui = "bold" } end
-      -- the lightest part of the statusline (section c: diagnostics) is the same colour as the tab row (#e2eeee)
+      -- the lightest part of the statusline (section c) is the same colour as the tab row (#d4dfdf)
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command" }) do
-        theme[m].c = { fg = theme[m].c and theme[m].c.fg or "#222222", bg = "#e2eeee" }
+        theme[m].c = { fg = theme[m].c and theme[m].c.fg or "#222222", bg = "#d4dfdf" }
       end
       -- right side mirrors the left: y (percent) = b shade, z (line:col) = a (project) colour, so it fades c > b > a > language
       for _, m in ipairs({ "normal", "insert", "visual", "replace", "command" }) do
@@ -1895,7 +1895,8 @@ vim.opt.statusline = "%{%v:lua.project_name()%}%{%v:lua.git_status()%}%{%v:lua.n
 -- SPC 1-9 jump to the Nth tab. The file path, unsaved dot and git counts are in each window's winbar (lua/saga_breadcrumb.lua).
 local function tab_colors()
   local fill = vim.api.nvim_get_hl(0, { name = "TabLineFill", link = false })
-  local bg = fill.bg or 0xe2eeee
+  -- the tab row is a little darker than the theme's TabLineFill (#e2eeee); the statusline's section c uses the same colour
+  local bg = 0xd4dfdf
   vim.api.nvim_set_hl(0, "BufTab", { fg = 0x6a6a6a, bg = bg })
   vim.api.nvim_set_hl(0, "BufTabMod", { fg = 0x1f4e9c, bg = bg })
   vim.api.nvim_set_hl(0, "BufTabSel", { fg = 0x1d2b2a, bg = 0xfafafa, bold = true })
