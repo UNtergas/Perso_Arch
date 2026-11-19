@@ -55,7 +55,7 @@ function M.render(win)
   local mod = vim.bo[buf].modified
   -- [ project]>path : the project (folder name of the window's cwd) is a block with a folder icon, then the path
   local project = vim.fn.fnamemodify(vim.fn.getcwd(vim.fn.win_id2win(win)), ":t")
-  local left = "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%#WinBar# %<" .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
+  local left = "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%#WinBar#%<" .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
     .. (mod and " \u{f444}" or "") .. "%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
   return left .. "%=" .. (focused and harpoon_slots(buf) or "")
 end
