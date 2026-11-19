@@ -26,7 +26,7 @@ half page up), not `C-Space` (Alacritty sends the same NUL for Ctrl+\`).
 Pressing `Alt-e` opens a dropdown under the status bar, at the right, that lists the
 main keys. Press a key and it runs; `Esc` closes the dropdown. Keys that are not
 listed (the stock ones in this guide) work too: the dropdown passes any key on to
-tmux. `Alt-e Alt-e` sends a literal Alt-e to the program in the pane. While the
+tmux. `Alt-e Alt-e` is the same as `Alt-e e` (the go-to-window dialog); a literal Alt-e can no longer be sent to a program. While the
 dropdown is open the mode label in the status bar shows `PREFIX`.
 
 How it works: the real tmux prefix is switched off (`prefix None`). `Alt-e` is an
@@ -100,7 +100,7 @@ Divider arrow: in a window with exactly **two** panes only the half of the divid
 | `o` | Previous window |
 | `p` | Next window |
 | `1`..`9` | Jump to the pane with that number (the same numbers `q` shows) |
-| `e` then `1`..`9` | Jump to window by number (`Alt-e e 3`): a small "go to window" dialog like `N` and `&`, any other key closes it |
+| `e` or `Alt-e` again, then `1`..`9` | Jump to window by number (`Alt-e e 3`, or `Alt-e Alt-e 3` without releasing Alt): a small "go to window" dialog like `N` and `&`, any other key closes it |
 | `,` | Rename window in a popup (current name prefilled) |
 | `&` | Close the whole window (popup: y confirms, any other key cancels) |
 | `w` | Tree of all sessions and windows (`j`/`k`, Enter, `x` kills the highlighted one) |

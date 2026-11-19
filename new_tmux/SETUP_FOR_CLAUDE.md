@@ -84,7 +84,7 @@ An old default server can be replaced after the user has finished and exited all
 - **The `Alt-e` dropdown**: the real prefix is off (`set -g prefix None`). `Alt-e` is a root key (`bind -n M-e`) that opens a
   popup running `~/.tmux/which-key.sh`. The script prints the key list, reads one key, closes, and then runs
   `switch-client -T prefix` + `send-keys -K` so the key goes through the normal prefix table (every `bind` in the
-  config, listed or not, keeps working; `Alt-e Alt-e` sends a literal Alt-e). The status label shows `PREFIX` while the
+  config, listed or not, keeps working; `Alt-e Alt-e` opens the go-to-window dialog, same as `Alt-e e`; a literal Alt-e can no longer be sent to a program). The status label shows `PREFIX` while the
   popup is open through the global option `@popup` (the script sets and unsets it). `display-popup -h` does not take a
   format, so `tmux.conf` has two popup commands, chosen by the terminal height. When you add a key to `tmux.conf`, add
   a row to the list in `which-key.sh` and to `KEY_GUIDE.md`.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The key dropdown: Alt-e (root binding in tmux.conf) opens this in a popup under the status bar. It lists the keys,
 # reads ONE key, closes, and hands that key to tmux's prefix table, so every prefix binding works as before
-# (including the stock ones that are not listed here). Esc closes it. Alt-e again sends a literal Alt-e to the pane.
+# (including the stock ones that are not listed here). Esc closes it. Alt-e again is the same as e (go to window).
 # Copy of new_tmux/which-key.sh, lives in ~/.tmux/which-key.sh. usage: which-key.sh <client_name> <pane_id>
 client=$1 pane=$2
 tmux set -g @popup 1 \; refresh-client -S 2>/dev/null
@@ -33,7 +33,7 @@ sec "Windows"
 row "N"          "new window (name dialog)"
 row "o  p"       "previous / next window"
 row ","          "rename window"
-row "e  1..9"     "jump to window N (e, then the number)"
+row "e  1..9"     "jump to window N (e or Alt-e again, then the number)"
 row "w"          "tree of sessions and windows"
 row "&"          "close the window"
 sec "Sessions and other"
@@ -46,7 +46,6 @@ row "r"          "resize mode (hjkl, = equal, Esc)"
 row "R"          "reload ~/.tmux.conf"
 row ":"          "tmux command prompt"
 row "?"          "every key binding"
-row "Alt-e"      "send a literal Alt-e to the program"
 
 IFS= read -rsn1 k || exit 0
 case "$k" in
@@ -58,7 +57,7 @@ case "$k" in
       "[B"|"OB") name=Down ;;
       "[C"|"OC") name=Right ;;
       "[D"|"OD") name=Left ;;
-      e*)        tmux run-shell -b "sleep 0.1; tmux send-keys -t '$pane' M-e"; exit 0 ;;
+      e*)        name=e ;; # Alt-e again = the same as e: the go-to-window dialog (a second Alt-e without letting go of Alt)
       *)         exit 0 ;;
     esac ;;
   " ")  name=Space ;;
