@@ -303,6 +303,8 @@ require("lazy").setup({
 	},
 
       completion = {
+        -- the menu shows, but nothing is selected: Enter inserts a newline, and Down (or C-j) selects the first item
+        list = { selection = { preselect = false, auto_insert = true } },
         menu = {
           auto_show = true,
         },
@@ -323,6 +325,8 @@ require("lazy").setup({
         enabled = true,
 
         completion = {
+          -- same for ":" : the list shows, nothing is selected until you press Right (Left goes back)
+          list = { selection = { preselect = false, auto_insert = true } },
           menu = {
             auto_show = true,
           },
