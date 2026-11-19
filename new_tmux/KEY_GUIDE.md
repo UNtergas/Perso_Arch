@@ -90,7 +90,7 @@ for rows: use it on one of the two bottom terminals of the `a 2` preset.
 
 `Space` (stock: cycle layouts) is unbound. `Alt-e Space` does nothing.
 
-Divider arrow: in a window with exactly **two** panes only the half of the divider next to the active pane is dark, and a small arrow near the start of the divider (tmux cannot move it to the middle) points at the active pane. The arrow takes the colour of the half it sits on, so it is faint when the active pane is the bottom or right one. With three or more panes the borders are plain again, no arrow (tmux option `pane-border-indicators`, switched per window by a hook).
+Divider: only the half of the divider next to the active pane is dark, and the number on each pane's border shows which pane is which (dark on the active one). There is no arrow on the divider any more.
 
 ## Windows (tabs)
 
