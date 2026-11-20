@@ -1,0 +1,16 @@
+// Paparazzi layout preview, injected from outside the project (nothing in the repo changes).
+// env: PREVIEW_MODULE (gradle path, ex ":demo_services"), PREVIEW_PLUGIN_VERSION, PREVIEW_TEST_DIR
+gradle.projectsLoaded {
+    gradle.rootProject.buildscript {
+        repositories { google(); mavenCentral(); gradlePluginPortal() }
+        dependencies { classpath "app.cash.paparazzi:paparazzi-gradle-plugin:${System.getenv('PREVIEW_PLUGIN_VERSION') ?: '1.3.5'}" }
+    }
+}
+allprojects {
+    if (path == (System.getenv('PREVIEW_MODULE') ?: ':demo_services')) {
+        pluginManager.withPlugin('com.android.application') {
+            pluginManager.apply('app.cash.paparazzi')
+            android.sourceSets.test.java.srcDir(System.getenv('PREVIEW_TEST_DIR'))
+        }
+    }
+}

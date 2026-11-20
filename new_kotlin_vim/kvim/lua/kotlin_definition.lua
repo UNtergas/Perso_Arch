@@ -1,6 +1,59 @@
 -- Augment only this Kotlin client's definition responses, so gd and UI plugins share fallbacks.
 local M = {}
 
+-- gd on a view/data binding class or one of its fields lands in the generated Java under <module>/build/generated/
+-- data_binding_base_class_source_out; Android Studio opens the layout instead. Map: ActivityMainBinding -> activity_main.xml,
+-- the field tokenInput -> the line with android:id="@+id/token_input" in that layout. Anything unmatched is left alone.
+local function read_lines(path)
+  local ok, lines = pcall(vim.fn.readfile, path)
+  return ok and lines or nil
+end
+
+local function layout_for(module, name)
+  local layouts = vim.fn.glob(module .. "/src/*/res/layout/" .. name .. ".xml", false, true)
+  if #layouts == 0 then layouts = vim.fn.glob(module .. "/src/*/res/layout*/" .. name .. ".xml", false, true) end
+  return layouts[1]
+end
+
+function M.generated_to_layout(loc)
+  local uri = loc.targetUri or loc.uri
+  local range = loc.targetSelectionRange or loc.range
+  if not uri or not range then return loc end
+  local file = vim.uri_to_fname(uri)
+  local module = file:match("^(.-)/build/generated/data_binding_base_class_source_out/")
+  if not module or not file:match("Binding%.java$") then return loc end
+  local lines = read_lines(file)
+  local text = lines and lines[range.start.line + 1]
+  if not text then return loc end
+  local function at(xml, line, col)
+    local pos = { line = line, character = col }
+    return { uri = vim.uri_from_fname(xml), range = { start = pos, ["end"] = pos } }
+  end
+  local class = text:match("class%s+(%w+)Binding%f[%W]")
+  if class then
+    local xml = layout_for(module, (class:gsub("(%l)(%u)", "%1_%2"):gsub("(%u)(%u%l)", "%1_%2"):lower()))
+    return xml and at(xml, 0, 0) or loc
+  end
+  local field = text:match("public final [%w%.<>]+ (%w+);")
+  if field then
+    local layout = file:match("/(%w+)Binding%.java$")
+    local xml = layout and layout_for(module, (layout:gsub("(%l)(%u)", "%1_%2"):gsub("(%u)(%u%l)", "%1_%2"):lower()))
+    local id = field:gsub("(%u)", "_%1"):lower()
+    for i, l in ipairs(xml and read_lines(xml) or {}) do
+      local col = l:find('@+id/' .. id .. '"', 1, true) or l:find('@id/' .. id .. '"', 1, true)
+      if col then return at(xml, i - 1, col - 1) end
+    end
+  end
+  return loc
+end
+
+local function rewrite_generated(result)
+  if not vim.islist(result) then return result end
+  local out = {}
+  for i, loc in ipairs(result) do out[i] = M.generated_to_layout(loc) end
+  return out
+end
+
 function M.attach(client, opts)
   if client._kvim_definition_fix then return end
   client._kvim_definition_fix = true
@@ -48,6 +101,7 @@ function M.attach(client, opts)
       if not state.cancelled then handler(err, result, ctx, config) end
     end
     local function deliver(result, ctx, config)
+      result = rewrite_generated(result)
       if vim.islist(result) and #result > 1 then
         vim.ui.select(result, {
           prompt = "Definitions of " .. word,

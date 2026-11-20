@@ -23,7 +23,7 @@ Delete this section once every machine is done.
 
 `kvim` is a second Neovim for Kotlin and Android work, run as `NVIM_APPNAME=kvim nvim` through the alias `alias kvim='NVIM_APPNAME=kvim nvim'` in `~/.zshrc`. It never touches the normal `nvim`.
 
-When the user asks to set up `kvim` on a machine, or to work on its config, read `new_kotlin_vim/SETUP_FOR_CLAUDE.md` first. It has the install steps (including the alias), the checks, why each Kotlin customisation exists, and the rules for testing safely. The same `tree-sitter-cli` check as above applies.
+When the user asks to set up `kvim` on a machine, or to work on its config, read `new_kotlin_vim/SETUP_FOR_CLAUDE.md` first. It has the install steps (including the alias), the checks, why each Kotlin customisation exists, and the rules for testing safely. The same `tree-sitter-cli` check as above applies. For the Android parts (binding classes, `gd` to a layout, the `SPC o p` layout preview) read `new_kotlin_vim/ANDROID_KOTLIN_NOTES.md`.
 
 ## tmux (`new_tmux/`)
 

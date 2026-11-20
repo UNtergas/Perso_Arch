@@ -13,6 +13,8 @@
 
 Tell the user what you are about to do, then follow the steps. Do not skip the checks.
 
+Android-specific work (generated binding classes, `gd` to the layout, the `SPC o p` layout preview) has its own notes: `ANDROID_KOTLIN_NOTES.md`. Read it before touching any of that.
+
 ## 1. Prerequisites (check each, tell the user what is missing)
 
 - `nvim --version` is 0.12 or later.
@@ -24,6 +26,7 @@ Tell the user what you are about to do, then follow the steps. Do not skip the c
   `kotlin_language_server`, because its embedded Kotlin compiler crashes on Java 25.0.4.1
   (`IllegalArgumentException: 25.0.4.1`). On another machine run `ls /usr/lib/jvm` and, if the path
   differs, change that one line (`grep -n java-21 ~/.config/kvim/init.lua`). Only JDK 21 was tested; 25.0.4.1 is known to crash it.
+- Optional, for the `SPC o p` layout preview: `feh` (the preview window), JDK 21 and a buildable Android project (see `ANDROID_KOTLIN_NOTES.md`).
 - Optional: Gradle's cache `~/.gradle/caches/modules-2/files-2.1` with `*-sources.jar` files. Without them,
   `gd` on `kotlin.*` and `kotlinx.*` imports says "No definition found". Android Studio or Gradle
   downloads them when you "download sources".

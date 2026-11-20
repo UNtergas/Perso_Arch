@@ -1920,6 +1920,14 @@ function _G.code_action()
 end
 map({ "n", "i", "v" }, "<M-.>", _G.code_action, { desc = "Code action" })
 
+-- Android layouts: SPC o p renders res/layout*/x.xml with Paparazzi and shows it in a feh window (lua/layout_preview.lua)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "xml",
+  callback = function(ev)
+    map("n", "<leader>op", function() require("layout_preview").render(ev.buf) end, { buffer = ev.buf, desc = "Preview Android layout" })
+  end,
+})
+
 -- markdown: SPC o m renders the file with glow in a buffer (vim motions and / work, q goes back)
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
