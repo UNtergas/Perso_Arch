@@ -2201,7 +2201,7 @@ function _G.buffer_tab_arrow(n) _G.buffer_tab_scroll(n == 1 and -3 or 3) end
 vim.api.nvim_create_autocmd("BufEnter", { callback = function() _G.tab_first = nil end })
 -- Keys block of the tab row, between the logo and the tabs, fixed width so the tabs never move: a keyboard icon, then the last keys
 -- typed (dim), the ones of a command still waiting for more (bold: 30, d2, "a) and a macro being recorded (red). Coloured like the
--- project block of the winbar, so it follows the mode.
+-- cool cyan, its own accent (it does not follow the mode).
 local KEYS_W = 9
 local key_hist = {} -- { t = "j", w = 1 }, newest last
 local key_names = {
@@ -2242,9 +2242,8 @@ local function mix(a, b, t) -- colour a moved t of the way to colour b
   return m(16) + m(8) + m(0)
 end
 local function keys_block(fill)
-  pcall(function() require("saga_breadcrumb").project_colors() end)
-  local p = vim.api.nvim_get_hl(0, { name = "BarProject", link = false })
-  local bg, fg = p.bg or 0xb8c7c7, p.fg or 0x14201f
+  -- its own accent (cool cyan), not the mode colour of the winbar's project block
+  local bg, fg = 0xbfe6ea, 0x0f3a40
   local set = vim.api.nvim_set_hl
   set(0, "BufKeysIcon", { fg = fg, bg = bg })
   set(0, "BufKeysDim", { fg = mix(fg, bg, 0.5), bg = bg })
