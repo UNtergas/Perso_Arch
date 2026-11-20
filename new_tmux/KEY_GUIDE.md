@@ -59,10 +59,12 @@ new window instead. It opens the same name dialog first (prefilled `side` for `a
 | `[` / `]` | Like niri's `Mod+[` / `Mod+]` (consume-or-expel): a pane alone in its column is consumed into the column on the left / right (stacked below that pane). At the edge (no column on that side) it uses the neighbour on the other side, so `[` on the leftmost pane stacks it below the pane to its right. A pane in a stack is expelled into its own full-height column at the left / right edge. col1 \| col2, `[` on col2 gives col1 over col2, `[` again gives col2 \| col1, `]` reverses. Other columns keep their width: a consumed pane frees its width to the column it joins, an expelled pane takes half of its old column's width. Does nothing at the edge. Expelling goes to the window edge, so with 3+ columns it does not land next to its old column. Replaces stock `]` (paste buffer) |
 | `m` | Focus mode: this pane moves to the big 65% slot on the left, all the other panes stack on the right (35%). One way only, no toggle back: use `=` for equal sizes. Only `z`, `c` and `C` toggle |
 | `n` | Focus mode, top version: this pane moves to the top (70% of the height), all the other panes sit side by side below it (30%). One way only, like `m` |
-| `c` | Make this pane fill its column (full height), again to restore the old split |
-| `C` | Make this pane fill its row (95% of the width), again to restore the old split |
+| `c` | Make this pane fill its column (full height); the panes it squeezes show `COLUMN` in the statusline. Press again on the same pane to restore |
+| `C` | Make this pane fill its row (95% of the width); the panes it squeezes show `ROW`. Press again on the same pane to restore |
 | `x` | Close this pane (popup confirmation: y confirms, any other key cancels) |
 | `b` | Turn the pane numbers on / off for this window. On by default: every pane has its number (the one `1`..`9` and `q` use) on its top border, dark on the active pane |
+
+**Lanes.** The lane of a `c` expansion is the strip of panes that share the pane's columns (they get squeezed); for `C` it is the panes that share its rows. Every pane in the lane shows `COLUMN` (mint) or `ROW` (rose) in the statusline mode label. Expansions whose lanes do not touch live side by side: in a 2x2, `c` on both top panes works. A new expansion whose lane shares a pane with an existing one replaces it (the old one is restored first), so a pane is never under two rules. Pressing `c` / `C` on a squeezed pane makes that pane the expansion instead. `=` forgets all of them. Restoring returns each pane in the lane to its saved size.
 
 `c` does nothing visible on a pane that already fills its column (the big left
 terminal of the `a 1` preset): use it on one of the two right terminals. `C` is the same

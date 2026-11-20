@@ -15,6 +15,7 @@ scripts next to it in `~/.tmux/`. Without them `[` / `]` do nothing or print err
 | Notification list (the bell, `Alt-e g`) | `new_tmux/notifications.sh` | `~/.tmux/notifications.sh` (executable) |
 | Marks notifications read (hooks, bell count) | `new_tmux/notif-read.sh` | `~/.tmux/notif-read.sh` (executable) |
 | `Alt-e =` equal sizes for the whole window | `new_tmux/equalize.sh` | `~/.tmux/equalize.sh` (executable; needs `python3`) |
+| `Alt-e c` / `C` lane expand (COLUMN / ROW), statusline label | `new_tmux/expand.py` | `~/.tmux/expand.py` (executable; needs `python3`) |
 | Key guide for the user | `new_tmux/KEY_GUIDE.md` | stays in the repo |
 
 ## 1. Prerequisites (check each, tell the user what is missing)
@@ -57,7 +58,7 @@ An old default server can be replaced after the user has finished and exited all
 ## 2. Install
 
 1. Back up an existing `~/.tmux.conf`.
-2. `mkdir -p ~/.tmux && cp new_tmux/pane-col.sh new_tmux/flash.py new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh new_tmux/notify.sh new_tmux/notifications.sh new_tmux/notif-read.sh new_tmux/equalize.sh ~/.tmux/ && chmod +x ~/.tmux/*.sh`
+2. `mkdir -p ~/.tmux && cp new_tmux/pane-col.sh new_tmux/flash.py new_tmux/which-key.sh new_tmux/ask-name.sh new_tmux/dialog.sh new_tmux/notify.sh new_tmux/notifications.sh new_tmux/notif-read.sh new_tmux/equalize.sh new_tmux/expand.py ~/.tmux/ && chmod +x ~/.tmux/*.sh ~/.tmux/expand.py`
 3. `cp new_tmux/tmux.conf ~/.tmux.conf`
 4. Inside tmux: `tmux source ~/.tmux.conf`, or start a fresh server (see the reload note below).
 5. Enable relative line numbers by default: the config must contain `setw -g copy-mode-line-numbers relative`.
