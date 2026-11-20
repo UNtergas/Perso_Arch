@@ -17,7 +17,22 @@ local function escape(s) return s:gsub("%%", "%%%%"):gsub("[\r\n]", " ") end
 
 -- The project block takes the colour of the mode block of the statusline (insert green, visual blue, replace yellow, command
 -- purple); in normal mode it keeps the lighter utf-8 grey-teal.
-local PATH_BG = "#dbe6e6" -- the path block: a touch lighter than the tab row (#d4dfdf), darker than the bar (#fafafa)
+local PATH_BG = "#e9f1f1" -- the path block: lighter than the tab row (#d4dfdf), a step darker than the bar (#fafafa)
+-- the file type's icon in its own colour (nvim-web-devicons), on the path block's background; one highlight group per colour
+local icon_groups = {}
+local function file_icon(name)
+  local ok, devicons = pcall(require, "nvim-web-devicons")
+  if not ok then return "" end
+  local file = vim.fn.fnamemodify(name, ":t")
+  local icon, color = devicons.get_icon_color(file, vim.fn.fnamemodify(file, ":e"), { default = true })
+  if not icon then return "" end
+  local group = "BarIcon" .. (color or ""):gsub("#", "")
+  if not icon_groups[group] then
+    icon_groups[group] = true
+    api.nvim_set_hl(0, group, { fg = color, bg = PATH_BG })
+  end
+  return "%#" .. group .. "#" .. icon .. " "
+end
 local mode_key = { n = "normal", i = "insert", v = "visual", V = "visual", ["\22"] = "visual", s = "visual", S = "visual", R = "replace", c = "command", t = "insert" }
 function M.project_colors()
   local key = mode_key[api.nvim_get_mode().mode:sub(1, 1)] or "normal"
@@ -72,28 +87,16 @@ function M.render(win)
   local mod = vim.bo[buf].modified
   -- [ project]>path : the project (folder name of the window's cwd) is a block with a folder icon, then the path
   local project = vim.fn.fnamemodify(vim.fn.getcwd(vim.fn.win_id2win(win)), ":t")
-  local left = "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<" .. (mod and "%#BarModified#" or "%#BarPath#") .. " " .. escape(path)
+  local left = "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<%#BarPath# " .. (label and "" or file_icon(name)) .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
     .. (mod and " \u{f444}" or "") .. " %#BarPathArrow#\u{e0b0}%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
   return left .. "%=" .. (focused and harpoon_slots(buf) or "")
 end
 
--- The winbar of an Oil window: the same project block, then the folder being browsed relative to the project (nothing at the
--- project root). Called by _G.oil_winbar in init.lua.
+-- The winbar of an Oil window: the same project block, then "Oil explorer". Called by _G.oil_winbar in init.lua.
 function M.oil_bar(win)
   win = win or tonumber(vim.g.statusline_winid) or api.nvim_get_current_win()
-  local buf = api.nvim_win_get_buf(win)
   local project = vim.fn.fnamemodify(vim.fn.getcwd(vim.fn.win_id2win(win)), ":t")
-  local ok, oil = pcall(require, "oil")
-  local dir = ok and oil.get_current_dir(buf)
-  local path
-  if dir then
-    path = vim.fn.fnamemodify(dir, ":.")
-    if path == "." then path = "" end
-  else
-    path = api.nvim_buf_get_name(buf) -- trash / ssh: the buffer name
-  end
-  if path == "" then return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrowEnd#\u{e0b0}" end
-  return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<%#BarPath# " .. escape(path) .. " %#BarPathArrow#\u{e0b0}"
+  return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%#BarPath# Oil explorer %#BarPathArrow#\u{e0b0}"
 end
 
 function M.install(buf)

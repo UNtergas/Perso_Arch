@@ -1290,12 +1290,17 @@ require("lazy").setup({
             -- terminal / help / quickfix / Oil have no winbar, so the statusline names them
             function()
               if _G.githist_label(vim.api.nvim_buf_get_name(0)) then return "" end
-              return (vim.bo.buftype ~= "" or vim.bo.filetype == "oil") and vim.fn.expand("%:t") or ""
+              if vim.bo.filetype == "oil" then -- the folder being browsed (the winbar only says "Oil explorer")
+                local ok, oil = pcall(require, "oil")
+                local dir = ok and oil.get_current_dir(0)
+                return dir and (vim.fn.fnamemodify(dir, ":~:."):gsub("/$", "")) or vim.api.nvim_buf_get_name(0)
+              end
+              return vim.bo.buftype ~= "" and vim.fn.expand("%:t") or ""
             end,
             function() return vim.trim(_G.flags_status()) end,
           },
           -- right side: macro / search keep the bar colour, then one coloured block per item with a left arrow, fading from light to
-          -- dark like the right side of the tmux statusline: lsp (plain) > encoding > indent > percent > line:col > language
+          -- dark like the right side of the tmux statusline: lsp (plain) > encoding > indent > line:col | percent (the language is shown as an icon in the winbar)
           lualine_x = (function()
             local function block(bg, fg, extra)
               return vim.tbl_extend("force", { separator = { left = "\u{e0b2}" }, padding = { left = 1, right = 1 }, color = { fg = fg, bg = bg } }, extra or {})
@@ -1313,15 +1318,14 @@ require("lazy").setup({
               block("#b8c7c7", "#1c2828", { "encoding" }), -- utf-8 takes the colour the lsp block had
               block("#a3b5b5", "#1c2828", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
               -- line:column | percentage of the file (Top / Bot at the ends), one block: 76:42 | 5%
-              block("#2f4443", "#e6e6e6", {
+              block("#14201f", "#e6e6e6", {
                 function()
                   local cur, total = vim.fn.line("."), vim.fn.line("$")
                   local pct = cur == 1 and "Top" or (cur == total and "Bot" or math.floor(cur / total * 100) .. "%%") -- %% : a lone % would be read as a statusline item
                   return string.format("%d:%d | %s", cur, vim.fn.col("."), pct)
                 end,
-                color = { fg = "#e6e6e6", bg = "#2f4443", gui = "bold" },
+                color = { fg = "#e6e6e6", bg = "#14201f", gui = "bold" },
               }),
-              block("#14201f", "#e6e6e6", { "filetype", colored = false, fmt = function(s) return s:lower() end, color = { fg = "#e6e6e6", bg = "#14201f", gui = "bold" } }),
             }
           end)(),
           lualine_y = {}, -- lualine fills these with progress / location unless they are set empty: everything is in x
