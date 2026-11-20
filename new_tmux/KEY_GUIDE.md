@@ -227,7 +227,7 @@ The mouse is on.
 
 ## Status bar
 
-Far left, on the darkest colour: the OS icon (Nerd Font, picked from
+Far left, on the darkest colour: the notification bell (see below). Then, on dark teal: the OS icon (Nerd Font, picked from
 `/etc/os-release`) and the current user.
 Then: the mode label. Grey `NORMAL`, dark purple `COMMAND` while a dialog is open (new window, rename, close, go to window, layout, search, goto line, jump...), yellow `PREFIX` while the prefix is pressed,
 blue `COPY` in copy mode, lilac `ZOOM` when a pane is zoomed (same idea as the nvim mode
@@ -235,7 +235,7 @@ colours). Next to it, joined: `pane/total` and what the current pane is running
 (`nvim`, `zsh`, ...).
 Right side: the window tabs (the current one as a darker block, `Z` marks a zoomed
 window), then date + time, and on the far right `Session <name>` with an icon on
-the same dark colour as the user. The key hints are in the `Alt-e` dropdown, not in
+the same dark teal as the user. The key hints are in the `Alt-e` dropdown, not in
 the status bar.
 
 Colours are the koda-glade ones from the nvim lualine (see the comment above

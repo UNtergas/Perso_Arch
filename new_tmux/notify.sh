@@ -59,8 +59,8 @@ if [ "${#focused[@]}" -gt 0 ]; then
   # It closes after TMUX_NOTIFY_MS (5 s) or when you go to the window that sent it (notif-read.sh kills the panes tagged
   # with that window). The text goes in through the environment so a command name is never read as a format or shell code.
   where="$sname:$wname"
-  # big box (7 rows, at least 44 wide) with the title in capitals and spaced out: a terminal cannot draw a bigger font
-  title_big=$(printf %s "$title" | tr '[:lower:]' '[:upper:]' | sed 's/./& /g')
+  # big box (7 rows, at least 44 wide) with the title in capitals: a terminal cannot draw a bigger font
+  title_big=$(printf %s "$title" | tr '[:lower:]' '[:upper:]')
   w=$(( ${#title_big} > ${#where} ? ${#title_big} : ${#where} )); w=$(( w + 12 )); [ "$w" -lt 44 ] && w=44; [ "$w" -gt 90 ] && w=90
   secs=$(( ${TMUX_NOTIFY_MS:-5000} / 1000 )); [ "$secs" -lt 1 ] && secs=1
   script='printf "\n  \033[1;38;2;%d;%d;%dm\342\227\217  %s\033[0m\n\n  \033[1m%s\033[0m" $((0x${NT_COLOR:1:2})) $((0x${NT_COLOR:3:2})) $((0x${NT_COLOR:5:2})) "$NT_TITLE" "$NT_WHERE"; sleep "$NT_SECS"'
