@@ -92,11 +92,23 @@ function M.render(win)
   return left .. "%=" .. (focused and harpoon_slots(buf) or "")
 end
 
--- The winbar of an Oil window: the same project block, then "Oil explorer". Called by _G.oil_winbar in init.lua.
+-- The winbar of an Oil window: the same project block, then the folder being browsed relative to the project (~/... outside it;
+-- nothing at the project root). Called by _G.oil_winbar in init.lua.
 function M.oil_bar(win)
   win = win or tonumber(vim.g.statusline_winid) or api.nvim_get_current_win()
+  local buf = api.nvim_win_get_buf(win)
   local project = vim.fn.fnamemodify(vim.fn.getcwd(vim.fn.win_id2win(win)), ":t")
-  return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%#BarPath# Oil explorer %#BarPathArrow#\u{e0b0}"
+  local ok, oil = pcall(require, "oil")
+  local dir = ok and oil.get_current_dir(buf)
+  local path
+  if dir then
+    path = vim.fn.fnamemodify(dir, ":~:."):gsub("/$", "")
+    if path == "." then path = "" end
+  else
+    path = api.nvim_buf_get_name(buf) -- trash / ssh: the buffer name
+  end
+  if path == "" then return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrowEnd#\u{e0b0}" end
+  return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<%#BarPath# " .. escape(path) .. " %#BarPathArrow#\u{e0b0}"
 end
 
 function M.install(buf)

@@ -261,8 +261,9 @@ One tab per nvim: the keys that open a tab are removed (Oil, Telescope, `C-w T`)
 ## Gutter marks
 
 Left to right: fold arrow, one sign column, line number.
-- Git (gitsigns): green `┃` added, orange `┃` changed, red `▁` deleted.
-- Diagnostics: the line number turns red (error) or yellow (warning). Info and hints are not marked.
+- Git (gitsigns): a heavy dashed bar `┇`: green added (also every line of a new file git does not track yet), purple changed, red `▁` deleted. The first and last dash of a change can look shorter, that is how the dashed character lines up.
+- Diagnostics: an icon replaces the dash on its line (`` error, `` warning), and the line number turns red (error) or yellow (warning). Info and hints are not marked.
+- Below the last line, `~` marks lines that do not exist yet (dark grey).
 
 ## Sticky function header
 
@@ -277,6 +278,8 @@ The binds were checked to load without errors in headless Neovim, not typed
 interactively. Terminal-dependent keys (`C-M-arrows`, `M-p`, `M-o`)
 depend on your terminal sending them.
 
-The right end of the statusline shows keys typed so far in a pending command (`d`, `2d`, `"a`), the macro being recorded (`● @q`), the search count, the language server, `utf-8`, the indent (`SPC:4` for spaces, `TAB:4` for tabs; click it, or `SPC t i`, to change it), the position and how far down the file you are in one block, the last one on the right (`76:42 | 5%`, `Top` / `Bot` at the ends). The file type is no longer written there: the top bar shows the file's icon, in its own colour, before the path, and an Oil window's top bar says `Oil explorer` (the statusline names the folder it shows).
+The right end of the statusline shows the search count, the language server, `utf-8`, the indent (`SPC:4` for spaces, `TAB:4` for tabs; click it, or `SPC t i`, to change it), the position and how far down the file you are in one block, the last one on the right (`76:42 | 5%`, `Top` / `Bot` at the ends). The file type is no longer written there: the top bar shows the file's icon, in its own colour, before the path, and an Oil window's top bar shows the folder it browses after the project block.
+
+The **keys block** sits in the tab row between the logo and the tabs, always 9 columns wide so the tabs never move: a keyboard icon, then the last keys you typed (dim: `jjj`, `⎋` Esc, `↵` Enter, `␣` Space, `^w` Ctrl-w), the keys of a command still waiting for more in bold (`30`, `d2`, `"a`), and a macro being recorded as a red `● @q`. It takes the mode colour (green insert, blue visual). Record a macro with `q` and a letter, stop with `q`, play with `@` and the letter (`@@` again, `10@a` ten times).
 
 Messages ("written", substitutions, yanks, errors, warnings, `:echo`, shell output) are toasts at the bottom right (noice routes them to nvim-notify); the search count, the recording notice and the pending keys are not repeated as messages. `:messages` opens the history. `SPC t c` brings the command-line row back (and takes it away again) if a plugin misbehaves.

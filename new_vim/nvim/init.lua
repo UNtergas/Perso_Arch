@@ -140,7 +140,25 @@ vim.opt.foldlevelstart = 99
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldtext = "" -- show the folded line itself, highlighted
-vim.opt.fillchars = { fold = " ", eob = " " }
+vim.opt.fillchars = { fold = " ", eob = "~" }
+-- the ~ below the last line: the theme paints it almost the background colour, so give it a dark grey that shows
+vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.api.nvim_set_hl(0, "EndOfBuffer", { fg = "#5c6f6f" }) end })
+
+-- git marks in the sign column: saturated colours that show on the light background (the theme's own are faint)
+local function git_colors()
+  local set = vim.api.nvim_set_hl
+  set(0, "GitSignsAdd", { fg = "#2e8b3d", bold = true })
+  set(0, "GitSignsUntracked", { fg = "#2e8b3d", bold = true })
+  set(0, "GitSignsChange", { fg = "#9b4dca", bold = true })
+  set(0, "GitSignsChangedelete", { fg = "#9b4dca", bold = true })
+  set(0, "GitSignsDelete", { fg = "#d03030", bold = true })
+  set(0, "GitSignsTopdelete", { fg = "#d03030", bold = true })
+  for _, n in ipairs({ "Add", "Change", "Delete", "Topdelete", "Changedelete" }) do
+    set(0, "GitSignsStaged" .. n, { fg = "#7fb08a", bold = true })
+  end
+end
+git_colors()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.schedule(git_colors) end })
 
 function _G.fold_icon()
   if vim.v.virtnum ~= 0 then return " " end
@@ -160,12 +178,12 @@ vim.opt.statuscolumn = "%@v:lua.fold_click@%{v:lua.fold_icon()}%X %s%=%l "
 -- keep the cursor a few lines from the edge: the sticky function header
 -- (treesitter-context) needs room above the cursor to show
 vim.opt.scrolloff = 5
--- No command-line row: the mode word, pending keys and the macro indicator are in lualine, messages are toasts (noice -> nvim-notify),
+-- No command-line row: the mode word is in lualine, pending keys, the recent keys and the macro indicator are in the tab row, messages are toasts (noice -> nvim-notify),
 -- ":" and "/" are the noice popup. SPC t c brings the row back (and takes it away again).
 vim.opt.cmdheight = 0
 vim.opt.showmode = false
 vim.opt.showcmd = true
-vim.opt.showcmdloc = "statusline" -- pending keys (d, 2, "a ...) are drawn where %S is in the statusline: a lualine component below
+vim.opt.showcmdloc = "tabline" -- pending keys (d, 2, "a ...) are drawn by the keys block of the tab row (buffer_tabline); %S itself is not used there
 vim.opt.laststatus = 3 -- global statusline (lualine globalstatus = true); set early so the bar does not jump when lualine loads
 
 -- Light theme
@@ -465,6 +483,7 @@ require("lazy").setup({
         virtual_text = true,
         signs = {
           severity = { min = vim.diagnostic.severity.WARN }, -- errors and warnings only
+          text = { [vim.diagnostic.severity.ERROR] = "\u{f057}", [vim.diagnostic.severity.WARN] = "\u{f071}" }, -- on the git dashes, where the line has one
           numhl = { -- color the line number instead of using a second sign column
             [vim.diagnostic.severity.ERROR] = "DiagnosticError",
             [vim.diagnostic.severity.WARN] = "DiagnosticWarn",
@@ -848,7 +867,7 @@ require("lazy").setup({
       wk.add({ { "<C-w>T", hidden = true }, { "<C-w><", hidden = true }, { "<C-w>>", hidden = true }, { "<C-w>+", hidden = true }, { "<C-w>_", hidden = true }, { "<C-w>|", hidden = true }, { "<C-w>s", hidden = true }, { "<C-w>v", hidden = true }, { "<C-w>S", hidden = true } }) -- C-w T (break out into a new tab) is disabled below: one tab per nvim; keep it out of the C-w list
     end,
   },
-  { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = { sign_priority = 20, current_line_blame_opts = { delay = 250, virt_text_pos = "eol" }, current_line_blame_formatter = function(...) return _G.git_blame_format(...) end } }, -- above diagnostics so git marks always show; blame is toggled with SPC t b
+  { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = { sign_priority = 5, attach_to_untracked = true, signs = { add = { text = "\u{2507}" }, change = { text = "\u{2507}" }, delete = { text = "\u{2581}" }, topdelete = { text = "\u{2594}" }, changedelete = { text = "\u{2507}" }, untracked = { text = "\u{2507}" } }, signs_staged = { add = { text = "\u{2507}" }, change = { text = "\u{2507}" }, delete = { text = "\u{2581}" }, topdelete = { text = "\u{2594}" }, changedelete = { text = "\u{2507}" } }, current_line_blame_opts = { delay = 250, virt_text_pos = "eol" }, current_line_blame_formatter = function(...) return _G.git_blame_format(...) end } }, -- dashed marks, below the diagnostic icons (priority 10) so an error / warning icon replaces the dash on its line; blame is toggled with SPC t b
   { -- colors conflict blocks (ours / theirs) in the file
     "akinsho/git-conflict.nvim",
     event = "BufReadPost",
@@ -1085,12 +1104,7 @@ require("lazy").setup({
             -- terminal / help / quickfix / Oil have no winbar, so the statusline names them
             function()
               if _G.githist_label(vim.api.nvim_buf_get_name(0)) then return "" end
-              if vim.bo.filetype == "oil" then -- the folder being browsed (the winbar only says "Oil explorer")
-                local ok, oil = pcall(require, "oil")
-                local dir = ok and oil.get_current_dir(0)
-                return dir and (vim.fn.fnamemodify(dir, ":~:."):gsub("/$", "")) or vim.api.nvim_buf_get_name(0)
-              end
-              return vim.bo.buftype ~= "" and vim.fn.expand("%:t") or ""
+              return vim.bo.buftype ~= "" and vim.fn.expand("%:t") or "" -- Oil's folder is in its winbar
             end,
             function() return vim.trim(_G.flags_status()) end,
           },
@@ -1102,8 +1116,6 @@ require("lazy").setup({
             end
             return {
               { function() return vim.g.resize_mode and "h j k l resize   = equal   Esc done" or "" end, separator = "" },
-              { function() return vim.g.resize_mode and "" or "%S" end, separator = "" }, -- (hidden in resize mode: getcharstr leaves a raw key there) -- keys typed so far in a pending command (d, 2, "a ...), from showcmdloc = statusline
-              { function() local r = vim.fn.reg_recording() return r == "" and "" or "\u{f111} @" .. r end, separator = "" },
               { "searchcount", maxcount = 999, timeout = 100, separator = "" },
               { "lsp_status", icon = "\u{f085}", symbols = { spinner = {}, done = "", separator = " " }, padding = { left = 1, right = 1 }, separator = "" }, -- attached server names, plain on the bar colour
               -- error / warn / hint always show (zeros too); info only when there is one; plain on the bar colour, before utf-8
@@ -1976,6 +1988,88 @@ function _G.buffer_tab_scroll(d)
 end
 function _G.buffer_tab_arrow(n) _G.buffer_tab_scroll(n == 1 and -3 or 3) end
 vim.api.nvim_create_autocmd("BufEnter", { callback = function() _G.tab_first = nil end })
+-- Keys block of the tab row, between the logo and the tabs, fixed width so the tabs never move: a keyboard icon, then the last keys
+-- typed (dim), the ones of a command still waiting for more (bold: 30, d2, "a) and a macro being recorded (red). Coloured like the
+-- project block of the winbar, so it follows the mode.
+local KEYS_W = 9
+local key_hist = {} -- { t = "j", w = 1 }, newest last
+local key_names = {
+  ["<Esc>"] = "\u{238b}", ["<CR>"] = "\u{21b5}", ["<Space>"] = "\u{2423}", ["<BS>"] = "\u{232b}", ["<Tab>"] = "\u{21e5}",
+  ["<S-Tab>"] = "\u{21e4}", ["<Left>"] = "\u{2190}", ["<Down>"] = "\u{2193}", ["<Up>"] = "\u{2191}", ["<Right>"] = "\u{2192}",
+  ["<Del>"] = "\u{2326}", ["<lt>"] = "<", ["<Bar>"] = "|", ["<NL>"] = "\u{21b5}",
+}
+local keys_redraw = false
+vim.on_key(function(_, typed)
+  if not typed or typed == "" then return end
+  local k = vim.fn.keytrans(typed)
+  local i = 1
+  while i <= #k do
+    local s, e = k:find("^<[^>]+>", i)
+    if not s then
+      local ch = vim.fn.strpart(k, i - 1, 1, true)
+      s, e = i, i - 1 + #ch
+    end
+    local tok = k:sub(s, e)
+    i = e + 1
+    -- not keys: the mouse, focus, and nvim's internal codes (keytrans shows those as ~@ or <fd>)
+    if not (tok:find("Mouse") or tok:find("Scroll") or tok:find("Drag") or tok:find("Release") or tok:find("Focus")
+        or tok == "<Ignore>" or tok == "~@" or tok:find("^<%x%x>$")) then
+      local name = key_names[tok] or tok:gsub("^<C%-(.)>$", function(c) return "^" .. c:lower() end):gsub("^<[MA]%-(.+)>$", "M-%1")
+      key_hist[#key_hist + 1] = { t = name, w = vim.fn.strdisplaywidth(name) }
+      if #key_hist > 20 then table.remove(key_hist, 1) end
+    end
+  end
+  if not keys_redraw then
+    keys_redraw = true
+    vim.schedule(function() keys_redraw = false; vim.cmd.redrawtabline() end) -- once per burst of keys, outside the key callback
+  end
+end)
+vim.api.nvim_create_autocmd("ModeChanged", { callback = function() vim.schedule(function() vim.cmd.redrawtabline() end) end })
+local function mix(a, b, t) -- colour a moved t of the way to colour b
+  local function ch(c, sh) return bit.rshift(c, sh) % 256 end
+  local function m(sh) return math.floor(ch(a, sh) * (1 - t) + ch(b, sh) * t + 0.5) * 2 ^ sh end
+  return m(16) + m(8) + m(0)
+end
+local function keys_block(fill)
+  pcall(function() require("saga_breadcrumb").project_colors() end)
+  local p = vim.api.nvim_get_hl(0, { name = "BarProject", link = false })
+  local bg, fg = p.bg or 0xb8c7c7, p.fg or 0x14201f
+  local set = vim.api.nvim_set_hl
+  set(0, "BufKeysIcon", { fg = fg, bg = bg })
+  set(0, "BufKeysDim", { fg = mix(fg, bg, 0.5), bg = bg })
+  set(0, "BufKeysPend", { fg = fg, bg = bg, bold = true })
+  set(0, "BufKeysRec", { fg = 0x9b1c1c, bg = bg, bold = true })
+  set(0, "BufKeysArrow", { fg = bg, bg = fill })
+  local raw = vim.g.resize_mode and "" or vim.api.nvim_eval_statusline("%S", {}).str
+  -- a control key waiting for more (C-w) comes back from nvim as raw internal bytes (~@ and 0xfd): not readable, so it is cleaned
+  -- away and the newest key of the history is the pending one
+  local pending = vim.trim(raw:gsub("~@", ""):gsub("[\128-\255]", ""))
+  local ctrl_pending = raw ~= "" and pending == ""
+  local hist = vim.list_slice(key_hist)
+  -- the pending keys are the newest ones: show them bold instead of dim. The last one may not be in the history yet (nvim draws the
+  -- pending text before the key callback runs), so drop the longest run of newest keys that is the start of the pending text
+  local lower_p, tail, drop = pending:lower(), "", 0
+  for k = 1, #hist do
+    tail = hist[#hist - k + 1].t:lower() .. tail
+    if lower_p:sub(1, #tail) == tail then drop = k else break end
+  end
+  for _ = 1, drop do table.remove(hist) end
+  if ctrl_pending and #hist > 0 then pending = hist[#hist].t; table.remove(hist) end
+  local rec = vim.fn.reg_recording()
+  local left = rec ~= "" and "\u{f111} @" .. rec .. " " or ""
+  local room = KEYS_W - vim.fn.strdisplaywidth(left) - vim.fn.strdisplaywidth(pending)
+  if room < 0 then pending = vim.fn.strcharpart(pending, vim.fn.strchars(pending) + room); room = 0 end
+  local dim, used = {}, 0
+  for i = #hist, 1, -1 do
+    if used + hist[i].w > room then break end
+    table.insert(dim, 1, hist[i].t)
+    used = used + hist[i].w
+  end
+  local pad = string.rep(" ", math.max(0, room - used))
+  return "%#BufKeysIcon# \u{f030c} "
+    .. (left ~= "" and "%#BufKeysRec#" .. left or "") .. "%#BufKeysDim#" .. table.concat(dim):gsub("%%", "%%%%")
+    .. "%#BufKeysPend#" .. pending:gsub("%%", "%%%%") .. "%#BufKeysDim#" .. pad .. " %#BufKeysArrow#\u{e0b0}%#BufTabFill#"
+end
 function _G.buffer_tabline()
   local ok, ui = pcall(require, "buffer_manager.ui")
   if not ok then return "" end
@@ -2015,13 +2109,14 @@ function _G.buffer_tabline()
   local function arrow(active)
     local fill = vim.api.nvim_get_hl(0, { name = "BufTabFill", link = false }).bg
     local lg = vim.api.nvim_get_hl(0, { name = "BufTabLogo", link = false })
-    vim.api.nvim_set_hl(0, "BufTabLogoArrow", { fg = lg.bg, bg = fill }) -- always the grey: the white of the current tab must not reach into the arrow
-    return "%#BufTabLogo# " .. logo .. " %#BufTabLogoArrow#\u{e0b0}%#BufTabFill#"
+    local kb = keys_block(fill)
+    vim.api.nvim_set_hl(0, "BufTabLogoArrow", { fg = lg.bg, bg = vim.api.nvim_get_hl(0, { name = "BufKeysIcon", link = false }).bg }) -- logo > keys block
+    return "%#BufTabLogo# " .. logo .. " %#BufTabLogoArrow#\u{e0b0}" .. kb
   end
   if #items == 0 then return arrow(false) .. "%=" end -- no tab yet (a new project on Oil): the logo is still there
   -- too many tabs for the width: keep the current one and as many neighbours as fit, with < > at the cut ends
   local lo, hi, used = curi, curi, items[curi] and items[curi].w or 0
-  local avail = vim.o.columns - 8
+  local avail = vim.o.columns - 8 - (KEYS_W + 5) -- the keys block takes its width off the tabs
   if _G.tab_first then
     -- scrolled by hand (SPC [ / ], or a click on ‹ ›): start at that tab and fill to the right; switching buffer follows again
     lo = math.max(1, math.min(_G.tab_first, #items))
