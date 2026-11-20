@@ -2216,7 +2216,7 @@ vim.api.nvim_create_autocmd("BufEnter", { callback = function() _G.tab_first = n
 -- Keys block of the tab row, between the logo and the tabs, fixed width so the tabs never move: a keyboard icon, then the last keys
 -- typed (dim), the ones of a command still waiting for more (bold: 30, d2, "a) and a macro being recorded (red). Coloured like the
 -- cool cyan, its own accent (it does not follow the mode).
-local KEYS_W = 9
+local KEYS_W = 6
 local key_hist = {} -- { t = "j", w = 1 }, newest last
 local key_names = {
   ["<Esc>"] = "\u{238b}", ["<CR>"] = "\u{21b5}", ["<Space>"] = "\u{2423}", ["<BS>"] = "\u{232b}", ["<Tab>"] = "\u{21e5}",
