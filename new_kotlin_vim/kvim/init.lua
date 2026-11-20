@@ -1149,6 +1149,20 @@ require("lazy").setup({
   },
   { "nvim-treesitter/nvim-treesitter-context", event = "BufReadPost", opts = { max_lines = 3 } },
   {
+    "catgoose/nvim-colorizer.lua", -- #rrggbb / #rrggbbaa text gets its own colour as background (names like "red" and tailwind are off: they hit plain code)
+    event = "VeryLazy",
+    opts = {
+      options = {
+        parsers = {
+          names = { enable = false },
+          tailwind = { enable = false },
+          hex = { default = false, rrggbb = true, rrggbbaa = true },
+        },
+        display = { mode = "background" },
+      },
+    },
+  },
+  {
     "kylechui/nvim-surround",
     event = "VeryLazy",
     init = function()
