@@ -277,6 +277,6 @@ The binds were checked to load without errors in headless Neovim, not typed
 interactively. Terminal-dependent keys (`C-M-arrows`, `M-p`, `M-o`)
 depend on your terminal sending them.
 
-The right end of the statusline shows keys typed so far in a pending command (`d`, `2d`, `"a`), the macro being recorded (`● @q`), the search count, the language server, `utf-8`, the indent (`SPC:4` for spaces, `TAB:4` for tabs; click it, or `SPC t i`, to change it), the position and how far down the file you are in one block (`76:42 | 5%`, `Top` / `Bot` at the ends) and the file type.
+The right end of the statusline shows keys typed so far in a pending command (`d`, `2d`, `"a`), the macro being recorded (`● @q`), the search count, the language server, `utf-8`, the indent (`SPC:4` for spaces, `TAB:4` for tabs; click it, or `SPC t i`, to change it), the position and how far down the file you are in one block, the last one on the right (`76:42 | 5%`, `Top` / `Bot` at the ends). The file type is no longer written there: the top bar shows the file's icon, in its own colour, before the path, and an Oil window's top bar says `Oil explorer` (the statusline names the folder it shows).
 
 Messages ("written", substitutions, yanks, errors, warnings, `:echo`, shell output) are toasts at the bottom right (noice routes them to nvim-notify); the search count, the recording notice and the pending keys are not repeated as messages. `:messages` opens the history. `SPC t c` brings the command-line row back (and takes it away again) if a plugin misbehaves.
