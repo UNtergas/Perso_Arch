@@ -2069,7 +2069,7 @@ local function keys_block(fill)
   for _ = 1, drop do table.remove(hist) end
   if ctrl_pending and #hist > 0 then pending = hist[#hist].t; table.remove(hist) end
   local rec = vim.fn.reg_recording()
-  local left = rec ~= "" and "\u{f111} @" .. rec .. " " or ""
+  local left = rec ~= "" and "@" .. rec .. " " or ""
   local room = KEYS_W - vim.fn.strdisplaywidth(left) - vim.fn.strdisplaywidth(pending)
   if room < 0 then pending = vim.fn.strcharpart(pending, vim.fn.strchars(pending) + room); room = 0 end
   local dim, used = {}, 0
