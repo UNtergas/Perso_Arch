@@ -149,8 +149,8 @@ local function git_colors()
   local set = vim.api.nvim_set_hl
   set(0, "GitSignsAdd", { fg = "#2e8b3d", bold = true })
   set(0, "GitSignsUntracked", { fg = "#2e8b3d", bold = true })
-  set(0, "GitSignsChange", { fg = "#9b4dca", bold = true })
-  set(0, "GitSignsChangedelete", { fg = "#9b4dca", bold = true })
+  set(0, "GitSignsChange", { fg = "#ff8a00", bold = true })
+  set(0, "GitSignsChangedelete", { fg = "#ff8a00", bold = true })
   set(0, "GitSignsDelete", { fg = "#d03030", bold = true })
   set(0, "GitSignsTopdelete", { fg = "#d03030", bold = true })
   for _, n in ipairs({ "Add", "Change", "Delete", "Topdelete", "Changedelete" }) do

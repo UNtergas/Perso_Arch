@@ -149,8 +149,8 @@ local function git_colors()
   local set = vim.api.nvim_set_hl
   set(0, "GitSignsAdd", { fg = "#2e8b3d", bold = true })
   set(0, "GitSignsUntracked", { fg = "#2e8b3d", bold = true })
-  set(0, "GitSignsChange", { fg = "#9b4dca", bold = true })
-  set(0, "GitSignsChangedelete", { fg = "#9b4dca", bold = true })
+  set(0, "GitSignsChange", { fg = "#ff8a00", bold = true })
+  set(0, "GitSignsChangedelete", { fg = "#ff8a00", bold = true })
   set(0, "GitSignsDelete", { fg = "#d03030", bold = true })
   set(0, "GitSignsTopdelete", { fg = "#d03030", bold = true })
   for _, n in ipairs({ "Add", "Change", "Delete", "Topdelete", "Changedelete" }) do
@@ -273,8 +273,8 @@ require("lazy").setup({
       vim.cmd.colorscheme("koda-glade")
     end,
   },
-  -- active window tracking: the border around the focused window is drawn thick and blue (same blue as the active
-  -- tmux pane border). Backgrounds stay as they are. Loads on the first WinLeave, i.e. once there is a split.
+  -- active window tracking: the border around the focused window is drawn thick in the same deep teal as the active
+  -- tmux pane border. Backgrounds stay as they are. Loads on the first WinLeave, i.e. once there is a split.
   {
     "nvim-zh/colorful-winsep.nvim",
     event = "WinLeave",
@@ -1014,7 +1014,7 @@ require("lazy").setup({
     opts = {
       picker = { enabled = true }, -- also replaces vim.ui.select for code actions with a filterable list
       -- smooth scrolling: any viewport change (Ctrl-J/K half page, search jumps, gg/G, mouse wheel) is animated.
-      -- Short on purpose (default total is 250 ms); `vim.g.snacks_scroll = false` turns it off, per buffer: vim.b.snacks_scroll
+      -- Short on purpose (default total is 250 ms; was 150, now 60, ~4 frames); `vim.g.snacks_scroll = false` turns it off, per buffer: vim.b.snacks_scroll
       scroll = { enabled = true, animate = { duration = { step = 15, total = 60 }, easing = "linear" } },
       dashboard = {
         enabled = true,
@@ -1909,6 +1909,9 @@ local function toggle_term()
   vim.cmd("startinsert")
 end
 map("n", "<leader>ot", toggle_term, { desc = "Toggle terminal" })
+-- Ctrl+\ toggles the terminal too; in terminal mode it is Ctrl+\ Ctrl+\ (a lone Ctrl+\ starts nvim's <C-\><C-n>)
+map("n", "<C-\\>", toggle_term, { desc = "Toggle terminal" })
+map("t", "<C-\\><C-\\>", toggle_term, { desc = "Toggle terminal" })
 -- Esc Esc leaves terminal mode (a single Esc still goes to the program inside, e.g. vim / fzf)
 map("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Leave terminal mode" })
 
