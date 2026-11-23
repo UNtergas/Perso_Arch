@@ -43,7 +43,7 @@ and hands it to tmux's prefix table. So every "prefix + key" binding is unchange
 If the current window has a single pane, the preset turns that window into the layout: the pane you are in
 stays and 2 more are added. If the window already has several panes, it is not touched and the preset opens a
 new window instead. It opens the same name dialog first (prefilled `side` for `a 1`, `stacked` for `a 2`; Esc cancels). Panes start in the current pane's directory;
-`a 1` focuses the left terminal, `a 2` the top one. `a` opens a small "layout" dialog first; any key other than 1 or 2 closes it. `d` is unbound now (detach is `Q`).
+`a 1` focuses the left terminal, `a 2` the top one. `a` opens a small "layout" dialog first; any key other than 1 or 2 closes it. `d` is the session picker now (detach is `Q`).
 
 ## Panes
 
@@ -61,6 +61,8 @@ new window instead. It opens the same name dialog first (prefilled `side` for `a
 | `n` | Focus mode, top version: this pane moves to the top (70% of the height), all the other panes sit side by side below it (30%). One way only, like `m` |
 | `c` | Make this pane fill its column (full height); the panes it squeezes show `COLUMN` in the statusline. Press again on the same pane to restore |
 | `C` | Make this pane fill its row (95% of the width); the panes it squeezes show `ROW`. Press again on the same pane to restore |
+| `s` `N` | This pane takes `N` x 10% of its column's height, `N` = `1`..`9` (`s 3` = 30%, `s 9` = 90%; the other panes in the column share the rest). A small popup asks for the number; any other key cancels. Same column as `c` |
+| `S` `N` | Same for the width of its row, like `C`: `S 2` = 20%, `S 5` = 50% |
 | `x` | Close this pane (popup confirmation: y confirms, any other key cancels) |
 | `D` | Close all the other panes of this window, keep this one (like `Ctrl-w o` in vim). Popup confirmation shows how many will close: y confirms, any other key cancels. The programs in them end, so an nvim with unsaved changes loses them |
 | `b` | Turn the pane numbers on / off for this window. On by default: every pane has its number (the one `1`..`9` and `q` use) on its top border, dark on the active pane |
@@ -138,7 +140,7 @@ A window also closes when its last pane closes (`exit`, `Ctrl-D`, or `x`).
 | Keys / command | Does |
 |---|---|
 | `Q` | Detach: leave tmux, everything keeps running |
-| `s` | Session picker |
+| `d` | Session picker (was `s`) |
 | `(` / `)` | Previous / next session |
 | `$` | Rename session in a popup (current name prefilled) |
 | `X` | Close this session (popup confirmation) |
@@ -247,7 +249,7 @@ the statusline in `tmux.conf`).
 | Key | Stock | Here |
 |---|---|---|
 | prefix | `Ctrl-b` | `Alt-e` (opens the key dropdown) |
-| `d` | detach | unbound (the `stacked` preset is now `a` then `2`; detach is `Q`) |
+| `d` | detach | session picker (the `stacked` preset is now `a` then `2`; detach is `Q`) |
 | `a` | (unused) | opens the layout dialog: `1` = `side` preset (3 terminals, 65 / 35), `2` = `stacked` |
 | `C` | customize mode | fill the row |
 | `o` | next pane | previous window |

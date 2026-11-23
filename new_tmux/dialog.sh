@@ -8,7 +8,7 @@ tmux set -g @dialog 1 \; refresh-client -S 2>/dev/null
 trap 'tmux set -gu @dialog \; refresh-client -S 2>/dev/null' EXIT
 action=${1:?action required}
 case "$action" in
-  kill-pane|kill-other-panes|command|find-window|pane-title|copy-*) fmt='#{pane_id}' ;;
+  kill-pane|kill-other-panes|size-col|size-row|command|find-window|pane-title|copy-*) fmt='#{pane_id}' ;;
   kill-window|rename-window|move-window) fmt='#{window_id}' ;;
   *) fmt='#{session_id}' ;;
 esac
@@ -29,6 +29,11 @@ case "$action" in
     printf ' Close the other %s pane%s? [y/N] ' "$n" "$([ "$n" -gt 1 ] && echo s)"
     IFS= read -rsn1 answer || exit 0
     case "$answer" in y|Y) tmux kill-pane -a -t "$target" ;; esac
+    exit 0 ;;
+  size-col|size-row) # this pane takes N x 10% of its column's height (size-col) / its row's width (size-row)
+    if [ "$action" = size-col ]; then printf ' height of the column, 1-9 = 10%%-90%%: '; flag=y; else printf ' width of the row, 1-9 = 10%%-90%%: '; flag=x; fi
+    IFS= read -rsn1 key || exit 0
+    case "$key" in [1-9]) tmux resize-pane -t "$target" -"$flag" "${key}0%" ;; esac
     exit 0 ;;
   window-number)
     printf ' window (1-9): '
