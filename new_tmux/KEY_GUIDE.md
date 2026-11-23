@@ -158,6 +158,7 @@ The mode uses vi keys. Selecting and copying:
 |---|---|
 | `v` or `Space` | Start selecting |
 | `V` | Select whole lines |
+| `iw` (or `v` `i` `w`) | Select the whole word under the cursor, from anywhere inside it (like `viw` in vim; plain `v` then `w` only moves to the next word). The word borders are tmux's `word-separators` |
 | `Ctrl-v` | Block (rectangle) selection |
 | `o` | Jump to the other end of the selection |
 | `y` | Copy to the system clipboard and leave (`wl-copy` on Wayland, `xclip` on X11) |
