@@ -265,6 +265,25 @@ Left to right: fold arrow, one sign column, line number.
 - Diagnostics: an icon replaces the dash on its line (`` error, `` warning), and the line number turns red (error) or yellow (warning). Info and hints are not marked.
 - Below the last line, `~` marks lines that do not exist yet (dark grey).
 
+## Better comments
+
+Like the VS Code extension: a comment whose text starts with a symbol is coloured to the end of the line
+(`lua/better_comments.lua`, no plugin, drawn while redrawing, nothing is stored in the file).
+
+| Write | Colour |
+|---|---|
+| `// ! alert` | red, bold |
+| `// ? question` | blue |
+| `// * important` | green |
+| `// TODO` / `// FIXME` | orange, bold |
+| `// // old code` (the leader repeated) | grey, struck through |
+
+The symbol needs a space before it and after it, so `//! x`, `/// x` and `#!/bin/sh` stay untouched. It works with any comment
+leader of the filetype (`//`, `#`, `--`, `;`, `"`, `<!--`), after code on the same line (`foo() // ! x`) and inside `/** ... */`
+blocks (` * ! x`). With a treesitter parser the text must really be inside a comment; for a filetype without a parser (Kotlin
+here) it guesses: the buffer's own comment leader, an even number of quotes before it, an open `/*` above. `:BetterComments`
+turns it on and off. Test: `nvim --headless -c "lua vim.wait(1200)" -c "luafile new_vim/tests/better_comments.lua" +qa`.
+
 ## Sticky function header
 
 `nvim-treesitter-context` pins the enclosing function / loop / block above the

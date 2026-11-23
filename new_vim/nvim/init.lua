@@ -160,6 +160,10 @@ end
 git_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.schedule(git_colors) end })
 
+-- Better Comments (like the VS Code extension): "// ! alert" red, "// ? query" blue, "// * highlight" green, TODO / FIXME orange,
+-- "// // old code" grey and struck through. lua/better_comments.lua; :BetterComments turns it on / off.
+require("better_comments").setup()
+
 function _G.fold_icon()
   if vim.v.virtnum ~= 0 then return " " end
   local l = vim.v.lnum
