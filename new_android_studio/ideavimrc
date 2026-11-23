@@ -1,0 +1,314 @@
+" ~/.ideavimrc: Android Studio, same keys and navigation as the nvim setup (new_vim/nvim/init.lua).
+" Needs the IdeaVim plugin (tested against 2.47.3 and Android Studio 2026.2.1: every <Action> id below exists in that build).
+" Reload inside the IDE: SPC h r (or :source ~/.ideavimrc). The key guide is new_android_studio/KEY_GUIDE.md.
+" What cannot be done in an IDE (Oil, Telescope, the keys block, tmux-style window chords...) is listed there.
+
+let mapleader = " "
+
+" ---- options (same as nvim) -------------------------------------------------------------------------------------------
+set number relativenumber
+set scrolloff=5
+set ignorecase smartcase
+set incsearch hlsearch
+set clipboard=unnamed,unnamedplus
+set visualbell
+set ideajoin
+set idearefactormode=keep
+" which-key: popup after a prefix key (SPC, g, ], [ ...): needs the "Which-Key" plugin from the Marketplace
+set which-key
+" notimeout: which-key only stays open without a key timeout
+set notimeout
+let g:WhichKey_DefaultDelay = 300
+let g:WhichKey_SortOrder = "by_key_prefix_first"
+
+" ---- plugins bundled with IdeaVim (nvim equivalents in brackets) ----------------------------------------------------
+" commentary: gc / gcc          [Comment.nvim]
+set commentary
+" surround: ys ds cs, S       [nvim-surround]
+set surround
+" multiple-cursors: C-d               [vim-visual-multi]
+set multiple-cursors
+set highlightedyank
+" easymotion: s + characters, then a label (flash.nvim). Needs the Marketplace plugins "AceJump" and "IdeaVim-EasyMotion";
+" without them `set easymotion` is rejected on :source. Labels are typed in lower case.
+set easymotion
+set matchit
+" textobj-entire: ae / ie
+set textobj-entire
+" NERDTree: Project tool window keys (C-n)
+set NERDTree
+
+" ---- who owns which key ---------------------------------------------------------------------------------------------------
+" nvim's chords win over the IDE shortcuts for these (copy / paste / undo stay with the IDE: C-c, C-v, C-z).
+sethandler <C-D> a:vim
+sethandler <C-F> a:vim
+sethandler <C-S> a:vim
+sethandler <C-N> a:vim
+sethandler <C-B> a:vim
+sethandler <C-T> a:vim
+sethandler <C-W> a:vim
+sethandler <C-K> a:vim
+sethandler <C-\> a:vim
+sethandler <C-S-T> a:vim
+sethandler <C-S-Down> a:vim
+sethandler <C-S-Up> a:vim
+sethandler <C-A-Left> a:vim
+sethandler <C-A-Right> a:vim
+sethandler <C-A-Up> a:vim
+sethandler <C-A-Down> a:vim
+sethandler <A-J> a:vim
+sethandler <A-K> a:vim
+sethandler <A-P> a:vim
+sethandler <A-O> a:vim
+sethandler <A-.> a:vim
+sethandler <A-D> a:vim
+sethandler <A-Q> a:vim
+
+" ---- basics -----------------------------------------------------------------------------------------------------------------
+nnoremap ; :
+xnoremap ; :
+nnoremap <Esc> :nohlsearch<CR>
+nmap <C-S> <Action>(SaveAll)
+vmap <C-S> <Esc><Action>(SaveAll)
+imap <C-S> <Esc><Action>(SaveAll)
+nnoremap <C-F> /
+xnoremap <C-F> /
+" half page down / up (C-d is multi-cursor here)
+nnoremap <A-j> <C-d>
+nnoremap <A-k> <C-u>
+xnoremap <A-j> <C-d>
+xnoremap <A-k> <C-u>
+" indent / outdent
+nnoremap <A-p> >>
+nnoremap <A-o> <<
+inoremap <A-p> <C-t>
+inoremap <A-o> <C-d>
+vnoremap <A-p> >gv
+vnoremap <A-o> <gv
+
+" ---- jumping around ---------------------------------------------------------------------------------------------------
+nmap gd <Action>(GotoDeclaration)
+nmap gD <Action>(GotoTypeDeclaration)
+nmap gi <Action>(GotoImplementation)
+nmap gr <Action>(ShowUsages)
+nmap gR <Action>(FindUsages)
+nmap gp <Action>(QuickImplementations)
+nmap K <Action>(QuickJavaDoc)
+nmap ]d <Action>(GotoNextError)
+nmap [d <Action>(GotoPreviousError)
+nmap ]g <Action>(VcsShowNextChangeMarker)
+nmap [g <Action>(VcsShowPrevChangeMarker)
+nmap <C-t> <Action>(GotoSymbol)
+nmap <C-S-T> <Action>(FileStructurePopup)
+" flash: s = jump with labels (n, v, o); S = grow the selection by syntax (flash treesitter select, closest the IDE has)
+nmap s <Plug>(easymotion-sn)
+xmap s <Plug>(easymotion-sn)
+omap s <Plug>(easymotion-sn)
+nmap S v<Action>(EditorSelectWord)
+xmap S <Action>(EditorSelectWord)
+
+" ---- files and buffers --------------------------------------------------------------------------------------------------
+nmap <leader><leader> <Action>(GotoFile)
+nmap <leader>. <Action>(GotoFile)
+nmap <leader>, <Action>(RecentFiles)
+nmap <leader>bb <Action>(RecentFiles)
+nmap <C-B> <Action>(RecentFiles)
+vmap <C-B> <Action>(RecentFiles)
+nmap <leader>: <Action>(GotoAction)
+nmap <leader>e <Action>(ActivateProjectToolWindow)
+nmap <C-N> <Action>(ActivateProjectToolWindow)
+vmap <C-N> <Esc><Action>(ActivateProjectToolWindow)
+nmap <C-K>a <Action>(NewElement)
+nmap <C-K>A <Action>(NewElement)
+nmap <leader>bS <Action>(SaveAll)
+nmap <leader>fR <Action>(RenameFile)
+" SPC 1 .. 9: Nth editor tab
+nmap <leader>1 <Action>(GoToTab1)
+nmap <leader>2 <Action>(GoToTab2)
+nmap <leader>3 <Action>(GoToTab3)
+nmap <leader>4 <Action>(GoToTab4)
+nmap <leader>5 <Action>(GoToTab5)
+nmap <leader>6 <Action>(GoToTab6)
+nmap <leader>7 <Action>(GoToTab7)
+nmap <leader>8 <Action>(GoToTab8)
+nmap <leader>9 <Action>(GoToTab9)
+
+" ---- search and replace ---------------------------------------------------------------------------------------------------
+nmap <leader>ss <Action>(Find)
+nmap <leader>sp <Action>(FindInPath)
+nmap <leader>fg <Action>(FindInPath)
+nmap <leader>sw viw<Action>(FindInPath)
+nmap <leader>sr <Action>(ReplaceInPath)
+vmap <leader>sr <Action>(ReplaceInPath)
+nmap <leader>so <Action>(ActivateStructureToolWindow)
+nmap <leader>su <Action>(LocalHistory.ShowHistory)
+
+" ---- windows and splits (C-w chords) --------------------------------------------------------------------------------
+nmap <C-W><Bslash> <Action>(SplitVertically)
+nmap <C-W>- <Action>(SplitHorizontally)
+nmap <C-W>x <Action>(Unsplit)
+nmap <C-W><C-X> <Action>(Unsplit)
+nmap <C-W><C-W> <Action>(CloseContent)
+nmap <C-W>a <Action>(CloseAllEditors)
+nmap <C-W>z <Action>(MaximizeEditorInSplit)
+nmap <C-W>= <Action>(UnsplitAll)
+nmap <C-W>d <Action>(ActivateProblemsViewToolWindow)
+nmap <C-W><C-D> <Action>(ActivateProblemsViewToolWindow)
+nnoremap <C-A-Left> <C-w>h
+nnoremap <C-A-Down> <C-w>j
+nnoremap <C-A-Up> <C-w>k
+nnoremap <C-A-Right> <C-w>l
+
+" ---- editing -------------------------------------------------------------------------------------------------------------
+nmap <leader>cf <Action>(ReformatCode)
+vmap <leader>cf <Action>(ReformatCode)
+" gs = surround the selection (nvim-surround's visual map)
+xmap gs <Plug>VSurround
+nmap ysw ysiw
+nmap ysW ysiW
+nmap ysp ysip
+nmap ys( ysi(
+nmap ys{ ysi{
+nmap ys[ ysi[
+nmap ys< ysi<
+" multiple cursors: C-d on the word, again for each next match; C-S-Down / Up add a cursor below / above
+nmap <C-D> <Plug>NextWholeOccurrence
+xmap <C-D> <Plug>NextOccurrence
+nmap <C-S-Down> <Action>(EditorCloneCaretBelow)
+nmap <C-S-Up> <Action>(EditorCloneCaretAbove)
+
+" ---- code intelligence ----------------------------------------------------------------------------------------------------
+nmap <leader>cr <Action>(RenameElement)
+nmap <leader>rn <Action>(RenameElement)
+nmap <leader>ca <Action>(ShowIntentionActions)
+vmap <leader>ca <Action>(ShowIntentionActions)
+nmap <A-.> <Action>(ShowIntentionActions)
+imap <A-.> <Action>(ShowIntentionActions)
+vmap <A-.> <Action>(ShowIntentionActions)
+nmap <leader>cx <Action>(ActivateProblemsViewToolWindow)
+nmap <leader>cX <Action>(ActivateProblemsViewToolWindow)
+nmap <leader>d <Action>(ShowErrorDescription)
+
+" ---- git -----------------------------------------------------------------------------------------------------------------
+nmap <leader>gm <Action>(Git.ResolveConflicts)
+nmap <leader>gr <Action>(Vcs.RollbackChangedLines)
+" lazygit: two External Tools in the group "Vim" (see KEY_GUIDE.md, "Lazygit"): they open lazygit in its own alacritty window
+nmap <leader>gg <Action>(Tool_Vim_lazygit)
+nmap <leader>gv <Action>(ActivateVersionControlToolWindow)
+nmap <leader>gf <Action>(Tool_Vim_lazygit_file)
+nmap <leader>gh <Action>(Vcs.ShowTabbedFileHistory)
+nmap <leader>gH <Action>(Git.Log)
+nmap <leader>gl <Action>(Git.Log)
+nmap <leader>tb <Action>(Annotate)
+
+" ---- harpoon: the "HarpoonIJ" plugin (Marketplace, 0.2.0) ---------------------------------------------------------------
+" Five direct-jump slots (the list itself can be longer). SPC h h opens the list as an editor: dd deletes a line, dd then p
+" moves it, Enter jumps, Esc closes and saves. There is no "remove this file" action: open the list and dd its line.
+nmap <leader>ha <Action>(AddToHarpoon)
+nmap <leader>hd <Action>(ShowHarpoon)
+nmap <leader>hh <Action>(ShowHarpoon)
+nmap <leader>h1 <Action>(GotoHarpoon1)
+nmap <leader>h2 <Action>(GotoHarpoon2)
+nmap <leader>h3 <Action>(GotoHarpoon3)
+nmap <leader>h4 <Action>(GotoHarpoon4)
+nmap <leader>h5 <Action>(GotoHarpoon5)
+" SPC h s 1..5 puts this file in slot N
+nmap <leader>hs1 <Action>(SetHarpoon1)
+nmap <leader>hs2 <Action>(SetHarpoon2)
+nmap <leader>hs3 <Action>(SetHarpoon3)
+nmap <leader>hs4 <Action>(SetHarpoon4)
+nmap <leader>hs5 <Action>(SetHarpoon5)
+
+" ---- terminal, help, reload ----------------------------------------------------------------------------------------------
+nmap <leader>ot <Action>(ActivateTerminalToolWindow)
+nmap <C-\> <Action>(ActivateTerminalToolWindow)
+nmap <leader>hb <Action>(GotoAction)
+nmap <leader>hk <Action>(GotoAction)
+nnoremap <leader>hr :source ~/.ideavimrc<CR>
+nnoremap <leader>q :nohlsearch<CR>
+nmap <A-q> <Action>(HideAllWindows)
+
+" ---- which-key descriptions (plugin "Which-Key"; a blank description would hide an entry; format: "<keys> text") ----
+let g:WhichKeyDesc_00_Ls = "<leader>s Search"
+let g:WhichKeyDesc_01_Lb = "<leader>b Buffers"
+let g:WhichKeyDesc_02_Lc = "<leader>c Code"
+let g:WhichKeyDesc_03_Lf = "<leader>f File"
+let g:WhichKeyDesc_04_Lg = "<leader>g Git"
+let g:WhichKeyDesc_05_Lh = "<leader>h Harpoon and help"
+let g:WhichKeyDesc_06_Lhs = "<leader>hs Put this file in slot N"
+let g:WhichKeyDesc_07_Lo = "<leader>o Open"
+let g:WhichKeyDesc_08_Lt = "<leader>t Toggle"
+let g:WhichKeyDesc_09_LL = "<leader><leader> Find file"
+let g:WhichKeyDesc_10_L = "<leader>. Find any file"
+let g:WhichKeyDesc_11_L = "<leader>, Recent files"
+let g:WhichKeyDesc_12_L = "<leader>: Command palette"
+let g:WhichKeyDesc_13_Le = "<leader>e Project tool window"
+let g:WhichKeyDesc_14_Lbb = "<leader>bb Recent files"
+let g:WhichKeyDesc_15_LbS = "<leader>bS Save all"
+let g:WhichKeyDesc_16_LfR = "<leader>fR Rename file"
+let g:WhichKeyDesc_17_Lfg = "<leader>fg Find in project"
+let g:WhichKeyDesc_18_Lss = "<leader>ss Find in file"
+let g:WhichKeyDesc_19_Lsp = "<leader>sp Find in project"
+let g:WhichKeyDesc_20_Lsw = "<leader>sw Find word in project"
+let g:WhichKeyDesc_21_Lsr = "<leader>sr Replace in project"
+let g:WhichKeyDesc_22_Lso = "<leader>so Outline (Structure)"
+let g:WhichKeyDesc_23_Lsu = "<leader>su Local history"
+let g:WhichKeyDesc_24_Lcf = "<leader>cf Reformat"
+let g:WhichKeyDesc_25_Lcr = "<leader>cr Rename symbol"
+let g:WhichKeyDesc_26_Lca = "<leader>ca Code action"
+let g:WhichKeyDesc_27_Lcx = "<leader>cx Problems"
+let g:WhichKeyDesc_28_LcX = "<leader>cX Problems"
+let g:WhichKeyDesc_29_Lrn = "<leader>rn Rename symbol"
+let g:WhichKeyDesc_30_Ld = "<leader>d Error description"
+let g:WhichKeyDesc_31_Lgm = "<leader>gm Merge tool"
+let g:WhichKeyDesc_32_Lgr = "<leader>gr Revert hunk"
+let g:WhichKeyDesc_33_Lgg = "<leader>gg Lazygit"
+let g:WhichKeyDesc_34_Lgf = "<leader>gf Lazygit: this file's log"
+let g:WhichKeyDesc_35_Lgh = "<leader>gh File history"
+let g:WhichKeyDesc_36_LgH = "<leader>gH Git log"
+let g:WhichKeyDesc_37_Lgl = "<leader>gl Git log"
+let g:WhichKeyDesc_38_Ltb = "<leader>tb Git blame"
+let g:WhichKeyDesc_39_Lha = "<leader>ha Add file to harpoon"
+let g:WhichKeyDesc_40_Lhd = "<leader>hd Edit harpoon list (dd a line, Esc saves)"
+let g:WhichKeyDesc_41_Lhh = "<leader>hh Harpoon list"
+let g:WhichKeyDesc_42_Lhb = "<leader>hb Search keybinds"
+let g:WhichKeyDesc_43_Lhk = "<leader>hk Search keybinds"
+let g:WhichKeyDesc_44_Lhr = "<leader>hr Reload ~/.ideavimrc"
+let g:WhichKeyDesc_45_Lot = "<leader>ot Terminal"
+let g:WhichKeyDesc_46_Lq = "<leader>q Clear highlight"
+let g:WhichKeyDesc_47_L1 = "<leader>1 Tab 1"
+let g:WhichKeyDesc_48_Lh1 = "<leader>h1 Harpoon slot 1"
+let g:WhichKeyDesc_49_Lhs1 = "<leader>hs1 File to slot 1"
+let g:WhichKeyDesc_50_L2 = "<leader>2 Tab 2"
+let g:WhichKeyDesc_51_Lh2 = "<leader>h2 Harpoon slot 2"
+let g:WhichKeyDesc_52_Lhs2 = "<leader>hs2 File to slot 2"
+let g:WhichKeyDesc_53_L3 = "<leader>3 Tab 3"
+let g:WhichKeyDesc_54_Lh3 = "<leader>h3 Harpoon slot 3"
+let g:WhichKeyDesc_55_Lhs3 = "<leader>hs3 File to slot 3"
+let g:WhichKeyDesc_56_L4 = "<leader>4 Tab 4"
+let g:WhichKeyDesc_57_Lh4 = "<leader>h4 Harpoon slot 4"
+let g:WhichKeyDesc_58_Lhs4 = "<leader>hs4 File to slot 4"
+let g:WhichKeyDesc_59_L5 = "<leader>5 Tab 5"
+let g:WhichKeyDesc_60_Lh5 = "<leader>h5 Harpoon slot 5"
+let g:WhichKeyDesc_61_Lhs5 = "<leader>hs5 File to slot 5"
+let g:WhichKeyDesc_62_L6 = "<leader>6 Tab 6"
+let g:WhichKeyDesc_65_L7 = "<leader>7 Tab 7"
+let g:WhichKeyDesc_68_L8 = "<leader>8 Tab 8"
+let g:WhichKeyDesc_71_L9 = "<leader>9 Tab 9"
+let g:WhichKeyDesc_74_gd = "gd Definition"
+let g:WhichKeyDesc_75_gD = "gD Type declaration"
+let g:WhichKeyDesc_76_gi = "gi Implementation"
+let g:WhichKeyDesc_77_gr = "gr Usages"
+let g:WhichKeyDesc_78_gp = "gp Peek definition"
+let g:WhichKeyDesc_79_gs = "gs Surround selection"
+let g:WhichKeyDesc_80_d = "]d Next error"
+let g:WhichKeyDesc_81_d = "[d Previous error"
+let g:WhichKeyDesc_82_g = "]g Next change"
+let g:WhichKeyDesc_83_g = "[g Previous change"
+let g:WhichKeyDesc_84_ysw = "ysw Surround word"
+let g:WhichKeyDesc_85_ysW = "ysW Surround WORD"
+let g:WhichKeyDesc_86_ysp = "ysp Surround paragraph"
+let g:WhichKeyDesc_90_s = "s Flash jump (labels)"
+let g:WhichKeyDesc_91_S = "S Grow selection by syntax"
+let g:WhichKeyDesc_92_gR = "gR Usages tool window"
+let g:WhichKeyDesc_93_Lgv = "<leader>gv Version Control tool window"
