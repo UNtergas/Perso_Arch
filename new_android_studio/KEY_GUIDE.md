@@ -32,6 +32,7 @@ against the installed 2026.2.1 build, but the keys themselves still need a first
 | `C-t` / `C-S-t` | Symbol in the project / in this file |
 | `]d` `[d` | Next / previous error |
 | `]g` `[g` | Next / previous changed block |
+| `]b` `[b` / `]B` `[B` | Next / previous editor tab (Neovim's built-in buffer keys) / last / first |
 | `M-j` / `M-k` | Half page down / up (`C-d` is multi-cursor, as in nvim) |
 | `M-p` / `M-o` | Indent / outdent (normal, insert, visual) |
 | `M-.` / `SPC c a` | Intention actions (code action) |

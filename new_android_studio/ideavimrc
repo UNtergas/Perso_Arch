@@ -31,6 +31,8 @@ set multiple-cursors
 set highlightedyank
 " easymotion: s + characters, then a label (flash.nvim). Needs the Marketplace plugins "AceJump" and "IdeaVim-EasyMotion";
 " without them `set easymotion` is rejected on :source. Labels are typed in lower case.
+" its default maps all start with <leader><leader> and would turn SPC SPC (go to file) into a prefix that waits for a third key; only `s` below is used
+let g:EasyMotion_do_mapping = 0
 set easymotion
 set matchit
 " textobj-entire: ae / ie
@@ -96,6 +98,11 @@ nmap gp <Action>(QuickImplementations)
 nmap K <Action>(QuickJavaDoc)
 nmap ]d <Action>(GotoNextError)
 nmap [d <Action>(GotoPreviousError)
+" ]b [b ]B [B: Neovim's built-in buffer keys (:bnext :bprevious :blast :brewind) -> editor tabs
+nmap ]b <Action>(NextTab)
+nmap [b <Action>(PreviousTab)
+nmap ]B <Action>(GoToLastTab)
+nmap [B <Action>(GoToTab1)
 nmap ]g <Action>(VcsShowNextChangeMarker)
 nmap [g <Action>(VcsShowPrevChangeMarker)
 nmap <C-t> <Action>(GotoSymbol)
@@ -312,3 +319,7 @@ let g:WhichKeyDesc_90_s = "s Flash jump (labels)"
 let g:WhichKeyDesc_91_S = "S Grow selection by syntax"
 let g:WhichKeyDesc_92_gR = "gR Usages tool window"
 let g:WhichKeyDesc_93_Lgv = "<leader>gv Version Control tool window"
+let g:WhichKeyDesc_94_nb = "]b Next tab (buffer)"
+let g:WhichKeyDesc_95_pb = "[b Previous tab (buffer)"
+let g:WhichKeyDesc_96_nB = "]B Last tab (buffer)"
+let g:WhichKeyDesc_97_pB = "[B First tab (buffer)"
