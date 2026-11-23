@@ -62,6 +62,7 @@ new window instead. It opens the same name dialog first (prefilled `side` for `a
 | `c` | Make this pane fill its column (full height); the panes it squeezes show `COLUMN` in the statusline. Press again on the same pane to restore |
 | `C` | Make this pane fill its row (95% of the width); the panes it squeezes show `ROW`. Press again on the same pane to restore |
 | `x` | Close this pane (popup confirmation: y confirms, any other key cancels) |
+| `D` | Close all the other panes of this window, keep this one (like `Ctrl-w o` in vim). Popup confirmation shows how many will close: y confirms, any other key cancels. The programs in them end, so an nvim with unsaved changes loses them |
 | `b` | Turn the pane numbers on / off for this window. On by default: every pane has its number (the one `1`..`9` and `q` use) on its top border, dark on the active pane |
 
 **Lanes.** The lane of a `c` expansion is the strip of panes that share the pane's columns (they get squeezed); for `C` it is the panes that share its rows. Every pane in the lane shows `COLUMN` (mint) or `ROW` (rose) in the statusline mode label. Expansions whose lanes do not touch live side by side: in a 2x2, `c` on both top panes works. A new expansion whose lane shares a pane with an existing one replaces it (the old one is restored first), so a pane is never under two rules. Pressing `c` / `C` on a squeezed pane makes that pane the expansion instead. `=` forgets all of them. Restoring returns each pane in the lane to its saved size.
@@ -141,7 +142,6 @@ A window also closes when its last pane closes (`exit`, `Ctrl-D`, or `x`).
 | `(` / `)` | Previous / next session |
 | `$` | Rename session in a popup (current name prefilled) |
 | `X` | Close this session (popup confirmation) |
-| `D` | Choose which attached client to detach |
 | `tmux ls` | List sessions |
 | `tmux attach -t NAME` (or `tmux a`) | Resume |
 | `tmux kill-session -t NAME` | Close one session for good |
@@ -266,4 +266,4 @@ the statusline in `tmux.conf`).
 
 Nothing asks you on the status line any more: every prompt is a small dialog, and while it is open the mode label reads `COMMAND` in dark purple. In copy mode `/` `?` (search), `:` (goto line), `f` `F` `t` `T` (jump to a character) and the count prefix `1`..`9` (digits, then the key to repeat) open dialogs too. `Alt-e /` (describe key) is unbound.
 
-Rename (`Alt-e ,` / `$`), close (`x` / `&` / `X`), command (`:`), and window jump/move/search (`'` / `.` / `f`) use the same rounded, three-row popup as the new-window dialog. Rename/input accepts Enter and cancels with Esc or Ctrl-C. Close accepts only `y` or `Y`; any other key cancels. `Q` still detaches without closing programs.
+Rename (`Alt-e ,` / `$`), close (`x` / `D` / `&` / `X`), command (`:`), and window jump/move/search (`'` / `.` / `f`) use the same rounded, three-row popup as the new-window dialog. Rename/input accepts Enter and cancels with Esc or Ctrl-C. Close accepts only `y` or `Y`; any other key cancels. `Q` still detaches without closing programs.

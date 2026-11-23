@@ -8,7 +8,7 @@ tmux set -g @dialog 1 \; refresh-client -S 2>/dev/null
 trap 'tmux set -gu @dialog \; refresh-client -S 2>/dev/null' EXIT
 action=${1:?action required}
 case "$action" in
-  kill-pane|command|find-window|pane-title|copy-*) fmt='#{pane_id}' ;;
+  kill-pane|kill-other-panes|command|find-window|pane-title|copy-*) fmt='#{pane_id}' ;;
   kill-window|rename-window|move-window) fmt='#{window_id}' ;;
   *) fmt='#{session_id}' ;;
 esac
@@ -21,6 +21,14 @@ case "$action" in
     printf ' Close %s? [y/N] ' "${action#kill-}"
     IFS= read -rsn1 answer || exit 0
     case "$answer" in y|Y) tmux "$action" -t "$target" ;; esac
+    exit 0 ;;
+  kill-other-panes) # every pane of this window except the one you are on (like Ctrl-w o in vim)
+    n=$(tmux list-panes -t "$target" -F '#{?@toast_src,,x}' | grep -c x)
+    n=$(( n - 1 ))
+    if [ "$n" -lt 1 ]; then printf ' No other pane in this window'; sleep 1; exit 0; fi
+    printf ' Close the other %s pane%s? [y/N] ' "$n" "$([ "$n" -gt 1 ] && echo s)"
+    IFS= read -rsn1 answer || exit 0
+    case "$answer" in y|Y) tmux kill-pane -a -t "$target" ;; esac
     exit 0 ;;
   window-number)
     printf ' window (1-9): '
