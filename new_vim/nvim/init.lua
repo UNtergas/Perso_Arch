@@ -275,6 +275,21 @@ require("lazy").setup({
         end,
       })
       vim.cmd.colorscheme("koda-glade")
+
+      -- cursor: normal = deep teal block (same teal as the active window border), insert = deep orange bar (a terminal draws a bar one pixel wide whatever its percentage).
+      -- The indent guides are pastel red / yellow / green / blue / purple, so a dark saturated colour cannot get lost in them. Replace = red underline. Terminal must honour cursor colours.
+      vim.opt.guicursor = table.concat({
+        "n-v-c-sm:block-CursorNormal",
+        "i-ci-ve:ver25-CursorInsert",
+        "r-cr-o:hor25-CursorReplace",
+      }, ",")
+      local function cursor_colors()
+        vim.api.nvim_set_hl(0, "CursorNormal", { fg = "#ffffff", bg = "#0f6b6b" })
+        vim.api.nvim_set_hl(0, "CursorInsert", { fg = "#ffffff", bg = "#d84315" })
+        vim.api.nvim_set_hl(0, "CursorReplace", { fg = "#ffffff", bg = "#c62828" })
+      end
+      cursor_colors()
+      vim.api.nvim_create_autocmd("ColorScheme", { callback = cursor_colors })
     end,
   },
   -- active window tracking: the border around the focused window is drawn thick in the same deep teal as the active
