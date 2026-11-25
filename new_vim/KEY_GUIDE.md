@@ -88,6 +88,7 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `ysw` / `ysW` | n | Surround the word / WORD under the cursor (same as `ysiw` / `ysiW`) |
 | `ysp` / `ys(` / `ys{` / `ys[` / `ys<` | n | Surround the paragraph / inside the brackets (same as `ysip`, `ysi(`...); `yst` stays the "till char" motion, use `ysit` for tags |
 | `gs` | v | Surround selection |
+| `/**` then `Enter` | i | Gives the whole doc block, cursor on the middle line (` /**`, ` * |`, ` */`). `Enter` inside it continues with ` * ` (`o` / `O` in normal mode too); nothing is generated from the declaration |
 | `C-k` | i | Show the signature of the function being typed (parameters, the current one highlighted); again hides it. `M-q` hides it too. In the completion menu, use `C-j` / `Tab` and `S-Tab` to move |
 | `M-Up` / `M-Down` | n i x | Move the line (or the selected lines) up / down like VSCode, re-indented to fit; a count moves further (`3` `M-Down`); nothing at the first / last line |
 | `(` `{` `[` | i | Insert the closing bracket too, cursor between; typing the closing one steps over it, Backspace on an empty pair removes both, Enter between `{ }` opens an indented line (nvim-autopairs; brackets only, no quotes) |

@@ -215,6 +215,54 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
+-- JS / TS: the filetype's indent function puts the continuation line of a block comment one column left (" * text" + Enter gives
+-- "* |" under the "/" instead of " * |"). In a block comment the new line takes the indent of the line above it (one more under a
+-- "/*" line); anywhere else the filetype's own function decides.
+local function in_block_comment(lnum) -- is line lnum inside /* ... */, its closing line not counted
+  for l = lnum, math.max(1, lnum - 300), -1 do
+    local t = vim.fn.getline(l)
+    if t:find("%*/") then return false end
+    if t:find("/%*") then return true end
+  end
+  return false
+end
+function _G.comment_indent(orig)
+  local prev = vim.v.lnum - 1
+  if prev >= 1 and in_block_comment(prev) then
+    local t = vim.fn.getline(prev)
+    return vim.fn.indent(prev) + (t:match("^%s*/%*") and 1 or 0)
+  end
+  return vim.fn.eval(orig)
+end
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+  callback = function(ev)
+    local orig = vim.bo[ev.buf].indentexpr
+    if orig ~= "" and not orig:find("comment_indent", 1, true) then
+      vim.bo[ev.buf].indentexpr = "v:lua.comment_indent('" .. orig .. "')"
+    end
+  end,
+})
+
+-- Enter right after a lone "/**" gives the whole block, with the cursor on the middle line:
+--   /**
+--    * |
+--    */
+-- Pressing Enter inside the block continues it with " * " (formatoptions "r" and "o", set by the filetype plugins). Returns true
+-- when it handled the key, so blink's keymap stops there.
+function _G.docblock_enter()
+  local line = vim.api.nvim_get_current_line()
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  if not line:match("^%s*/%*%*%s*$") or col < #line:gsub("%s+$", "") then return false end
+  local indent = line:match("^%s*")
+  vim.schedule(function() -- the text is locked while the key is handled
+    vim.api.nvim_buf_set_lines(0, row - 1, row, false, { indent .. "/**", indent .. " * ", indent .. " */" })
+    vim.api.nvim_win_set_cursor(0, { row + 1, #indent + 3 })
+    vim.cmd("startinsert!")
+  end)
+  return true
+end
+
 require("lazy").setup({
 
   -- Theme (Alabaster, same as the Emacs config)
@@ -371,6 +419,7 @@ require("lazy").setup({
 
 	  ["<CR>"] = {
 	    "accept",
+	    function() return _G.docblock_enter() end, -- /** then Enter: the three-line doc block
 	    "fallback",
 	  },
 
