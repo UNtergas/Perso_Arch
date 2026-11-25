@@ -426,6 +426,10 @@ require("lazy").setup({
 	  ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
 	  ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
 
+	  -- the arrows do not drive the menu: they move the cursor as usual (Tab / S-Tab / C-j do the selecting)
+	  ["<Up>"] = false,
+	  ["<Down>"] = false,
+
 	  -- shift+enter acts as enter (accepts a selected item, else a newline)
 	  ["<S-CR>"] = {
 	    "accept",
@@ -434,7 +438,7 @@ require("lazy").setup({
 	},
 
       completion = {
-        -- the menu shows, but nothing is selected: Enter inserts a newline, and Down (or C-j) selects the first item
+        -- the menu shows, but nothing is selected: Enter inserts a newline, and Tab (or C-j) selects the first item
         list = { selection = { preselect = false, auto_insert = false } },
         menu = {
           auto_show = true,
@@ -463,8 +467,17 @@ require("lazy").setup({
       cmdline = {
         enabled = true,
 
+        -- ":" menu: Tab / S-Tab select, Enter accepts; the arrows go back to history (Up/Down) and cursor moves (Left/Right)
+        keymap = {
+          preset = "cmdline",
+          ["<Up>"] = false,
+          ["<Down>"] = false,
+          ["<Left>"] = false,
+          ["<Right>"] = false,
+        },
+
         completion = {
-          -- same for ":" : the list shows, nothing is selected until you press Right (Left goes back)
+          -- same for ":" : the list shows, nothing is selected until you press Tab (S-Tab goes back)
           list = { selection = { preselect = false, auto_insert = false } },
           menu = {
             auto_show = true,
@@ -527,6 +540,14 @@ require("lazy").setup({
         init_options = {
           disableAutomaticTypingAcquisition = true,
           maxTsServerMemory = 3072,
+          -- offer symbols from other files / packages (useState, classes, types) and attach their import as an extra edit,
+          -- so accepting the item with Enter adds the import line too (no Alt-. needed)
+          preferences = {
+            includeCompletionsForModuleExports = true,
+            includeCompletionsWithInsertText = true,
+            includeCompletionsForImportStatements = true,
+            allowIncompleteCompletions = true,
+          },
         },
       })
 
