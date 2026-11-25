@@ -1281,10 +1281,13 @@ require("lazy").setup({
     "mg979/vim-visual-multi",
     branch = "master",
     init = function()
-      -- keep VM's own keys, and add the ones from before: Ctrl-d selects the word, again for the next match. Ctrl-Shift-Down / Up
-      -- add a cursor below the bottom-most / above the top-most cursor, so the set keeps growing both ways (VM's own
-      -- "add cursor" works from the cursor you are on, so Up after Down went nowhere): select the edge region first, then add.
+      -- multiple cursors start from Ctrl-d (the word, again for the next match) or Ctrl-Shift-Down / Up (add a cursor below the bottom-most /
+      -- above the top-most one, so the set grows both ways); then c / i / a ... act at every cursor.
+      -- VM's other start-up keys (Ctrl-Up/Down, Shift-arrows, Ctrl-n, backslash chords...) are off: they kept firing by accident.
+      -- Once VM is running its own keys (n N q Q Tab, Esc to leave) still work.
       -- VM maps [ and ] (go to previous / next cursor), which clash with maps in this config: they live on Alt-N / Alt-n.
+      vim.g.VM_default_mappings = 0
+      vim.g.VM_mouse_mappings = 0
       vim.g.VM_maps = {
         ["Find Under"] = "<C-d>",
         ["Find Subword Under"] = "<C-d>",
