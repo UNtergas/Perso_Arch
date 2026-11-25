@@ -79,7 +79,7 @@ case "$action" in
 esac
 out=$(fzf --print-query --query "$query" --disabled --no-info --no-separator \
   --prompt "$prompt" --pointer ' ' \
-  --color 'bg:#eef1f1,fg:#14201f,prompt:#4a6a6a,query:#14201f,bg+:#eef1f1' \
+  --color 'bg:#20242c,fg:#d3dae3,prompt:#4b8cd8,query:#d3dae3,bg+:#20242c' \
   --height 100% --layout reverse </dev/null)
 rc=$?
 # fzf returns 1 on Enter when its empty candidate list has no match; the query is still valid.

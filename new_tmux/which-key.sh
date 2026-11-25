@@ -7,7 +7,7 @@ client=$1 pane=$2
 tmux set -g @popup 1 \; refresh-client -S 2>/dev/null
 trap 'tmux set -gu @popup \; refresh-client -S 2>/dev/null' EXIT
 
-B=$'\e[1m' D=$'\e[0m' H=$'\e[1;38;2;74;106;106m' K=$'\e[1;38;2;20;32;31m' G=$'\e[38;2;90;110;110m'
+B=$'\e[1m' D=$'\e[0m' H=$'\e[1;38;2;75;140;216m' K=$'\e[1;38;2;211;218;227m' G=$'\e[38;2;110;119;135m'
 row() { printf '  %s%-13s%s %s\n' "$K" "$1" "$D" "$2"; }
 sec() { printf ' %s%s%s\n' "$H" "$1" "$D"; }
 printf ' %sAlt-e%s  %s(press a key, Esc closes)%s\n' "$B" "$D" "$G" "$D"

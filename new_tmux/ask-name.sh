@@ -6,7 +6,7 @@
 tmux set -g @dialog 1 \; refresh-client -S 2>/dev/null
 trap 'tmux set -gu @dialog \; refresh-client -S 2>/dev/null' EXIT
 out=$(fzf --print-query --query "$1" --disabled --no-info --no-separator --prompt ' name: ' --pointer ' ' \
-  --color 'bg:#eef1f1,fg:#14201f,prompt:#4a6a6a,query:#14201f,bg+:#eef1f1' \
+  --color 'bg:#20242c,fg:#d3dae3,prompt:#4b8cd8,query:#d3dae3,bg+:#20242c' \
   --height 100% --layout reverse </dev/null)
 rc=$?
 [ "$rc" -eq 130 ] && exit 0   # Esc / Ctrl-C
