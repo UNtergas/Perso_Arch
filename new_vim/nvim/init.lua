@@ -366,6 +366,11 @@ require("lazy").setup({
           set(0, "Added", { fg = "#c9d05c" })
           set(0, "Removed", { fg = "#f43753" })
           set(0, "NoiceCmdlinePopupBorder", { fg = "#73cef4" })
+          -- background: tender #282828 -> terminal/tmux surface, darkened to #161920 (every group that uses it, so floats/signs/winbar match)
+          for name in pairs(vim.api.nvim_get_hl(0, {})) do
+            local h = vim.api.nvim_get_hl(0, { name = name, link = false })
+            if h.bg == 0x282828 then h.bg = 0x161920; set(0, name, h) end
+          end
         end,
       })
       vim.cmd.colorscheme("tender")
@@ -1192,25 +1197,25 @@ require("lazy").setup({
       -- tender palette (jacoborus/tender.vim airline theme): a = bright block with dark text, b = dark mode-coloured text, c = tab row colour.
       -- a > b > c fade from brightest to darkest; the tab row and the winbar use the same colours
       local theme = require("lualine.themes.auto")
-      local bg_c, bg_b = "#1d1d1d", "#444444"
+      local bg_c, bg_b = "#1d1f22", "#383b40"
       local mode_a = {
-        normal = { fg = "#282828", bg = "#b3deef", gui = "bold" },
-        insert = { fg = "#282828", bg = "#c9d05c", gui = "bold" },
-        visual = { fg = "#282828", bg = "#ffc24b", gui = "bold" },
-        replace = { fg = "#282828", bg = "#f43753", gui = "bold" },
-        command = { fg = "#282828", bg = "#d3b987", gui = "bold" },
+        normal = { fg = "#1c1e22", bg = "#7fb5e3", gui = "bold" },
+        insert = { fg = "#1c1e22", bg = "#accb7e", gui = "bold" },
+        visual = { fg = "#1c1e22", bg = "#efc262", gui = "bold" },
+        replace = { fg = "#1c1e22", bg = "#ea5359", gui = "bold" },
+        command = { fg = "#1c1e22", bg = "#c5afb0", gui = "bold" },
       }
       for m, a in pairs(mode_a) do
         theme[m].a = a
         theme[m].b = { fg = a.bg, bg = bg_b, gui = "bold" } -- the branch text takes the mode colour
-        theme[m].c = { fg = "#eeeeee", bg = bg_c }
-        theme[m].y = { fg = "#eeeeee", bg = bg_b }
+        theme[m].c = { fg = "#e0e4e8", bg = bg_c }
+        theme[m].y = { fg = "#e0e4e8", bg = bg_b }
         theme[m].z = a
       end
       theme.inactive = {
-        a = { fg = "#bbbbbb", bg = "#666666" },
-        b = { fg = "#bbbbbb", bg = bg_b },
-        c = { fg = "#999999", bg = bg_c },
+        a = { fg = "#b5b8bc", bg = "#51545c" },
+        b = { fg = "#b5b8bc", bg = bg_b },
+        c = { fg = "#93969c", bg = bg_c },
       }
       -- the first block's colours per mode, for the project block of the winbar (lua/saga_breadcrumb.lua)
       _G.mode_a = {}
@@ -1232,7 +1237,7 @@ require("lazy").setup({
             {
               "mode", -- NORMAL / INSERT / VISUAL ... (the project name is in the winbar now); RESIZE while C-w r is on
               fmt = function(name) return vim.g.resize_mode and "RESIZE" or name end,
-              color = function() if vim.g.resize_mode then return { fg = "#282828", bg = "#ff9e64", gui = "bold" } end end,
+              color = function() if vim.g.resize_mode then return { fg = "#1c1e22", bg = "#f7b182", gui = "bold" } end end,
             },
           },
           lualine_b = {
@@ -1269,16 +1274,16 @@ require("lazy").setup({
               { "diagnostics", sections = { "error", "warn", "hint" }, always_visible = true, padding = { left = 1, right = 1 }, separator = "",
                 symbols = { error = "\u{f057} ", warn = "\u{f071} ", hint = "\u{f0eb} " } },
               { "diagnostics", sections = { "info" }, symbols = { info = "\u{f05a} " }, padding = { left = 0, right = 1 }, separator = "" },
-              block("#335261", "#b3deef", { "encoding" }),
-              block("#73cef4", "#282828", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
+              block("#2f485f", "#a1cbed", { "encoding" }),
+              block("#6ebaf0", "#1c1e22", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
               -- line:column | percentage of the file (Top / Bot at the ends), one block: 76:42 | 5%
-              block("#b3deef", "#282828", {
+              block("#7fb5e3", "#1c1e22", {
                 function()
                   local cur, total = vim.fn.line("."), vim.fn.line("$")
                   local pct = cur == 1 and "Top" or (cur == total and "Bot" or math.floor(cur / total * 100) .. "%%") -- %% : a lone % would be read as a statusline item
                   return string.format("%d:%d | %s", cur, vim.fn.col("."), pct)
                 end,
-                color = { fg = "#282828", bg = "#b3deef", gui = "bold" },
+                color = { fg = "#1c1e22", bg = "#7fb5e3", gui = "bold" },
               }),
             }
           end)(),
