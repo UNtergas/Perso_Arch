@@ -364,10 +364,10 @@ require("lazy").setup({
 	    "fallback",
 	  },
 
-	  ["<C-k>"] = {
-	    "select_prev",
-	    "fallback",
-	  },
+	  -- Ctrl-k: show the signature of the function being typed (parameters, current one highlighted); again hides it.
+	  -- Alt-q hides it too (and, with no signature open, falls back to the global "close popups"). Shown by hand only.
+	  ["<C-k>"] = { "show_signature", "hide_signature", "fallback" },
+	  ["<M-q>"] = { "hide_signature", "fallback" },
 
 	  ["<CR>"] = {
 	    "accept",
@@ -401,6 +401,14 @@ require("lazy").setup({
             },
           },
         },
+      },
+
+      -- signature help: "enabled" is what lets C-k (show_signature) work at all; the automatic triggers are off, so it only
+      -- appears when asked for (C-k) and hides with C-k again or Alt-q
+      signature = {
+        enabled = true,
+        trigger = { enabled = false },
+        window = { border = "rounded", show_documentation = false },
       },
 
       cmdline = {
@@ -987,6 +995,15 @@ require("lazy").setup({
       vim.g.nvim_surround_no_visual_mappings = true -- `S` in visual is flash treesitter
     end,
     config = function()
+      -- ( { [ < wrap without the inner spaces (nvim-surround's default pads them: "( text )"); the closing forms, b B r > and the quotes were already tight
+      require("nvim-surround").setup({
+        surrounds = {
+          ["("] = { add = { "(", ")" } },
+          ["{"] = { add = { "{", "}" } },
+          ["["] = { add = { "[", "]" } },
+          ["<"] = { add = { "<", ">" } },
+        },
+      })
       vim.keymap.set("x", "gs", "<Plug>(nvim-surround-visual)", { desc = "Surround selection" })
       -- ysw = ysiw, ysW = ysiW (the plain "w" motion only wrapped from the cursor to the next word, rarely wanted)
       vim.keymap.set("n", "ysw", "ysiw", { remap = true, desc = "Surround word" })
@@ -1173,6 +1190,16 @@ require("lazy").setup({
         },
         inactive_sections = { lualine_c = { "filename" }, lualine_x = { "location" } },
       })
+    end,
+  },
+  { -- ( { [ close themselves: typing the opening one inserts the pair with the cursor between; typing the closing one steps over it,
+    -- Backspace on an empty pair removes both, and Enter between { } opens an indented line. Brackets only: no quotes or backticks.
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    config = function()
+      local npairs = require("nvim-autopairs")
+      npairs.setup({ check_ts = true }) -- treesitter: no pair inside a string or comment where it would be wrong
+      for _, q in ipairs({ "'", '"', "`" }) do npairs.remove_rule(q) end
     end,
   },
   {
@@ -1394,8 +1421,7 @@ map({ "n", "v" }, "<C-b>", function() require("buffer_manager.ui").toggle_quick_
 
 -- scroll: <C-d>/<C-f>/<C-b> are taken above, so the native scrolls live on other keys
 -- (normal! ignores mappings, so it reaches the built-in <C-d>/<C-u>).
--- Alt-j / Alt-k, not Ctrl-K: Ctrl-K starts the window chords (C-k h/j/k/l, C-k a ...), so a lone Ctrl-K waited a full
--- timeoutlen (1 s) for a second key before it scrolled
+-- Alt-j / Alt-k scroll half a page
 map({ "n", "x" }, "<M-j>", [[<Cmd>exe "normal! \<C-d>"<CR>]], { desc = "Half page down" })
 map({ "n", "x" }, "<M-k>", [[<Cmd>exe "normal! \<C-u>"<CR>]], { desc = "Half page up" })
 -- <PageDown>/<PageUp> are already full-page scroll natively
@@ -1448,8 +1474,8 @@ map("n", "<C-w>q", pick_window, { desc = "Number the windows, press a number to 
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
 map("n", "<C-w>T", "<Nop>", { desc = "Disabled: one tab per nvim" })
--- C-w < > + (window width / height by one step) are off: resizing is C-k h/j/k/l, C-w r and C-w =
-for _, k in ipairs({ "<", ">", "+" }) do map("n", "<C-w>" .. k, "<Nop>", { desc = "Disabled: use C-k h/j/k/l or C-w r" }) end
+-- C-w < > + (window width / height by one step) are off: resizing is C-w r and C-w =
+for _, k in ipairs({ "<", ">", "+" }) do map("n", "<C-w>" .. k, "<Nop>", { desc = "Disabled: use C-w r" }) end
 -- C-w _ and C-w | (maximise the height / width) are off too: C-w c / C / z are the toggles that fill a column / row / the screen
 for _, k in ipairs({ "_", "|" }) do map("n", "<C-w>" .. k, "<Nop>", { desc = "Disabled: use C-w c / C / z" }) end
 -- C-w s / v (and C-w S, C-w Ctrl-s / Ctrl-v) are off: C-w - splits stacked, C-w \ splits side by side (the :split commands still work)
@@ -1479,17 +1505,13 @@ map("n", "<C-w>C", window_toggle("saved_row", "wincmd |"), { desc = "Window fill
 map({ "n", "x" }, ";", ":", { desc = "Command line" })
 
 -- ctrl+k chords
-local function mk_parent(p)
-  local dir = vim.fn.fnamemodify(p, ":h")
-  if dir ~= "" and dir ~= "." then vim.fn.mkdir(dir, "p") end
-end
 local ck = { "n", "v" }
 -- C-w arrows move the window (they replace the built-in C-w arrows, which only focus a window: C-M-hjkl focus)
 map(ck, "<C-w><Left>", "<C-w>H", { desc = "Move window left" })
 map(ck, "<C-w><Down>", "<C-w>J", { desc = "Move window down" })
 map(ck, "<C-w><Up>", "<C-w>K", { desc = "Move window up" })
 map(ck, "<C-w><Right>", "<C-w>L", { desc = "Move window right" })
--- C-k h/j/k/l resize the window: h narrower, l wider, j shorter, k taller. One step is 10% of the screen (columns for h / l, rows
+-- Resize mode (C-w r: h narrower, l wider, j shorter, k taller) moves by steps of 10% of the screen (columns for h / l, rows
 -- for j / k), so from an even split the sizes land on 50, 40, 30, 20 %. C-w = equalises every window, and again puts the
 -- previous sizes back (the saved sizes are dropped when the number of windows changes).
 local function resize_step(dir)
@@ -1509,10 +1531,6 @@ local function resize_step(dir)
     vim.cmd("resize " .. (((dir == "j") == has_below) and "+" or "-") .. dh)
   end
 end
-map(ck, "<C-k>h", function() resize_step("h") end, { desc = "Window narrower (10%)" })
-map(ck, "<C-k>l", function() resize_step("l") end, { desc = "Window wider (10%)" })
-map(ck, "<C-k>j", function() resize_step("j") end, { desc = "Window shorter (10%)" })
-map(ck, "<C-k>k", function() resize_step("k") end, { desc = "Window taller (10%)" })
 map(ck, "<C-w>=", function()
   local saved = vim.t.equal_saved
   if saved and saved.n == #vim.api.nvim_tabpage_list_wins(0) then
@@ -1523,7 +1541,7 @@ map(ck, "<C-w>=", function()
     vim.cmd("wincmd =")
   end
 end, { desc = "Equal window sizes (again: back to the previous sizes)" })
--- C-w r: resize mode, like i3 (replaces the built-in C-w r, rotate). h / j / k / l resize the window in 10% steps (same as C-k h/j/k/l), = equal sizes (no toggle back),
+-- C-w r: resize mode, like i3 (replaces the built-in C-w r, rotate). h / j / k / l resize the window in 10% steps, = equal sizes (no toggle back),
 -- Esc / Enter / q leave; any other key leaves too.
 map(ck, "<C-w>r", function()
   -- the mode is shown in the statusline (RESIZE in the mode block, the keys next to it), not as a message
@@ -1556,16 +1574,6 @@ end, { desc = "Resize mode (h/j/k/l, = equal, Esc)" })
 -- C-w \ splits side by side, C-w - splits stacked (like tmux: \ side by side, - stacked)
 map("n", "<C-w>\\", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
 map("n", "<C-w>-", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })
-map(ck, "<C-k>a", function()
-  vim.ui.input({ prompt = "New file: ", completion = "file" }, function(p)
-    if p and p ~= "" then mk_parent(p); vim.cmd("edit " .. vim.fn.fnameescape(p)) end
-  end)
-end, { desc = "New file" })
-map(ck, "<C-k>A", function()
-  vim.ui.input({ prompt = "New folder: ", completion = "dir" }, function(p)
-    if p and p ~= "" then vim.fn.mkdir(p, "p") end
-  end)
-end, { desc = "New folder" })
 
 -- leader (SPC) maps, Doom style
 map("n", "<leader><leader>", tb("find_files"), { desc = "Find file in project" })
@@ -1588,9 +1596,26 @@ map("n", "<leader>[", function() _G.buffer_tab_scroll(-3) end, { desc = "Scroll 
 map("n", "<leader>]", function() _G.buffer_tab_scroll(3) end, { desc = "Scroll tabs right" })
 map("n", "<leader>bS", "<cmd>wall<cr>", { desc = "Save all buffers" })
 map("n", "<leader>fR", function() Snacks.rename.rename_file() end, { desc = "Rename file (updates imports)" })
+-- Alt-Up / Alt-Down move the line (normal, insert) or the selected lines (visual) up / down, like VSCode; a count moves further
+-- (3 Alt-Down), the moved lines are re-indented to fit their new place, and nothing happens at the first / last line
+map("n", "<M-Down>", "<Cmd>silent! execute 'move .+' . v:count1<CR>==", { desc = "Move line down" })
+map("n", "<M-Up>", "<Cmd>silent! execute 'move .-' . (v:count1 + 1)<CR>==", { desc = "Move line up" })
+map("i", "<M-Down>", "<Cmd>silent! move .+1<CR><C-o>==", { desc = "Move line down" })
+map("i", "<M-Up>", "<Cmd>silent! move .-2<CR><C-o>==", { desc = "Move line up" })
+map("x", "<M-Down>", ":<C-u>silent! '<,'>move '>+1<CR>gv=gv", { desc = "Move selection down" })
+map("x", "<M-Up>", ":<C-u>silent! '<,'>move '<-2<CR>gv=gv", { desc = "Move selection up" })
 map({ "n", "v" }, "<leader>cf", function()
   require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "Format (manual)" })
+-- "u" in visual mode lowercases the selection: too easy to hit by mistake (normal-mode u is still undo; gu and U are unchanged)
+map({ "x", "s" }, "u", "<Nop>", { desc = "Disabled (visual lowercase)" })
+-- lowercase only from a visual selection (v or V), and only by typing guu: the normal-mode gu operator (guu, guiw, gu$...) is off,
+-- and a lone gu in visual mode does nothing, so only the full guu runs the real gu on the selection
+-- (an operator that does nothing instead of <Nop>, so the keys after it (the u of guu, the iw of guiw) are swallowed and do not run as undo / insert)
+function _G.noop_operator() end
+map("n", "gu", function() vim.o.operatorfunc = "v:lua.noop_operator"; return "g@" end, { expr = true, desc = "Disabled (lowercase operator, use visual + guu)" })
+map("x", "gu", "<Nop>", { desc = "Disabled (type guu)" })
+map("x", "guu", "gu", { desc = "Lowercase selection" })
 -- SPC c x: Lspsaga workspace diagnostics.
 -- SPC c X: the same diagnostics in a flat Telescope list.
 map("n", "<leader>cx", "<cmd>Lspsaga show_workspace_diagnostics<cr>", { desc = "Diagnostics (Lspsaga)" })

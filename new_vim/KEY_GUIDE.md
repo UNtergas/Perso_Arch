@@ -20,8 +20,6 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `C-n` | n v | Toggle Oil file browser: opens at the current file's folder, again goes back |
 | `SPC e` | n | Oil file browser (edit files as text). It also opens for `nvim .` and `:e .` instead of netrw |
 | `C-b` | n v | Buffer manager (same as `SPC b b`) |
-| `C-k a` | n v | New file (creates parent folders) |
-| `C-k A` | n v | New folder |
 | `C-s` | n v | Save |
 | `C-s` | i | Save and back to normal mode |
 | `S-CR` | n v i | Same as Enter |
@@ -41,7 +39,7 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `gp` | n | Peek definition in an editable popup; Esc closes |
 | `SPC s o` | n | Toggle document outline tree; Enter expands/jumps, o jumps directly, q closes |
 | `C-t` | n | Find symbol in workspace (VSCode) |
-| `M-j` / `M-k` | n x | Scroll half a page down / up (animated, about 150 ms). Not `C-k`: it starts the window chords |
+| `M-j` / `M-k` | n x | Scroll half a page down / up (animated, about 150 ms). |
 | `]d` / `[d` | n | Next / previous diagnostic, without popups (counts work) |
 | `]g` / `[g` | n | Next / previous git hunk |
 
@@ -65,7 +63,6 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | Key | Mode | Does |
 |---|---|---|
 | `C-w <arrow>` | n v | Move the window to the far left/bottom/top/right (replaces the built-in C-w arrows, which only focus; use `C-M-h/j/k/l` to focus) |
-| `C-k h/j/k/l` | n v | Resize the window by moving a divider in that direction, in steps of 10% of the screen (columns for `h` `l`, rows for `j` `k`). A window with a neighbour on the right / below grows with `l` / `j` and shrinks with `h` / `k`; the rightmost / bottom-most window has its divider on the left / top, so `h` / `k` grow it and `l` / `j` shrink it. Same as tmux. A window with no neighbour in that direction does nothing |
 | `C-w =` | n v | Equal window sizes; press again to put the previous sizes back (forgotten when the number of windows changes) |
 | `C-w r` | n v | Resize mode, like i3 (replaces the built-in C-w r, rotate): `h` `j` `k` `l` resize the window in 10% steps, `=` equal sizes (no toggle back), `Esc` / `Enter` / `q` leave (any other key leaves too). The command line shows `-- RESIZE --` while it is on |
 | `C-w -` | n | Split stacked (new window below) |
@@ -91,6 +88,9 @@ Find any bind: `SPC h b` (Telescope keymaps) or press `SPC` and wait
 | `ysw` / `ysW` | n | Surround the word / WORD under the cursor (same as `ysiw` / `ysiW`) |
 | `ysp` / `ys(` / `ys{` / `ys[` / `ys<` | n | Surround the paragraph / inside the brackets (same as `ysip`, `ysi(`...); `yst` stays the "till char" motion, use `ysit` for tags |
 | `gs` | v | Surround selection |
+| `C-k` | i | Show the signature of the function being typed (parameters, the current one highlighted); again hides it. `M-q` hides it too. In the completion menu, use `C-j` / `Tab` and `S-Tab` to move |
+| `M-Up` / `M-Down` | n i x | Move the line (or the selected lines) up / down like VSCode, re-indented to fit; a count moves further (`3` `M-Down`); nothing at the first / last line |
+| `(` `{` `[` | i | Insert the closing bracket too, cursor between; typing the closing one steps over it, Backspace on an empty pair removes both, Enter between `{ }` opens an indented line (nvim-autopairs; brackets only, no quotes) |
 | `SPC s u` | n | Undo tree |
 | `SPC c f` | n v | Format (manual; black, rustfmt, else LSP) |
 
