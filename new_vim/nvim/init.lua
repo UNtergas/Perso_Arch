@@ -2012,6 +2012,31 @@ local function tab_colors()
   local function darker(c, k) return math.floor(bit.rshift(c, 16) % 256 * k) * 65536 + math.floor(bit.rshift(c, 8) % 256 * k) * 256 + math.floor(c % 256 * k) end
   vim.api.nvim_set_hl(0, "BufTabStrip", { fg = darker(fn, 0.7), bg = 0xfafafa })
 end
+-- harpoon slots (right end of the tab row): the tab colours with a green tint, so they read as another group of tabs
+local function harpoon_colors()
+  vim.api.nvim_set_hl(0, "HarpTab", { fg = 0x3f6a55, bg = 0xc2dccf })
+  vim.api.nvim_set_hl(0, "HarpTabSel", { fg = 0x14402b, bg = 0xe6f5ec, bold = true })
+  vim.api.nvim_set_hl(0, "HarpTabIcon", { fg = 0x2f5a45, bg = 0xaccdbb })
+  vim.api.nvim_set_hl(0, "HarpTabArrow", { fg = 0xaccdbb, bg = 0xd4dfdf })
+end
+harpoon_colors()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = harpoon_colors })
+function _G.harpoon_tab_click(i) pcall(function() require("harpoon"):list():select(i) end) end
+-- "󰀱 1 2 3": an icon chip, then one small chip per slot, the slot of the current file brighter. Nothing (and no reserved room)
+-- while the harpoon list is empty. Returns the string and its display width.
+local function harpoon_block()
+  local ok, harpoon = pcall(require, "harpoon")
+  if not ok then return "", 0 end
+  local items = harpoon:list().items
+  if #items == 0 then return "", 0 end
+  local current = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
+  local out, w = { "%#HarpTabArrow#\u{e0b2}%#HarpTabIcon# \u{f0031} " }, 5
+  for i, item in ipairs(items) do
+    out[#out + 1] = "%" .. i .. "@v:lua.harpoon_tab_click@" .. (item.value == current and "%#HarpTabSel#" or "%#HarpTab#") .. " " .. i .. " %X"
+    w = w + 3
+  end
+  return table.concat(out) .. "%#BufTabFill#", w
+end
 tab_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = tab_colors })
 function _G.buffer_tab_click(n) pcall(function() require("buffer_manager.ui").nav_file(n) end) end
@@ -2130,10 +2155,8 @@ function _G.buffer_tabline()
     if seen[t] > 1 then t = vim.fn.fnamemodify(m.buf_name, ":h:t") .. "/" .. t end -- two tabs with one name: add the folder
     local active = m.buf_id == cur
     if active then curi = i end
-    local mod = vim.api.nvim_buf_is_valid(m.buf_id) and vim.bo[m.buf_id].modified
-    local errs = vim.api.nvim_buf_is_valid(m.buf_id) and vim.diagnostic.count(m.buf_id, { severity = vim.diagnostic.severity.ERROR })[vim.diagnostic.severity.ERROR] or 0
-    local plain = " " .. i .. " " .. t .. (errs > 0 and " \u{f057} " .. errs or "") .. (mod and " \u{f444}" or "") .. " "
-    items[i] = { i = i, name = t:gsub("%%", "%%%%"), active = active, mod = mod, errs = errs, w = vim.fn.strdisplaywidth(plain) }
+    local plain = " " .. i .. " " .. t .. " " -- the unsaved dot and the error / warning count are in the winbar (lua/saga_breadcrumb.lua)
+    items[i] = { i = i, name = t:gsub("%%", "%%%%"), active = active, w = vim.fn.strdisplaywidth(plain) }
   end
   -- the logo block comes first: white Linux logo, dark red while a language server is attached to this buffer, grey when
   -- there is none (kvim has the Kotlin logo on dark purple)
@@ -2146,10 +2169,11 @@ function _G.buffer_tabline()
     vim.api.nvim_set_hl(0, "BufTabLogoArrow", { fg = lg.bg, bg = vim.api.nvim_get_hl(0, { name = "BufKeysIcon", link = false }).bg }) -- logo > keys block
     return "%#BufTabLogo# " .. logo .. " %#BufTabLogoArrow#\u{e0b0}" .. kb
   end
-  if #items == 0 then return arrow(false) .. "%=" end -- no tab yet (a new project on Oil): the logo is still there
+  local harp, harp_w = harpoon_block()
+  if #items == 0 then return arrow(false) .. "%=" .. harp end -- no tab yet (a new project on Oil): the logo is still there
   -- too many tabs for the width: keep the current one and as many neighbours as fit, with < > at the cut ends
   local lo, hi, used = curi, curi, items[curi] and items[curi].w or 0
-  local avail = vim.o.columns - 8 - (KEYS_W + 5) -- the keys block takes its width off the tabs
+  local avail = vim.o.columns - 8 - (KEYS_W + 5) - harp_w -- the keys block takes its width off the tabs
   if _G.tab_first then
     -- scrolled by hand (SPC [ / ], or a click on ‹ ›): start at that tab and fill to the right; switching buffer follows again
     lo = math.max(1, math.min(_G.tab_first, #items))
@@ -2168,13 +2192,11 @@ function _G.buffer_tabline()
   for i = lo, hi do
     local it = items[i]
     local base = it.active and "%#BufTabSel#" or "%#BufTab#"
-    local dot = it.mod and ((it.active and "%#BufTabSelMod#" or "%#BufTabMod#") .. " \u{f444}") or ""
-    local err = it.errs > 0 and ((it.active and "%#BufTabSelErr#" or "%#BufTabErr#") .. " \u{f057} " .. it.errs) or "" -- errors in this buffer
     -- the current tab starts with a strip (a three-eighths block, darker shade of the theme's function colour) where the others have a space
     local lead = it.active and "%#BufTabStrip#\u{258d}" .. base or " "
-    out[#out + 1] = "%" .. it.i .. "@v:lua.buffer_tab_click@" .. base .. lead .. it.i .. " " .. it.name .. err .. dot .. base .. " %X"
+    out[#out + 1] = "%" .. it.i .. "@v:lua.buffer_tab_click@" .. base .. lead .. it.i .. " " .. it.name .. base .. " %X"
   end
-  out[#out + 1] = "%#BufTabFill#" .. (hi < #items and "%2@v:lua.buffer_tab_arrow@ \u{203a}%X" or "") .. "%="
+  out[#out + 1] = "%#BufTabFill#" .. (hi < #items and "%2@v:lua.buffer_tab_arrow@ \u{203a}%X" or "") .. "%=" .. harp
   return table.concat(out)
 end
 vim.api.nvim_create_autocmd({ "BufEnter", "BufAdd", "BufDelete", "BufWipeout", "BufModifiedSet", "BufFilePost", "VimResized", "DiagnosticChanged" }, {

@@ -1,5 +1,4 @@
--- The winbar of every file window: the project block, then the path, unsaved dot and the file's own git counts on the left; on the focused
--- window the harpoon slots on the right. (The name is historic: it used to be Lspsaga's symbol breadcrumb, now gone.)
+-- The winbar of every file window: the project block, then the path, unsaved dot and the file's own git counts on the left; (the harpoon slots are in the tab row, init.lua). (The name is historic: it used to be Lspsaga's symbol breadcrumb, now gone.)
 -- While vim-visual-multi is on in the window, VM's info (mode, cursor n / total, patterns) takes the bar instead.
 -- It still replaces Lspsaga's winbar functions so Lspsaga never writes its own.
 local M = {}
@@ -49,26 +48,24 @@ end
 local function colors()
   local bar = api.nvim_get_hl(0, { name = "WinBar", link = false })
   local bg = bar.bg or 0xfafafa
-  api.nvim_set_hl(0, "HarpSlot", { fg = 0x6a6a6a, bg = bg })
-  api.nvim_set_hl(0, "HarpSlotSel", { fg = 0x1d2b2a, bg = bg, bold = true, underline = true })
   api.nvim_set_hl(0, "BarModified", { fg = 0x1f4e9c, bg = PATH_BG })
   -- the path takes the theme's comment colour, on its own light background, ending with an arrow into the bar
   api.nvim_set_hl(0, "BarPath", { fg = api.nvim_get_hl(0, { name = "Comment", link = false }).fg, bg = PATH_BG })
+  -- error (red) / warning (amber) count, on the path block; the same red as the old tab indicator
+  local err = api.nvim_get_hl(0, { name = "DiagnosticError", link = false }).fg or 0xb3261e
+  api.nvim_set_hl(0, "BarDiagError", { fg = err, bg = PATH_BG, bold = true })
+  api.nvim_set_hl(0, "BarDiagWarn", { fg = 0xa86a00, bg = PATH_BG, bold = true })
   api.nvim_set_hl(0, "BarPathArrow", { fg = PATH_BG, bg = bg })
   M.project_colors()
 end
 
-local function harpoon_slots(buf)
-  local ok, harpoon = pcall(require, "harpoon")
-  if not ok then return "" end
-  local items = harpoon:list().items
-  if #items == 0 then return "" end
-  local current = vim.fn.fnamemodify(api.nvim_buf_get_name(buf), ":.")
-  local parts = { "%#HarpSlot#[\u{f0031}]" } -- [󰀱] then one slot each, the current file's slot highlighted
-  for i, item in ipairs(items) do
-    parts[#parts + 1] = (item.value == current and "%#HarpSlotSel#" or "%#HarpSlot#") .. "[" .. i .. "]"
-  end
-  return table.concat(parts, " ") .. "%#WinBar# "
+-- one indicator at a time: the error count if the buffer has errors, else the warning count, else nothing
+local function diag_indicator(buf)
+  local S = vim.diagnostic.severity
+  local c = vim.diagnostic.count(buf, { severity = { S.ERROR, S.WARN } })
+  if (c[S.ERROR] or 0) > 0 then return " %#BarDiagError#\u{f057} " .. c[S.ERROR] end
+  if (c[S.WARN] or 0) > 0 then return " %#BarDiagWarn#\u{f071} " .. c[S.WARN] end
+  return ""
 end
 
 function M.render(win)
@@ -88,8 +85,8 @@ function M.render(win)
   -- [ project]>path : the project (folder name of the window's cwd) is a block with a folder icon, then the path
   local project = vim.fn.fnamemodify(vim.fn.getcwd(vim.fn.win_id2win(win)), ":t")
   local left = "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<%#BarPath# " .. (label and "" or file_icon(name)) .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
-    .. (mod and " \u{f444}" or "") .. " %#BarPathArrow#\u{e0b0}%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
-  return left .. "%=" .. (focused and harpoon_slots(buf) or "")
+    .. (mod and " \u{f444}" or "") .. diag_indicator(buf) .. " %#BarPathArrow#\u{e0b0}%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
+  return left
 end
 
 -- The winbar of an Oil window: the same project block, then the folder being browsed relative to the project (~/... outside it;
@@ -142,7 +139,7 @@ function M.setup()
   })
   -- the path, dot and counts follow the buffer: redraw when it is edited or saved, when git signs update and when the
   -- harpoon list changes (those two already redraw the status area; BufModifiedSet is the new one)
-  api.nvim_create_autocmd("BufModifiedSet", { group = group, callback = function() vim.cmd.redrawstatus() end })
+  api.nvim_create_autocmd({ "BufModifiedSet", "DiagnosticChanged" }, { group = group, callback = function() vim.cmd.redrawstatus() end })
   -- redraw the bar when VM starts / ends and while it is on (cursor moves, mode changes, typing), so its info stays current
   api.nvim_create_autocmd("User", {
     group = group, pattern = { "visual_multi_start", "visual_multi_exit" }, callback = function() vim.cmd("redrawstatus") end,
