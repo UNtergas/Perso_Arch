@@ -15,11 +15,11 @@ local M = {}
 local ns = vim.api.nvim_create_namespace("better_comments")
 
 local COLORS = {
-  BetterCommentAlert = { fg = "#c0262d", bold = true },
-  BetterCommentQuery = { fg = "#1f6fc9" },
-  BetterCommentHighlight = { fg = "#2e8b3d" },
-  BetterCommentTodo = { fg = "#d97706", bold = true },
-  BetterCommentStrike = { fg = "#8a8a8a", strikethrough = true },
+  BetterCommentAlert = { fg = "#f43753", bold = true },
+  BetterCommentQuery = { fg = "#73cef4" },
+  BetterCommentHighlight = { fg = "#c9d05c" },
+  BetterCommentTodo = { fg = "#ffc24b", bold = true },
+  BetterCommentStrike = { fg = "#666666", strikethrough = true },
 }
 local SYMBOL = { ["!"] = "BetterCommentAlert", ["?"] = "BetterCommentQuery", ["*"] = "BetterCommentHighlight" }
 local DEFAULT_LEADERS = { "//", "#", "--", ";", '"', "%", "<!--", "/*" }

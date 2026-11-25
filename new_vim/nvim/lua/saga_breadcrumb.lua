@@ -16,7 +16,7 @@ local function escape(s) return s:gsub("%%", "%%%%"):gsub("[\r\n]", " ") end
 
 -- The project block takes the colour of the mode block of the statusline (insert green, visual blue, replace yellow, command
 -- purple); in normal mode it keeps the lighter utf-8 grey-teal.
-local PATH_BG = "#e9f1f1" -- the path block: lighter than the tab row (#d4dfdf), a step darker than the bar (#fafafa)
+local PATH_BG = "#333333" -- the path block: lighter than the tab row (#1d1d1d), a step lighter than the bar (#282828)
 -- the file type's icon in its own colour (nvim-web-devicons), on the path block's background; one highlight group per colour
 local icon_groups = {}
 local function file_icon(name)
@@ -36,9 +36,9 @@ local mode_key = { n = "normal", i = "insert", v = "visual", V = "visual", ["\22
 function M.project_colors()
   local key = mode_key[api.nvim_get_mode().mode:sub(1, 1)] or "normal"
   local a = _G.mode_a and _G.mode_a[key]
-  local bg = (key ~= "normal" and a and a.bg) or "#b8c7c7"
-  local fg = (key ~= "normal" and a and a.fg) or "#14201f"
-  if vim.g.resize_mode then bg, fg = "#f0c4a0", "#4a2a00" end -- C-w r: the peach of tmux's RESIZE label
+  local bg = (key ~= "normal" and a and a.bg) or "#73cef4"
+  local fg = (key ~= "normal" and a and a.fg) or "#282828"
+  if vim.g.resize_mode then bg, fg = "#ff9e64", "#282828" end -- C-w r: the peach of tmux's RESIZE label
   local bar = api.nvim_get_hl(0, { name = "WinBar", link = false }).bg
   api.nvim_set_hl(0, "BarProject", { fg = fg, bg = bg, bold = true })
   api.nvim_set_hl(0, "BarProjectArrow", { fg = bg, bg = PATH_BG }) -- project block > path block
@@ -47,14 +47,14 @@ end
 
 local function colors()
   local bar = api.nvim_get_hl(0, { name = "WinBar", link = false })
-  local bg = bar.bg or 0xfafafa
-  api.nvim_set_hl(0, "BarModified", { fg = 0x1f4e9c, bg = PATH_BG })
+  local bg = bar.bg or 0x282828
+  api.nvim_set_hl(0, "BarModified", { fg = 0x73cef4, bg = PATH_BG })
   -- the path takes the theme's comment colour, on its own light background, ending with an arrow into the bar
   api.nvim_set_hl(0, "BarPath", { fg = api.nvim_get_hl(0, { name = "Comment", link = false }).fg, bg = PATH_BG })
   -- error (red) / warning (amber) count, on the path block; the same red as the old tab indicator
-  local err = api.nvim_get_hl(0, { name = "DiagnosticError", link = false }).fg or 0xb3261e
+  local err = api.nvim_get_hl(0, { name = "DiagnosticError", link = false }).fg or 0xf43753
   api.nvim_set_hl(0, "BarDiagError", { fg = err, bg = PATH_BG, bold = true })
-  api.nvim_set_hl(0, "BarDiagWarn", { fg = 0xa86a00, bg = PATH_BG, bold = true })
+  api.nvim_set_hl(0, "BarDiagWarn", { fg = 0xffc24b, bg = PATH_BG, bold = true })
   api.nvim_set_hl(0, "BarPathArrow", { fg = PATH_BG, bg = bg })
   M.project_colors()
 end
