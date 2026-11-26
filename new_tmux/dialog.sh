@@ -8,7 +8,7 @@ tmux set -g @dialog 1 \; refresh-client -S 2>/dev/null
 trap 'tmux set -gu @dialog \; refresh-client -S 2>/dev/null' EXIT
 action=${1:?action required}
 case "$action" in
-  kill-pane|kill-other-panes|size-col|size-row|command|find-window|pane-title|copy-*) fmt='#{pane_id}' ;;
+  kill-pane|kill-other-panes|size-col|size-row|command|find-window|pane-title|move-pane|pull-pane|copy-*) fmt='#{pane_id}' ;;
   kill-window|rename-window|move-window) fmt='#{window_id}' ;;
   *) fmt='#{session_id}' ;;
 esac
@@ -45,7 +45,33 @@ case "$action" in
     IFS= read -rsn1 key || exit 0
     case "$key" in 1|2) tmux set -g @preset "$key" ;; esac
     exit 0 ;;
-  command) prompt=' : ' ;;
+  move-pane) # send this pane to another window (it goes beside that window's panes, or into a new window) and follow it there
+    list=$( { printf '%s\t%s\n' '+ new window' ''
+      tmux list-windows -a -F '#{session_name}:#{window_index}  #{window_name}  (#{window_panes} pane#{?#{==:#{window_panes},1},,s})' \
+        -f "#{!=:#{window_id},$(tmux display-message -p -t "$target" '#{window_id}')}" | awk '{t=$1; sub(/^[^ ]+ +/,""); print $0 "\t" t}'; } )
+    pick=$(printf '%s\n' "$list" | fzf --delimiter $'\t' --with-nth 1 --no-info --no-separator --prompt ' move pane to: ' --pointer ' ' \
+      --color 'bg:#20242c,fg:#d3dae3,prompt:#4b8cd8,pointer:#4b8cd8,hl:#73cef4,hl+:#73cef4,bg+:#2b3340' --height 100% --layout reverse) || exit 0
+    dest=${pick##*$'\t'}
+    if [ -z "$dest" ]; then tmux break-pane -s "$target"
+    else tmux join-pane -h -s "$target" -t "$dest" \; select-window -t "$dest" \; select-pane -t "$target"; fi
+    exit 0 ;;
+  pull-pane) # bring a pane of another window into this one (it goes beside the current pane)
+    here=$(tmux display-message -p -t "$target" '#{window_id}')
+    pick=$(tmux list-panes -a -F '#{pane_id}'$'\t''#{session_name}:#{window_index} #{window_name}  #{pane_current_command}  #{b:pane_current_path}' -f "#{!=:#{window_id},$here}" \
+      | fzf --delimiter $'\t' --with-nth 2 --no-info --no-separator --prompt ' pull pane here: ' --pointer ' ' \
+        --color 'bg:#20242c,fg:#d3dae3,prompt:#4b8cd8,pointer:#4b8cd8,hl:#73cef4,hl+:#73cef4,bg+:#2b3340' --height 100% --layout reverse) || exit 0
+    src=${pick%%$'\t'*}
+    [ -n "$src" ] && tmux join-pane -h -s "$src" -t "$target" \; select-pane -t "$src"
+    exit 0 ;;
+  command) # tmux command line with suggestions: type to filter the command names, Tab completes the highlighted one, Enter runs what is typed
+    pick=$(tmux list-commands | awk '{n=$1; u=$0; sub(/^[^ ]+ \([^)]*\) */,"",u); printf "%s\t%s\n", n, u}' \
+      | fzf --print-query --delimiter $'\t' --nth 1 --with-nth '1,2' --no-info --no-separator --prompt ' : ' --pointer ' ' --tiebreak begin \
+        --bind 'tab:transform-query(echo {1} )' \
+        --color 'bg:#20242c,fg:#d3dae3,prompt:#4b8cd8,pointer:#4b8cd8,hl:#73cef4,hl+:#73cef4,bg+:#2b3340,query:#d3dae3' \
+        --height 100% --layout reverse)
+    out=${pick%%$'\n'*}; out=${out%% }
+    [ -n "$out" ] && tmux "$out"
+    exit 0 ;;
   pane-title) query=$(tmux display-message -p -t "$target" '#{pane_title}'); prompt=' pane title: ' ;;
   copy-search-down) prompt=' search down: ' ;;
   copy-search-up) prompt=' search up: ' ;;

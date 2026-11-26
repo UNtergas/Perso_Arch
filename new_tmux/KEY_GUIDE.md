@@ -92,6 +92,8 @@ for rows: use it on one of the two bottom terminals of the `a 2` preset.
 | `q` | Show pane numbers (press a number to jump to it) |
 | `"` / `%` | Stock splits (stacked / side by side). They do not keep the directory, use `-` and `\` |
 | `M` | Clear the marked pane |
+| `J` | Move this pane to another window: a picker (type to search; `+ new window` makes a window of it), then you follow the pane there. The pane joins that window as a new column. Works across sessions |
+| `K` | Pull a pane from another window into this one (picker lists every pane of the other windows: window, running command, folder). The pulled pane lands beside the current one |
 
 `Space` (stock: cycle layouts) is unbound. `Alt-e Space` does nothing.
 
@@ -219,7 +221,7 @@ The mouse is on.
 |---|---|
 | `R` | Reload `~/.tmux.conf` (was `r`; `r` is the resize mode now) |
 | `r` | Resize mode, like i3: `h` `j` `k` `l` resize the active pane in 10% steps, `=` equal sizes, `Esc` / `Enter` / `q` leave (any other key leaves too). The status label shows RESIZE while it is on |
-| `:` | tmux command prompt |
+| `:` | tmux command line in a popup: the commands are listed as you type (with their options), `Tab` completes the highlighted one, `Enter` runs what is typed |
 | `?` | List every key binding (searchable) |
 | `T` | Set the pane title (a small dialog, prefilled with the current title) |
 | `t` | Clock (any key leaves) |
