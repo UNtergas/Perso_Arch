@@ -334,9 +334,9 @@ require("lazy").setup({
         "r-cr-o:hor25-CursorReplace",
       }, ",")
       local function cursor_colors()
-        vim.api.nvim_set_hl(0, "CursorNormal", { fg = "#282828", bg = "#b3deef" })
-        vim.api.nvim_set_hl(0, "CursorInsert", { fg = "#282828", bg = "#ffc24b" })
-        vim.api.nvim_set_hl(0, "CursorReplace", { fg = "#282828", bg = "#f43753" })
+        vim.api.nvim_set_hl(0, "CursorNormal", { fg = "#161514", bg = "#a0ad66" })
+        vim.api.nvim_set_hl(0, "CursorInsert", { fg = "#161514", bg = "#eab06e" })
+        vim.api.nvim_set_hl(0, "CursorReplace", { fg = "#161514", bg = "#d98578" })
       end
       cursor_colors()
       vim.api.nvim_create_autocmd("ColorScheme", { callback = cursor_colors })
@@ -408,10 +408,64 @@ require("lazy").setup({
           set(0, "VM_Mono", { bg = "#5ad4e6", fg = "#161514" })
           set(0, "Added", { fg = "#7bd88f" })
           set(0, "Removed", { fg = "#fc618d" })
-          set(0, "NoiceCmdlinePopupBorder", { fg = "#5ad4e6" })
+          set(0, "NoiceCmdlinePopupBorder", { fg = "#a0ad66" })
         end,
       })
       vim.cmd.colorscheme("monokai-pro-spectrum")
+    end,
+  },
+  -- Startup colour scheme: kanagawa dragon (priority 650 < 700, loads last so it wins over monokai-pro). Other schemes: :Theme <name>
+  {
+    "rebelot/kanagawa.nvim",
+    lazy = false,
+    priority = 650,
+    config = function()
+      vim.opt.background = "dark"
+      require("kanagawa").setup({ theme = "dragon", background = { dark = "dragon" } })
+      -- background: dragon #181616 -> DMS surface #161514; text #eee8de, syntax brighter, same hue, comments grey #7a746a
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        pattern = "kanagawa*",
+        callback = function()
+          for name in pairs(vim.api.nvim_get_hl(0, {})) do
+            local h = vim.api.nvim_get_hl(0, { name = name, link = false })
+            if h.bg == 0x181616 then h.bg = 0x161514; vim.api.nvim_set_hl(0, name, h) end
+          end
+          local set = vim.api.nvim_set_hl
+          -- everything but comments brighter with the same hue (lightness up, saturation up a little), so kanagawa's colours stay colours
+          local function lighten(c)
+            local r, g, b = (math.floor(c / 65536) % 256) / 255, (math.floor(c / 256) % 256) / 255, (c % 256) / 255
+            local mx, mn = math.max(r, g, b), math.min(r, g, b)
+            local l, d = (mx + mn) / 2, mx - mn
+            local h, sat = 0, 0
+            if d > 0 then
+              sat = d / (1 - math.abs(2 * l - 1))
+              if mx == r then h = ((g - b) / d) % 6 elseif mx == g then h = (b - r) / d + 2 else h = (r - g) / d + 4 end
+            end
+            l = math.min(0.86, l + (1 - l) * 0.4)
+            sat = math.min(0.9, sat * 1.9)
+            local c2 = (1 - math.abs(2 * l - 1)) * sat
+            local x = c2 * (1 - math.abs(h % 2 - 1))
+            local m = l - c2 / 2
+            local rr, gg, bb = 0, 0, 0
+            if h < 1 then rr, gg, bb = c2, x, 0 elseif h < 2 then rr, gg, bb = x, c2, 0 elseif h < 3 then rr, gg, bb = 0, c2, x
+            elseif h < 4 then rr, gg, bb = 0, x, c2 elseif h < 5 then rr, gg, bb = x, 0, c2 else rr, gg, bb = c2, 0, x end
+            return math.floor((rr + m) * 255 + 0.5) * 65536 + math.floor((gg + m) * 255 + 0.5) * 256 + math.floor((bb + m) * 255 + 0.5)
+          end
+          for name in pairs(vim.api.nvim_get_hl(0, {})) do
+            local h = vim.api.nvim_get_hl(0, { name = name, link = false })
+            if h.fg and not name:lower():find("comment", 1, true) then h.fg = lighten(h.fg); set(0, name, h) end
+          end
+          set(0, "Normal", { fg = "#eee8de", bg = "#161514" })
+          set(0, "Comment", { fg = "#7a746a", italic = true }) -- dim warm grey, clearly below the text
+          set(0, "@comment", { link = "Comment" })
+          set(0, "Visual", { bg = "#4a443d", bold = true })
+          set(0, "Search", { bg = "#5a4f2a", fg = "#d4cec4" })
+          set(0, "CurSearch", { bg = "#e0d48e", fg = "#161514" })
+          set(0, "IncSearch", { bg = "#e0d48e", fg = "#161514" })
+          for _, n in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do set(0, n, { bg = "#2f2c29" }) end
+        end,
+      })
+      vim.cmd.colorscheme("kanagawa-dragon")
     end,
   },
   -- active window tracking: the border around the focused window is drawn thick in the same deep teal as the active
@@ -421,7 +475,7 @@ require("lazy").setup({
     event = "WinLeave",
     opts = {
       border = "bold",
-      colors = { "#5ad4e6" },
+      colors = { "#a0ad66" },
       animate = { enabled = false },
       excluded_ft = { "packer", "TelescopePrompt", "mason", "lazy" },
     },
@@ -1256,11 +1310,11 @@ require("lazy").setup({
       local theme = require("lualine.themes.auto")
       local bg_c, bg_b = "#100f0e", "#2f2c29"
       local mode_a = {
-        normal = { fg = "#161514", bg = "#78834a", gui = "bold" },
-        insert = { fg = "#161514", bg = "#6b9d66", gui = "bold" },
-        visual = { fg = "#161514", bg = "#c4ba7f", gui = "bold" },
-        replace = { fg = "#161514", bg = "#ba6e61", gui = "bold" },
-        command = { fg = "#161514", bg = "#d4c3a8", gui = "bold" },
+        normal = { fg = "#161514", bg = "#a0ad66", gui = "bold" },
+        insert = { fg = "#161514", bg = "#86bd80", gui = "bold" },
+        visual = { fg = "#161514", bg = "#e0d48e", gui = "bold" },
+        replace = { fg = "#161514", bg = "#d98578", gui = "bold" },
+        command = { fg = "#161514", bg = "#e6d6ba", gui = "bold" },
       }
       for m, a in pairs(mode_a) do
         theme[m].a = a
@@ -1270,8 +1324,8 @@ require("lazy").setup({
         theme[m].z = a
       end
       theme.inactive = {
-        a = { fg = "#999187", bg = "#282522" },
-        b = { fg = "#999187", bg = bg_b },
+        a = { fg = "#b8b1a6", bg = "#35312d" },
+        b = { fg = "#b8b1a6", bg = bg_b },
         c = { fg = "#625b53", bg = bg_c },
       }
       -- the first block's colours per mode, for the project block of the winbar (lua/saga_breadcrumb.lua)
@@ -1294,7 +1348,7 @@ require("lazy").setup({
             {
               "mode", -- NORMAL / INSERT / VISUAL ... (the project name is in the winbar now); RESIZE while C-w r is on
               fmt = function(name) return vim.g.resize_mode and "RESIZE" or name end,
-              color = function() if vim.g.resize_mode then return { fg = "#161514", bg = "#d29a5c", gui = "bold" } end end,
+              color = function() if vim.g.resize_mode then return { fg = "#161514", bg = "#eab06e", gui = "bold" } end end,
             },
           },
           lualine_b = {
@@ -1331,16 +1385,16 @@ require("lazy").setup({
               { "diagnostics", sections = { "error", "warn", "hint" }, always_visible = true, padding = { left = 1, right = 1 }, separator = "",
                 symbols = { error = "\u{f057} ", warn = "\u{f071} ", hint = "\u{f0eb} " } },
               { "diagnostics", sections = { "info" }, symbols = { info = "\u{f05a} " }, padding = { left = 0, right = 1 }, separator = "" },
-              block("#282522", "#999187", { "encoding" }),
-              block("#3a3530", "#d4cec4", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
+              block("#35312d", "#b8b1a6", { "encoding" }),
+              block("#4a443d", "#eee8de", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
               -- line:column | percentage of the file (Top / Bot at the ends), one block: 76:42 | 5%
-              block("#78834a", "#161514", {
+              block("#a0ad66", "#161514", {
                 function()
                   local cur, total = vim.fn.line("."), vim.fn.line("$")
                   local pct = cur == 1 and "Top" or (cur == total and "Bot" or math.floor(cur / total * 100) .. "%%") -- %% : a lone % would be read as a statusline item
                   return string.format("%d:%d | %s", cur, vim.fn.col("."), pct)
                 end,
-                color = { fg = "#161514", bg = "#78834a", gui = "bold" },
+                color = { fg = "#161514", bg = "#a0ad66", gui = "bold" },
               }),
             }
           end)(),
@@ -1608,7 +1662,7 @@ end
 -- ctrl+w q: number every window (big digit in its middle, like tmux's Alt-e q), press the number to jump there; anything else
 -- cancels. Windows are numbered left to right, top to bottom. Up to 9 windows.
 -- tender blue (the normal-mode block of the statusline) with dark text; re-applied after a colour scheme change, which clears custom groups
-local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#161514", bg = "#78834a", bold = true }) end
+local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#161514", bg = "#a0ad66", bold = true }) end
 window_number_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.schedule(window_number_colors) end })
 local function pick_window()
@@ -2177,8 +2231,8 @@ end
 -- dark yellow for the changed-lines count (re-applied after a colorscheme change, which clears custom groups)
 local function diff_changed_hl()
   vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#fce566" })
-  vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#5ad4e6" }) -- branch icon
-  vim.api.nvim_set_hl(0, "TabModified", { fg = "#5ad4e6" }) -- blue: path + dot of an unsaved buffer in the tabline
+  vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#a0ad66" }) -- branch icon
+  vim.api.nvim_set_hl(0, "TabModified", { fg = "#e0d48e" }) -- blue: path + dot of an unsaved buffer in the tabline
   vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#525053" }) -- inactive window dividers: dark grey, so the active teal one stands out
 end
 diff_changed_hl()
@@ -2460,9 +2514,9 @@ for _, key in ipairs({ "h", "j", "k", "l", "+", "-", "<Left>", "<Down>", "<Up>",
   end, { expr = true, silent = true })
 end
 
--- :Theme <name> switches the colour scheme for this session (the one at startup is monokai-pro spectrum).
+-- :Theme <name> switches the colour scheme for this session (the one at startup is kanagawa-dragon).
 -- koda-<variant>: dark light moss glade. onedark-<style>: dark darker cool deep warm warmer light.
-local themes = { "monokai-pro-spectrum", "tender", "alabaster", "koda-dark", "koda-light", "koda-moss", "koda-glade" }
+local themes = { "kanagawa-dragon", "monokai-pro-spectrum", "tender", "alabaster", "koda-dark", "koda-light", "koda-moss", "koda-glade" }
 for _, style in ipairs({ "dark", "darker", "cool", "deep", "warm", "warmer", "light" }) do
   table.insert(themes, "onedark-" .. style)
 end
@@ -2475,7 +2529,7 @@ vim.api.nvim_create_user_command("Theme", function(opts)
     require("onedark").setup({ style = style })
     require("onedark").load()
   elseif vim.tbl_contains(themes, name) then
-    vim.opt.background = (name == "monokai-pro-spectrum" or name == "tender" or name == "koda-dark" or name == "koda-moss") and "dark" or "light"
+    vim.opt.background = (name == "kanagawa-dragon" or name == "monokai-pro-spectrum" or name == "tender" or name == "koda-dark" or name == "koda-moss") and "dark" or "light"
     vim.cmd.colorscheme(name)
   else
     vim.notify("Theme: unknown '" .. name .. "'. Options: " .. table.concat(themes, ", "), vim.log.levels.WARN)
