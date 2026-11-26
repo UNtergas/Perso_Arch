@@ -6,6 +6,8 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = "a"
 vim.opt.termguicolors = true
+-- vim.tbl_flatten is deprecated (use vim.iter(t):flatten()): flash.nvim's treesitter jump still calls it and pops the warning. Same result, no warning.
+vim.tbl_flatten = function(t) return vim.iter(t):flatten(math.huge):totable() end
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.signcolumn = "yes:1"
@@ -211,6 +213,54 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
+-- JS / TS: the filetype's indent function puts the continuation line of a block comment one column left (" * text" + Enter gives
+-- "* |" under the "/" instead of " * |"). In a block comment the new line takes the indent of the line above it (one more under a
+-- "/*" line); anywhere else the filetype's own function decides.
+local function in_block_comment(lnum) -- is line lnum inside /* ... */, its closing line not counted
+  for l = lnum, math.max(1, lnum - 300), -1 do
+    local t = vim.fn.getline(l)
+    if t:find("%*/") then return false end
+    if t:find("/%*") then return true end
+  end
+  return false
+end
+function _G.comment_indent(orig)
+  local prev = vim.v.lnum - 1
+  if prev >= 1 and in_block_comment(prev) then
+    local t = vim.fn.getline(prev)
+    return vim.fn.indent(prev) + (t:match("^%s*/%*") and 1 or 0)
+  end
+  return vim.fn.eval(orig)
+end
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+  callback = function(ev)
+    local orig = vim.bo[ev.buf].indentexpr
+    if orig ~= "" and not orig:find("comment_indent", 1, true) then
+      vim.bo[ev.buf].indentexpr = "v:lua.comment_indent('" .. orig .. "')"
+    end
+  end,
+})
+
+-- Enter right after a lone "/**" gives the whole block, with the cursor on the middle line:
+--   /**
+--    * |
+--    */
+-- Pressing Enter inside the block continues it with " * " (formatoptions "r" and "o", set by the filetype plugins). Returns true
+-- when it handled the key, so blink's keymap stops there.
+function _G.docblock_enter()
+  local line = vim.api.nvim_get_current_line()
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  if not line:match("^%s*/%*%*%s*$") or col < #line:gsub("%s+$", "") then return false end
+  local indent = line:match("^%s*")
+  vim.schedule(function() -- the text is locked while the key is handled
+    vim.api.nvim_buf_set_lines(0, row - 1, row, false, { indent .. "/**", indent .. " * ", indent .. " */" })
+    vim.api.nvim_win_set_cursor(0, { row + 1, #indent + 3 })
+    vim.cmd("startinsert!")
+  end)
+  return true
+end
+
 require("lazy").setup({
 
   -- Theme (Alabaster, same as the Emacs config)
@@ -346,18 +396,36 @@ require("lazy").setup({
 	    "fallback",
 	  },
 
-	  ["<C-k>"] = {
-	    "select_prev",
-	    "fallback",
-	  },
+	  -- Ctrl-k: show the signature of the function being typed (parameters, current one highlighted); again hides it.
+	  -- Alt-q hides it too (and, with no signature open, falls back to the global "close popups"). Shown by hand only.
+	  ["<C-k>"] = { "show_signature", "hide_signature", "fallback" },
+	  ["<M-q>"] = { "hide_signature", "fallback" },
 
 	  ["<CR>"] = {
 	    "accept",
+	    function() return _G.docblock_enter() end, -- /** then Enter: the three-line doc block
 	    "fallback",
 	  },
 
-	  ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
-	  ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+	  -- Tab / S-Tab wrap around the list instead of stepping off its end onto "nothing selected" (there Enter was a newline, not accept)
+	  ["<Tab>"] = {
+	    function(cmp)
+	      local l = require("blink.cmp.completion.list")
+	      if cmp.is_menu_visible() and l.selected_item_idx and l.selected_item_idx == #l.items then l.select(1) return true end
+	    end,
+	    "select_next", "snippet_forward", "fallback",
+	  },
+	  ["<S-Tab>"] = {
+	    function(cmp)
+	      local l = require("blink.cmp.completion.list")
+	      if cmp.is_menu_visible() and l.selected_item_idx == 1 then l.select(#l.items) return true end
+	    end,
+	    "select_prev", "snippet_backward", "fallback",
+	  },
+
+	  -- the arrows do not drive the menu: they move the cursor as usual (Tab / S-Tab / C-j do the selecting)
+	  ["<Up>"] = false,
+	  ["<Down>"] = false,
 
 	  -- shift+enter acts as enter (accepts a selected item, else a newline)
 	  ["<S-CR>"] = {
@@ -367,8 +435,8 @@ require("lazy").setup({
 	},
 
       completion = {
-        -- the menu shows, but nothing is selected: Enter inserts a newline, and Down (or C-j) selects the first item
-        list = { selection = { preselect = false, auto_insert = true } },
+        -- the menu shows, but nothing is selected: Enter inserts a newline, and Tab (or C-j) selects the first item
+        list = { selection = { preselect = false, auto_insert = false } },
         menu = {
           auto_show = true,
         },
@@ -385,12 +453,29 @@ require("lazy").setup({
         },
       },
 
+      -- signature help: "enabled" is what lets C-k (show_signature) work at all; the automatic triggers are off, so it only
+      -- appears when asked for (C-k) and hides with C-k again or Alt-q
+      signature = {
+        enabled = true,
+        trigger = { enabled = false },
+        window = { border = "rounded", show_documentation = false },
+      },
+
       cmdline = {
         enabled = true,
 
+        -- ":" menu: Tab / S-Tab select, Enter accepts; the arrows go back to history (Up/Down) and cursor moves (Left/Right)
+        keymap = {
+          preset = "cmdline",
+          ["<Up>"] = false,
+          ["<Down>"] = false,
+          ["<Left>"] = false,
+          ["<Right>"] = false,
+        },
+
         completion = {
-          -- same for ":" : the list shows, nothing is selected until you press Right (Left goes back)
-          list = { selection = { preselect = false, auto_insert = true } },
+          -- same for ":" : the list shows, nothing is selected until you press Tab (S-Tab goes back)
+          list = { selection = { preselect = false, auto_insert = false } },
           menu = {
             auto_show = true,
           },
@@ -453,6 +538,14 @@ require("lazy").setup({
         init_options = {
           disableAutomaticTypingAcquisition = true,
           maxTsServerMemory = 3072,
+          -- offer symbols from other files / packages (useState, classes, types) and attach their import as an extra edit,
+          -- so accepting the item with Enter adds the import line too (no Alt-. needed)
+          preferences = {
+            includeCompletionsForModuleExports = true,
+            includeCompletionsWithInsertText = true,
+            includeCompletionsForImportStatements = true,
+            allowIncompleteCompletions = true,
+          },
         },
       })
 
@@ -1073,7 +1166,13 @@ require("lazy").setup({
     "akinsho/git-conflict.nvim",
     event = "BufReadPost",
     config = function()
+      -- the plugin still calls vim.highlight and the table form of vim.validate (both deprecated, upstream has not fixed them):
+      -- point vim.highlight at vim.hl and drop its one table-form validate, only while it loads, so no deprecation warning shows
+      local validate = vim.validate
+      vim.highlight = vim.hl
+      vim.validate = function(a, ...) if type(a) == "table" and select("#", ...) == 0 then return end return validate(a, ...) end
       require("git-conflict").setup({ default_mappings = false, disable_diagnostics = false })
+      vim.validate = validate
       -- ours = light green, theirs = light blue (set after the plugin so ours wins on colorscheme change)
       local function conflict_colors()
         vim.api.nvim_set_hl(0, "GitConflictCurrent", { bg = "#c9efc9" })
@@ -1169,6 +1268,15 @@ require("lazy").setup({
       vim.g.nvim_surround_no_visual_mappings = true -- `S` in visual is flash treesitter
     end,
     config = function()
+      -- ( { [ < wrap without the inner spaces (nvim-surround's default pads them: "( text )"); the closing forms, b B r > and the quotes were already tight
+      require("nvim-surround").setup({
+        surrounds = {
+          ["("] = { add = { "(", ")" } },
+          ["{"] = { add = { "{", "}" } },
+          ["["] = { add = { "[", "]" } },
+          ["<"] = { add = { "<", ">" } },
+        },
+      })
       vim.keymap.set("x", "gs", "<Plug>(nvim-surround-visual)", { desc = "Surround selection" })
       -- ysw = ysiw, ysW = ysiW (the plain "w" motion only wrapped from the cursor to the next word, rarely wanted)
       vim.keymap.set("n", "ysw", "ysiw", { remap = true, desc = "Surround word" })
@@ -1361,6 +1469,16 @@ require("lazy").setup({
       })
     end,
   },
+  { -- ( { [ close themselves: typing the opening one inserts the pair with the cursor between; typing the closing one steps over it,
+    -- Backspace on an empty pair removes both, and Enter between { } opens an indented line. Brackets only: no quotes or backticks.
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    config = function()
+      local npairs = require("nvim-autopairs")
+      npairs.setup({ check_ts = true }) -- treesitter: no pair inside a string or comment where it would be wrong
+      for _, q in ipairs({ "'", '"', "`" }) do npairs.remove_rule(q) end
+    end,
+  },
   {
     "stevearc/conform.nvim",
     cmd = "ConformInfo",
@@ -1370,10 +1488,13 @@ require("lazy").setup({
     "mg979/vim-visual-multi",
     branch = "master",
     init = function()
-      -- keep VM's own keys, and add the ones from before: Ctrl-d selects the word, again for the next match. Ctrl-Shift-Down / Up
-      -- add a cursor below the bottom-most / above the top-most cursor, so the set keeps growing both ways (VM's own
-      -- "add cursor" works from the cursor you are on, so Up after Down went nowhere): select the edge region first, then add.
+      -- multiple cursors start from Ctrl-d (the word, again for the next match) or Ctrl-Shift-Down / Up (add a cursor below the bottom-most /
+      -- above the top-most one, so the set grows both ways); then c / i / a ... act at every cursor.
+      -- VM's other start-up keys (Ctrl-Up/Down, Shift-arrows, Ctrl-n, backslash chords...) are off: they kept firing by accident.
+      -- Once VM is running its own keys (n N q Q Tab, Esc to leave) still work.
       -- VM maps [ and ] (go to previous / next cursor), which clash with maps in this config: they live on Alt-N / Alt-n.
+      vim.g.VM_default_mappings = 0
+      vim.g.VM_mouse_mappings = 0
       vim.g.VM_maps = {
         ["Find Under"] = "<C-d>",
         ["Find Subword Under"] = "<C-d>",
@@ -1527,6 +1648,7 @@ require("lazy").setup({
       },
 
       win_options = { winbar = "%!v:lua.oil_winbar()" },
+      lsp_file_methods = { enabled = false }, -- imports are updated by the OilActionsPre hook near the end of this file
 
       view_options = {
         show_hidden = true,
@@ -1546,6 +1668,7 @@ end
 -- ctrl+s save, ctrl+f search in buffer, esc clears highlight
 map({ "n", "v" }, "<C-s>", "<cmd>write<cr>", { desc = "Save" })
 map("i", "<C-s>", "<cmd>write<cr><esc>", { desc = "Save and back to normal mode" })
+map("i", "<C-z>", "<C-o>u", { desc = "Undo (insert mode)" })
 map({ "n", "v" }, "<S-CR>", "<CR>", { remap = true, desc = "Same as Enter" })
 map({ "n", "v" }, "<C-f>", "/", { desc = "Search in buffer" })
 map("n", "<Esc>", "<cmd>nohlsearch<bar>redrawstatus<cr>", { desc = "Clear highlight" })
@@ -1579,8 +1702,7 @@ map({ "n", "v" }, "<C-b>", function() require("buffer_manager.ui").toggle_quick_
 
 -- scroll: <C-d>/<C-f>/<C-b> are taken above, so the native scrolls live on other keys
 -- (normal! ignores mappings, so it reaches the built-in <C-d>/<C-u>).
--- Alt-j / Alt-k, not Ctrl-K: Ctrl-K starts the window chords (C-k h/j/k/l, C-k a ...), so a lone Ctrl-K waited a full
--- timeoutlen (1 s) for a second key before it scrolled
+-- Alt-j / Alt-k scroll half a page
 map({ "n", "x" }, "<M-j>", [[<Cmd>exe "normal! \<C-d>"<CR>]], { desc = "Half page down" })
 map({ "n", "x" }, "<M-k>", [[<Cmd>exe "normal! \<C-u>"<CR>]], { desc = "Half page up" })
 -- <PageDown>/<PageUp> are already full-page scroll natively
@@ -1598,7 +1720,9 @@ end
 
 -- ctrl+w q: number every window (big digit in its middle, like tmux's Alt-e q), press the number to jump there; anything else
 -- cancels. Windows are numbered left to right, top to bottom. Up to 9 windows.
-vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#ffffff", bg = "#4a6a6a", bold = true })
+local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#ffffff", bg = "#4a6a6a", bold = true }) end
+window_number_colors()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.schedule(window_number_colors) end })
 local function pick_window()
   local wins = {}
   for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
@@ -1633,8 +1757,8 @@ map("n", "<C-w>q", pick_window, { desc = "Number the windows, press a number to 
 map("n", "<C-w><C-w>", function() Snacks.bufdelete() end, { desc = "Close buffer" })
 map("n", "<C-w>a", function() Snacks.bufdelete.all() end, { desc = "Close all buffers" })
 map("n", "<C-w>T", "<Nop>", { desc = "Disabled: one tab per nvim" })
--- C-w < > + (window width / height by one step) are off: resizing is C-k h/j/k/l, C-w r and C-w =
-for _, k in ipairs({ "<", ">", "+" }) do map("n", "<C-w>" .. k, "<Nop>", { desc = "Disabled: use C-k h/j/k/l or C-w r" }) end
+-- C-w < > + (window width / height by one step) are off: resizing is C-w r and C-w =
+for _, k in ipairs({ "<", ">", "+" }) do map("n", "<C-w>" .. k, "<Nop>", { desc = "Disabled: use C-w r" }) end
 -- C-w _ and C-w | (maximise the height / width) are off too: C-w c / C / z are the toggles that fill a column / row / the screen
 for _, k in ipairs({ "_", "|" }) do map("n", "<C-w>" .. k, "<Nop>", { desc = "Disabled: use C-w c / C / z" }) end
 -- C-w s / v (and C-w S, C-w Ctrl-s / Ctrl-v) are off: C-w - splits stacked, C-w \ splits side by side (the :split commands still work)
@@ -1664,17 +1788,13 @@ map("n", "<C-w>C", window_toggle("saved_row", "wincmd |"), { desc = "Window fill
 map({ "n", "x" }, ";", ":", { desc = "Command line" })
 
 -- ctrl+k chords
-local function mk_parent(p)
-  local dir = vim.fn.fnamemodify(p, ":h")
-  if dir ~= "" and dir ~= "." then vim.fn.mkdir(dir, "p") end
-end
 local ck = { "n", "v" }
 -- C-w arrows move the window (they replace the built-in C-w arrows, which only focus a window: C-M-hjkl focus)
 map(ck, "<C-w><Left>", "<C-w>H", { desc = "Move window left" })
 map(ck, "<C-w><Down>", "<C-w>J", { desc = "Move window down" })
 map(ck, "<C-w><Up>", "<C-w>K", { desc = "Move window up" })
 map(ck, "<C-w><Right>", "<C-w>L", { desc = "Move window right" })
--- C-k h/j/k/l resize the window: h narrower, l wider, j shorter, k taller. One step is 10% of the screen (columns for h / l, rows
+-- Resize mode (C-w r: h narrower, l wider, j shorter, k taller) moves by steps of 10% of the screen (columns for h / l, rows
 -- for j / k), so from an even split the sizes land on 50, 40, 30, 20 %. C-w = equalises every window, and again puts the
 -- previous sizes back (the saved sizes are dropped when the number of windows changes).
 local function resize_step(dir)
@@ -1694,10 +1814,6 @@ local function resize_step(dir)
     vim.cmd("resize " .. (((dir == "j") == has_below) and "+" or "-") .. dh)
   end
 end
-map(ck, "<C-k>h", function() resize_step("h") end, { desc = "Window narrower (10%)" })
-map(ck, "<C-k>l", function() resize_step("l") end, { desc = "Window wider (10%)" })
-map(ck, "<C-k>j", function() resize_step("j") end, { desc = "Window shorter (10%)" })
-map(ck, "<C-k>k", function() resize_step("k") end, { desc = "Window taller (10%)" })
 map(ck, "<C-w>=", function()
   local saved = vim.t.equal_saved
   if saved and saved.n == #vim.api.nvim_tabpage_list_wins(0) then
@@ -1708,7 +1824,7 @@ map(ck, "<C-w>=", function()
     vim.cmd("wincmd =")
   end
 end, { desc = "Equal window sizes (again: back to the previous sizes)" })
--- C-w r: resize mode, like i3 (replaces the built-in C-w r, rotate). h / j / k / l resize the window in 10% steps (same as C-k h/j/k/l), = equal sizes (no toggle back),
+-- C-w r: resize mode, like i3 (replaces the built-in C-w r, rotate). h / j / k / l resize the window in 10% steps, = equal sizes (no toggle back),
 -- Esc / Enter / q leave; any other key leaves too.
 map(ck, "<C-w>r", function()
   -- the mode is shown in the statusline (RESIZE in the mode block, the keys next to it), not as a message
@@ -1741,16 +1857,6 @@ end, { desc = "Resize mode (h/j/k/l, = equal, Esc)" })
 -- C-w \ splits side by side, C-w - splits stacked (like tmux: \ side by side, - stacked)
 map("n", "<C-w>\\", "<cmd>rightbelow vsplit<cr>", { desc = "Split side by side" })
 map("n", "<C-w>-", "<cmd>rightbelow split<cr>", { desc = "Split stacked" })
-map(ck, "<C-k>a", function()
-  vim.ui.input({ prompt = "New file: ", completion = "file" }, function(p)
-    if p and p ~= "" then mk_parent(p); vim.cmd("edit " .. vim.fn.fnameescape(p)) end
-  end)
-end, { desc = "New file" })
-map(ck, "<C-k>A", function()
-  vim.ui.input({ prompt = "New folder: ", completion = "dir" }, function(p)
-    if p and p ~= "" then vim.fn.mkdir(p, "p") end
-  end)
-end, { desc = "New folder" })
 
 -- leader (SPC) maps, Doom style
 map("n", "<leader><leader>", tb("find_files"), { desc = "Find file in project" })
@@ -1773,9 +1879,26 @@ map("n", "<leader>[", function() _G.buffer_tab_scroll(-3) end, { desc = "Scroll 
 map("n", "<leader>]", function() _G.buffer_tab_scroll(3) end, { desc = "Scroll tabs right" })
 map("n", "<leader>bS", "<cmd>wall<cr>", { desc = "Save all buffers" })
 map("n", "<leader>fR", function() Snacks.rename.rename_file() end, { desc = "Rename file (updates imports)" })
+-- Alt-Up / Alt-Down move the line (normal, insert) or the selected lines (visual) up / down, like VSCode; a count moves further
+-- (3 Alt-Down), the moved lines are re-indented to fit their new place, and nothing happens at the first / last line
+map("n", "<M-Down>", "<Cmd>silent! execute 'move .+' . v:count1<CR>==", { desc = "Move line down" })
+map("n", "<M-Up>", "<Cmd>silent! execute 'move .-' . (v:count1 + 1)<CR>==", { desc = "Move line up" })
+map("i", "<M-Down>", "<Cmd>silent! move .+1<CR><C-o>==", { desc = "Move line down" })
+map("i", "<M-Up>", "<Cmd>silent! move .-2<CR><C-o>==", { desc = "Move line up" })
+map("x", "<M-Down>", ":<C-u>silent! '<,'>move '>+1<CR>gv=gv", { desc = "Move selection down" })
+map("x", "<M-Up>", ":<C-u>silent! '<,'>move '<-2<CR>gv=gv", { desc = "Move selection up" })
 map({ "n", "v" }, "<leader>cf", function()
   require("conform").format({ async = true, lsp_format = "fallback" })
 end, { desc = "Format (manual)" })
+-- "u" in visual mode lowercases the selection: too easy to hit by mistake (normal-mode u is still undo; gu and U are unchanged)
+map({ "x", "s" }, "u", "<Nop>", { desc = "Disabled (visual lowercase)" })
+-- lowercase only from a visual selection (v or V), and only by typing guu: the normal-mode gu operator (guu, guiw, gu$...) is off,
+-- and a lone gu in visual mode does nothing, so only the full guu runs the real gu on the selection
+-- (an operator that does nothing instead of <Nop>, so the keys after it (the u of guu, the iw of guiw) are swallowed and do not run as undo / insert)
+function _G.noop_operator() end
+map("n", "gu", function() vim.o.operatorfunc = "v:lua.noop_operator"; return "g@" end, { expr = true, desc = "Disabled (lowercase operator, use visual + guu)" })
+map("x", "gu", "<Nop>", { desc = "Disabled (type guu)" })
+map("x", "guu", "gu", { desc = "Lowercase selection" })
 -- SPC c x: Lspsaga workspace diagnostics.
 -- SPC c X: the same diagnostics in a flat Telescope list.
 map("n", "<leader>cx", "<cmd>Lspsaga show_workspace_diagnostics<cr>", { desc = "Diagnostics (Lspsaga)" })
@@ -2017,23 +2140,61 @@ map("n", "<leader>hk", tb("keymaps"), { desc = "Search keybinds" })
 -- everything, writes a session, and restarts nvim (:restart, nvim 0.12+) into that session: same files, windows and
 -- cursor, fresh config. It stops if a buffer cannot be saved or a terminal job is still running (nothing is lost then).
 local function reload_config()
-  local session = vim.fn.stdpath("state") .. "/reload-session.vim"
+  local state = vim.fn.stdpath("state")
+  local session, runner = state .. "/reload-session.vim", state .. "/reload-run.vim"
   local ok, err = pcall(function()
     vim.cmd("wall")
     vim.cmd("mksession! " .. vim.fn.fnameescape(session))
-    vim.cmd("restart source " .. vim.fn.fnameescape(session))
+    -- the session builds its windows (sizes, scroll positions) before the winbar exists, and the winbar then takes a line from every
+    -- window: the layout shifts. So the winbar is on (globally) while the session loads, then each window gets its real value.
+    vim.fn.writefile({
+      [[lua pcall(function() require("saga_breadcrumb").setup() end); vim.go.winbar = "%!v:lua.saga_breadcrumb()"]],
+      "source " .. vim.fn.fnameescape(session),
+      [[lua vim.go.winbar = ""; pcall(function() require("saga_breadcrumb").install() end)]],
+    }, runner)
+    vim.cmd("restart source " .. vim.fn.fnameescape(runner))
   end)
   if not ok then vim.notify("Reload cancelled: " .. tostring(err), vim.log.levels.WARN) end
 end
 map("n", "<leader>hr", reload_config, { desc = "Reload the config (restart, keep the session)" })
 vim.api.nvim_create_user_command("Reload", reload_config, { desc = "Reload the config (restart, keep the session)" })
 
--- rename through oil also updates imports
+-- diagnose stray multiple cursors: when vim-visual-multi starts, say which keys were typed just before (also kept in
+-- ~/.local/state/nvim/vm-start.log), so the real trigger can be found
+do
+  local recent = {}
+  vim.on_key(function(_, typed)
+    if typed and typed ~= "" then
+      recent[#recent + 1] = vim.fn.keytrans(typed)
+      if #recent > 12 then table.remove(recent, 1) end
+    end
+  end)
+  vim.api.nvim_create_autocmd("User", {
+    pattern = "visual_multi_start",
+    callback = function()
+      local line = os.date("%F %T") .. "  mode=" .. vim.fn.mode() .. "  ft=" .. vim.bo.filetype .. "  keys: " .. table.concat(recent, " ")
+      local f = io.open(vim.fn.stdpath("state") .. "/vm-start.log", "a")
+      if f then f:write(line .. "\n") f:close() end
+      vim.schedule(function() vim.notify("Multi-cursor started. Last keys: " .. table.concat(recent, " "), vim.log.levels.WARN) end)
+    end,
+  })
+end
+
+-- rename / move through oil also updates imports. Runs BEFORE oil moves the file (the server has to see the old path), with real
+-- paths (oil gives "oil:///..." urls); oil's own LSP hook is off (it never matched ts_ls), so the edits are not applied twice.
+-- The edited files stay open and unsaved, like Space f R.
 vim.api.nvim_create_autocmd("User", {
-  pattern = "OilActionsPost",
+  pattern = "OilActionsPre",
   callback = function(event)
+    local oil_util = require("oil.util")
     for _, a in ipairs(event.data.actions or {}) do
-      if a.type == "move" then Snacks.rename.on_rename_file(a.src_url, a.dest_url) end
+      if a.type == "move" then
+        local s1, from = oil_util.parse_url(a.src_url)
+        local s2, to = oil_util.parse_url(a.dest_url)
+        if s1 == "oil://" and s2 == "oil://" and from and to then
+          Snacks.rename.on_rename_file((from:gsub("/$", "")), (to:gsub("/$", "")))
+        end
+      end
     end
   end,
 })
