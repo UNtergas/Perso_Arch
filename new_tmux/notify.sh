@@ -39,7 +39,7 @@ case "$kind" in
   wait) title="Claude needs you";   urgency=critical; bg='#d29a5c' ;;
   fail) title="$label failed";      urgency=critical; bg='#ba6e61' ;;
   bell) title="Bell";               urgency=normal;   bg='#999187' ;;
-  *)    title="$label finished";    urgency=normal;   bg='#78834a' ;;
+  *)    title="$label finished";    urgency=normal;   bg='#6b9d66' ;;
 esac
 
 # Keep it for the notification list (bell in the status bar, Alt-e g): time, kind, text, session:window, window id, unread (1).
