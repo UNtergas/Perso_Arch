@@ -334,7 +334,7 @@ require("lazy").setup({
         "r-cr-o:hor25-CursorReplace",
       }, ",")
       local function cursor_colors()
-        vim.api.nvim_set_hl(0, "CursorNormal", { fg = "#161514", bg = "#a0ad66" })
+        vim.api.nvim_set_hl(0, "CursorNormal", { fg = "#161514", bg = "#8fabc4" })
         vim.api.nvim_set_hl(0, "CursorInsert", { fg = "#161514", bg = "#eab06e" })
         vim.api.nvim_set_hl(0, "CursorReplace", { fg = "#161514", bg = "#d98578" })
       end
@@ -408,7 +408,7 @@ require("lazy").setup({
           set(0, "VM_Mono", { bg = "#5ad4e6", fg = "#161514" })
           set(0, "Added", { fg = "#7bd88f" })
           set(0, "Removed", { fg = "#fc618d" })
-          set(0, "NoiceCmdlinePopupBorder", { fg = "#a0ad66" })
+          set(0, "NoiceCmdlinePopupBorder", { fg = "#8fabc4" })
         end,
       })
       vim.cmd.colorscheme("monokai-pro-spectrum")
@@ -475,7 +475,7 @@ require("lazy").setup({
     event = "WinLeave",
     opts = {
       border = "bold",
-      colors = { "#a0ad66" },
+      colors = { "#8fabc4" },
       animate = { enabled = false },
       excluded_ft = { "packer", "TelescopePrompt", "mason", "lazy" },
     },
@@ -1310,7 +1310,7 @@ require("lazy").setup({
       local theme = require("lualine.themes.auto")
       local bg_c, bg_b = "#100f0e", "#2f2c29"
       local mode_a = {
-        normal = { fg = "#161514", bg = "#a0ad66", gui = "bold" },
+        normal = { fg = "#161514", bg = "#8fabc4", gui = "bold" },
         insert = { fg = "#161514", bg = "#86bd80", gui = "bold" },
         visual = { fg = "#161514", bg = "#e0d48e", gui = "bold" },
         replace = { fg = "#161514", bg = "#d98578", gui = "bold" },
@@ -1388,13 +1388,13 @@ require("lazy").setup({
               block("#35312d", "#b8b1a6", { "encoding" }),
               block("#4a443d", "#eee8de", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
               -- line:column | percentage of the file (Top / Bot at the ends), one block: 76:42 | 5%
-              block("#a0ad66", "#161514", {
+              block("#8fabc4", "#161514", {
                 function()
                   local cur, total = vim.fn.line("."), vim.fn.line("$")
                   local pct = cur == 1 and "Top" or (cur == total and "Bot" or math.floor(cur / total * 100) .. "%%") -- %% : a lone % would be read as a statusline item
                   return string.format("%d:%d | %s", cur, vim.fn.col("."), pct)
                 end,
-                color = { fg = "#161514", bg = "#a0ad66", gui = "bold" },
+                color = { fg = "#161514", bg = "#8fabc4", gui = "bold" },
               }),
             }
           end)(),
@@ -1662,7 +1662,7 @@ end
 -- ctrl+w q: number every window (big digit in its middle, like tmux's Alt-e q), press the number to jump there; anything else
 -- cancels. Windows are numbered left to right, top to bottom. Up to 9 windows.
 -- tender blue (the normal-mode block of the statusline) with dark text; re-applied after a colour scheme change, which clears custom groups
-local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#161514", bg = "#a0ad66", bold = true }) end
+local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#161514", bg = "#8fabc4", bold = true }) end
 window_number_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.schedule(window_number_colors) end })
 local function pick_window()
@@ -2231,7 +2231,7 @@ end
 -- dark yellow for the changed-lines count (re-applied after a colorscheme change, which clears custom groups)
 local function diff_changed_hl()
   vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#fce566" })
-  vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#a0ad66" }) -- branch icon
+  vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#8fabc4" }) -- branch icon
   vim.api.nvim_set_hl(0, "TabModified", { fg = "#e0d48e" }) -- blue: path + dot of an unsaved buffer in the tabline
   vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#525053" }) -- inactive window dividers: dark grey, so the active teal one stands out
 end
