@@ -198,38 +198,6 @@ hotkey-overlay {
 }
 prefer-no-csd
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
-animations {
-    workspace-switch {
-        spring damping-ratio=0.95 stiffness=523 epsilon=0.0001
-    }
-    window-open {
-        duration-ms 80
-        curve "ease-out-quad"
-    }
-    window-close {
-        duration-ms 80
-        curve "ease-out-quad"
-    }
-    horizontal-view-movement {
-        spring damping-ratio=0.85 stiffness=423 epsilon=0.0001
-    }
-    window-movement {
-        spring damping-ratio=0.75 stiffness=323 epsilon=0.0001
-    }
-    window-resize {
-        spring damping-ratio=0.85 stiffness=423 epsilon=0.0001
-    }
-    config-notification-open-close {
-        spring damping-ratio=0.65 stiffness=923 epsilon=0.001
-    }
-    screenshot-ui-open {
-        duration-ms 200
-        curve "ease-out-quad"
-    }
-    overview-open-close {
-        spring damping-ratio=0.85 stiffness=800 epsilon=0.0001
-    }
-}
 // Window rules let you adjust behavior for individual windows.
 // Find more information on the wiki:
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Window-Rules
@@ -287,17 +255,7 @@ window-rule {
 
 // Global opacity
 window-rule {
-    opacity 0.88 // 0.0 is fully transparent, 1.0 is fully opaque
-    background-effect{
-        blur true
-    }
-}
-
-blur {
-    passes 1;
-    offset 2;
-    noise 0;
-    saturation 1.0;
+    opacity 0.96 // 0.0 is fully transparent, 1.0 is fully opaque
 }
 
 debug {
