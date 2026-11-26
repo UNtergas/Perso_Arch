@@ -36,10 +36,10 @@ if [ "$kind" = bell ] && [ -n "$(tmux show -wqv -t "$wid" @claude)" ]; then exit
 tmux set -w -t "$wid" @claude "$kind" \; refresh-client -S 2>/dev/null
 
 case "$kind" in
-  wait) title="Claude needs you";   urgency=critical; bg='#f0a050' ;;
-  fail) title="$label failed";      urgency=critical; bg='#f8467a' ;;
-  bell) title="Bell";               urgency=normal;   bg='#69a6ed' ;;
-  *)    title="$label finished";    urgency=normal;   bg='#4ad85e' ;;
+  wait) title="Claude needs you";   urgency=critical; bg='#d29a5c' ;;
+  fail) title="$label failed";      urgency=critical; bg='#ba6e61' ;;
+  bell) title="Bell";               urgency=normal;   bg='#999187' ;;
+  *)    title="$label finished";    urgency=normal;   bg='#78834a' ;;
 esac
 
 # Keep it for the notification list (bell in the status bar, Alt-e g): time, kind, text, session:window, window id, unread (1).
@@ -68,7 +68,7 @@ if [ "${#focused[@]}" -gt 0 ]; then
     cw=${focused_win[$i]}
     ww=$(tmux display-message -p -t "$cw" '#{window_width}' 2>/dev/null) || continue
     id=$(tmux new-pane -d -A -P -F '#{pane_id}' -t "$cw" -x "$w" -y 7 -X 1 -Y 0 -B heavy \
-      -s "bg=#20242c,fg=#d3dae3" -S "fg=$bg" -R "fg=$bg" \
+      -s "bg=#161514,fg=#d4cec4" -S "fg=$bg" -R "fg=$bg" \
       -e "NT_TITLE=$title_big" -e "NT_WHERE=$where" -e "NT_COLOR=$bg" -e "NT_SECS=$secs" \
       bash -c "$script" 2>/dev/null) && [ -n "$id" ] && tmux set -p -t "$id" @toast_src "$wid" 2>/dev/null
   done

@@ -124,7 +124,7 @@ function _G.git_blame_format(name, info) -- name is "You" for your own commits
   end
   return { { " " .. text, "GitSignsCurrentLineBlame" } }
 end
-local function blame_colors() vim.api.nvim_set_hl(0, "GitSignsCurrentLineBlame", { fg = "#666666", italic = true }) end
+local function blame_colors() vim.api.nvim_set_hl(0, "GitSignsCurrentLineBlame", { fg = "#69676c", italic = true }) end
 blame_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.schedule(blame_colors) end })
 
@@ -144,19 +144,19 @@ vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldtext = "" -- show the folded line itself, highlighted
 vim.opt.fillchars = { fold = " ", eob = "~" }
 -- the ~ below the last line: the theme paints it almost the background colour, so give it a dark grey that shows
-vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.api.nvim_set_hl(0, "EndOfBuffer", { fg = "#5c6f6f" }) end })
+vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.api.nvim_set_hl(0, "EndOfBuffer", { fg = "#69676c" }) end })
 
 -- git marks in the sign column: tender green / yellow / red
 local function git_colors()
   local set = vim.api.nvim_set_hl
-  set(0, "GitSignsAdd", { fg = "#c9d05c", bold = true })
-  set(0, "GitSignsUntracked", { fg = "#c9d05c", bold = true })
-  set(0, "GitSignsChange", { fg = "#ffc24b", bold = true })
-  set(0, "GitSignsChangedelete", { fg = "#ffc24b", bold = true })
-  set(0, "GitSignsDelete", { fg = "#f43753", bold = true })
-  set(0, "GitSignsTopdelete", { fg = "#f43753", bold = true })
+  set(0, "GitSignsAdd", { fg = "#7bd88f", bold = true })
+  set(0, "GitSignsUntracked", { fg = "#7bd88f", bold = true })
+  set(0, "GitSignsChange", { fg = "#fce566", bold = true })
+  set(0, "GitSignsChangedelete", { fg = "#fce566", bold = true })
+  set(0, "GitSignsDelete", { fg = "#fc618d", bold = true })
+  set(0, "GitSignsTopdelete", { fg = "#fc618d", bold = true })
   for _, n in ipairs({ "Add", "Change", "Delete", "Topdelete", "Changedelete" }) do
-    set(0, "GitSignsStaged" .. n, { fg = "#6b7a3a", bold = true })
+    set(0, "GitSignsStaged" .. n, { fg = "#4c7a58", bold = true })
   end
 end
 git_colors()
@@ -378,6 +378,42 @@ require("lazy").setup({
       vim.cmd.colorscheme("tender")
     end,
   },
+  -- Startup colour scheme: Monokai Pro Spectrum (dark). Loads last (priority 700 < 800) so it wins over tender. Other schemes: :Theme <name>
+  {
+    "loctvl842/monokai-pro.nvim",
+    lazy = false,
+    priority = 700,
+    config = function()
+      vim.opt.background = "dark"
+      require("monokai-pro").setup({ filter = "spectrum" })
+      -- background: Spectrum #222222 -> terminal/tmux surface #161514 (every group that uses it, so floats/signs/winbar match)
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        pattern = "monokai-pro*",
+        callback = function()
+          for name in pairs(vim.api.nvim_get_hl(0, {})) do
+            local h = vim.api.nvim_get_hl(0, { name = name, link = false })
+            if h.bg == 0x222222 then h.bg = 0x161514; vim.api.nvim_set_hl(0, name, h) end
+          end
+          -- Spectrum's own search / selection groups are faint; stronger ones in the Spectrum accents
+          local set = vim.api.nvim_set_hl
+          set(0, "Normal", { fg = "#d4cec4", bg = "#161514" }) -- dimmer text, same as the DMS theme (toaster)
+          set(0, "Visual", { bg = "#4a4f5c", bold = true })
+          set(0, "Search", { bg = "#6b5d24", fg = "#d4cec4" })
+          set(0, "CurSearch", { bg = "#fce566", fg = "#161514" })
+          set(0, "IncSearch", { bg = "#fce566", fg = "#161514" })
+          for _, n in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do set(0, n, { bg = "#2f2c29" }) end
+          set(0, "VM_Cursor", { bg = "#5ad4e6", fg = "#161514" })
+          set(0, "VM_Extend", { bg = "#2f7a88" })
+          set(0, "VM_Insert", { bg = "#4a4a2a" })
+          set(0, "VM_Mono", { bg = "#5ad4e6", fg = "#161514" })
+          set(0, "Added", { fg = "#7bd88f" })
+          set(0, "Removed", { fg = "#fc618d" })
+          set(0, "NoiceCmdlinePopupBorder", { fg = "#5ad4e6" })
+        end,
+      })
+      vim.cmd.colorscheme("monokai-pro-spectrum")
+    end,
+  },
   -- active window tracking: the border around the focused window is drawn thick in the same deep teal as the active
   -- tmux pane border. Backgrounds stay as they are. Loads on the first WinLeave, i.e. once there is a split.
   {
@@ -385,7 +421,7 @@ require("lazy").setup({
     event = "WinLeave",
     opts = {
       border = "bold",
-      colors = { "#73cef4" },
+      colors = { "#5ad4e6" },
       animate = { enabled = false },
       excluded_ft = { "packer", "TelescopePrompt", "mason", "lazy" },
     },
@@ -918,7 +954,7 @@ require("lazy").setup({
       -- see its spec below), the scope guide and the underline on the opening / closing line all take the colour of the
       -- bracket that opens the scope. ibl draws the underline itself as { underline, sp = guide colour }.
       hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-        vim.api.nvim_set_hl(0, "IblIndent", { fg = "#3a3a3a" })
+        vim.api.nvim_set_hl(0, "IblIndent", { fg = "#2f2c29" })
         for k, name in ipairs(names) do
           vim.api.nvim_set_hl(0, name, { fg = colors[k] })
         end
@@ -1029,12 +1065,12 @@ require("lazy").setup({
       vim.validate = validate
       -- ours = dark green, theirs = dark blue (set after the plugin so ours wins on colorscheme change)
       local function conflict_colors()
-        vim.api.nvim_set_hl(0, "GitConflictCurrent", { bg = "#3a4a2a" })
-        vim.api.nvim_set_hl(0, "GitConflictCurrentLabel", { bg = "#55702f", bold = true })
-        vim.api.nvim_set_hl(0, "GitConflictIncoming", { bg = "#26414f" })
-        vim.api.nvim_set_hl(0, "GitConflictIncomingLabel", { bg = "#3d6a82", bold = true })
-        vim.api.nvim_set_hl(0, "GitConflictAncestor", { bg = "#333333" })
-        vim.api.nvim_set_hl(0, "GitConflictAncestorLabel", { bg = "#444444", bold = true })
+        vim.api.nvim_set_hl(0, "GitConflictCurrent", { bg = "#2c4a35" })
+        vim.api.nvim_set_hl(0, "GitConflictCurrentLabel", { bg = "#3f7a52", bold = true })
+        vim.api.nvim_set_hl(0, "GitConflictIncoming", { bg = "#24454d" })
+        vim.api.nvim_set_hl(0, "GitConflictIncomingLabel", { bg = "#2f7a88", bold = true })
+        vim.api.nvim_set_hl(0, "GitConflictAncestor", { bg = "#2f2c29" })
+        vim.api.nvim_set_hl(0, "GitConflictAncestorLabel", { bg = "#525053", bold = true })
       end
       conflict_colors()
       vim.api.nvim_create_autocmd("ColorScheme", { callback = conflict_colors })
@@ -1058,14 +1094,14 @@ require("lazy").setup({
     config = function()
       local function merge_colors()
         local hl = vim.api.nvim_set_hl
-        hl(0, "MergeOurs", { bg = "#3a4a2a" })
-        hl(0, "MergeOursText", { bg = "#55702f" })
-        hl(0, "MergeTheirs", { bg = "#26414f" })
-        hl(0, "MergeTheirsText", { bg = "#3d6a82" })
+        hl(0, "MergeOurs", { bg = "#2c4a35" })
+        hl(0, "MergeOursText", { bg = "#3f7a52" })
+        hl(0, "MergeTheirs", { bg = "#24454d" })
+        hl(0, "MergeTheirsText", { bg = "#2f7a88" })
         -- middle window: no diff background, so only the conflict colors show there
         hl(0, "MergeLocal", { bg = "NONE" })
         hl(0, "MergeLocalText", { bg = "NONE" })
-        hl(0, "MergeFiller", { fg = "#444444", bg = "#282828" })
+        hl(0, "MergeFiller", { fg = "#525053", bg = "#161514" })
       end
       merge_colors()
       vim.api.nvim_create_autocmd("ColorScheme", { callback = merge_colors })
@@ -1191,18 +1227,18 @@ require("lazy").setup({
     config = function()
       local notify = require("notify")
       -- Notifications stack upward from the bottom-right corner.
-      notify.setup({ timeout = 3000, render = "compact", stages = require("notify.stages.fade")(require("notify.stages.util").DIRECTION.BOTTOM_UP), background_colour = "#333333" })
+      notify.setup({ timeout = 3000, render = "compact", stages = require("notify.stages.fade")(require("notify.stages.util").DIRECTION.BOTTOM_UP), background_colour = "#2f2c29" })
       vim.notify = notify -- every vim.notify call in this config (and plugins) goes through it
       -- tender colours on a dark grey background
       local function colours()
-        local lvl = { ERROR = "#f43753", WARN = "#ffc24b", INFO = "#73cef4", DEBUG = "#999999", TRACE = "#d3b987" }
+        local lvl = { ERROR = "#fc618d", WARN = "#fce566", INFO = "#5ad4e6", DEBUG = "#8b888f", TRACE = "#bab6c0" }
         for name, fg in pairs(lvl) do
           for _, part in ipairs({ "Border", "Icon", "Title" }) do
             vim.api.nvim_set_hl(0, "Notify" .. name .. part, { fg = fg })
           end
-          vim.api.nvim_set_hl(0, "Notify" .. name .. "Body", { fg = "#eeeeee", bg = "#333333" })
+          vim.api.nvim_set_hl(0, "Notify" .. name .. "Body", { fg = "#d4cec4", bg = "#2f2c29" })
         end
-        vim.api.nvim_set_hl(0, "NotifyBackground", { bg = "#333333" })
+        vim.api.nvim_set_hl(0, "NotifyBackground", { bg = "#2f2c29" })
       end
       colours()
       vim.api.nvim_create_autocmd("ColorScheme", { callback = colours })
@@ -1218,25 +1254,25 @@ require("lazy").setup({
       -- tender palette (jacoborus/tender.vim airline theme): a = bright block with dark text, b = dark mode-coloured text, c = tab row colour.
       -- a > b > c fade from brightest to darkest; the tab row and the winbar use the same colours
       local theme = require("lualine.themes.auto")
-      local bg_c, bg_b = "#1d1f22", "#383b40"
+      local bg_c, bg_b = "#100f0e", "#2f2c29"
       local mode_a = {
-        normal = { fg = "#1c1e22", bg = "#7fb5e3", gui = "bold" },
-        insert = { fg = "#1c1e22", bg = "#accb7e", gui = "bold" },
-        visual = { fg = "#1c1e22", bg = "#efc262", gui = "bold" },
-        replace = { fg = "#1c1e22", bg = "#ea5359", gui = "bold" },
-        command = { fg = "#1c1e22", bg = "#c5afb0", gui = "bold" },
+        normal = { fg = "#161514", bg = "#78834a", gui = "bold" },
+        insert = { fg = "#161514", bg = "#6b9d66", gui = "bold" },
+        visual = { fg = "#161514", bg = "#c4ba7f", gui = "bold" },
+        replace = { fg = "#161514", bg = "#ba6e61", gui = "bold" },
+        command = { fg = "#161514", bg = "#d4c3a8", gui = "bold" },
       }
       for m, a in pairs(mode_a) do
         theme[m].a = a
         theme[m].b = { fg = a.bg, bg = bg_b, gui = "bold" } -- the branch text takes the mode colour
-        theme[m].c = { fg = "#e0e4e8", bg = bg_c }
-        theme[m].y = { fg = "#e0e4e8", bg = bg_b }
+        theme[m].c = { fg = "#d4cec4", bg = bg_c }
+        theme[m].y = { fg = "#d4cec4", bg = bg_b }
         theme[m].z = a
       end
       theme.inactive = {
-        a = { fg = "#b5b8bc", bg = "#51545c" },
-        b = { fg = "#b5b8bc", bg = bg_b },
-        c = { fg = "#93969c", bg = bg_c },
+        a = { fg = "#999187", bg = "#282522" },
+        b = { fg = "#999187", bg = bg_b },
+        c = { fg = "#625b53", bg = bg_c },
       }
       -- the first block's colours per mode, for the project block of the winbar (lua/saga_breadcrumb.lua)
       _G.mode_a = {}
@@ -1244,7 +1280,7 @@ require("lazy").setup({
       -- "#rrggbb" foreground of a highlight group (lualine wants a hex string, not the number nvim returns)
       _G.hl_hex = function(name)
         local fg = vim.api.nvim_get_hl(0, { name = name, link = false }).fg
-        return fg and string.format("#%06x", fg) or "#888888"
+        return fg and string.format("#%06x", fg) or "#8b888f"
       end
       require("lualine").setup({
         options = {
@@ -1258,7 +1294,7 @@ require("lazy").setup({
             {
               "mode", -- NORMAL / INSERT / VISUAL ... (the project name is in the winbar now); RESIZE while C-w r is on
               fmt = function(name) return vim.g.resize_mode and "RESIZE" or name end,
-              color = function() if vim.g.resize_mode then return { fg = "#1c1e22", bg = "#f7b182", gui = "bold" } end end,
+              color = function() if vim.g.resize_mode then return { fg = "#161514", bg = "#d29a5c", gui = "bold" } end end,
             },
           },
           lualine_b = {
@@ -1295,16 +1331,16 @@ require("lazy").setup({
               { "diagnostics", sections = { "error", "warn", "hint" }, always_visible = true, padding = { left = 1, right = 1 }, separator = "",
                 symbols = { error = "\u{f057} ", warn = "\u{f071} ", hint = "\u{f0eb} " } },
               { "diagnostics", sections = { "info" }, symbols = { info = "\u{f05a} " }, padding = { left = 0, right = 1 }, separator = "" },
-              block("#2f485f", "#a1cbed", { "encoding" }),
-              block("#6ebaf0", "#1c1e22", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
+              block("#282522", "#999187", { "encoding" }),
+              block("#3a3530", "#d4cec4", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
               -- line:column | percentage of the file (Top / Bot at the ends), one block: 76:42 | 5%
-              block("#7fb5e3", "#1c1e22", {
+              block("#78834a", "#161514", {
                 function()
                   local cur, total = vim.fn.line("."), vim.fn.line("$")
                   local pct = cur == 1 and "Top" or (cur == total and "Bot" or math.floor(cur / total * 100) .. "%%") -- %% : a lone % would be read as a statusline item
                   return string.format("%d:%d | %s", cur, vim.fn.col("."), pct)
                 end,
-                color = { fg = "#1c1e22", bg = "#7fb5e3", gui = "bold" },
+                color = { fg = "#161514", bg = "#78834a", gui = "bold" },
               }),
             }
           end)(),
@@ -1572,7 +1608,7 @@ end
 -- ctrl+w q: number every window (big digit in its middle, like tmux's Alt-e q), press the number to jump there; anything else
 -- cancels. Windows are numbered left to right, top to bottom. Up to 9 windows.
 -- tender blue (the normal-mode block of the statusline) with dark text; re-applied after a colour scheme change, which clears custom groups
-local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#1c1e22", bg = "#7fb5e3", bold = true }) end
+local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#161514", bg = "#78834a", bold = true }) end
 window_number_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.schedule(window_number_colors) end })
 local function pick_window()
@@ -2140,17 +2176,17 @@ function _G.name_status()
 end
 -- dark yellow for the changed-lines count (re-applied after a colorscheme change, which clears custom groups)
 local function diff_changed_hl()
-  vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#ffc24b" })
-  vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#b3deef" }) -- branch icon
-  vim.api.nvim_set_hl(0, "TabModified", { fg = "#73cef4" }) -- blue: path + dot of an unsaved buffer in the tabline
-  vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#444444" }) -- inactive window dividers: dark grey, so the active teal one stands out
+  vim.api.nvim_set_hl(0, "StatusDiffChanged", { fg = "#fce566" })
+  vim.api.nvim_set_hl(0, "StatusBranch", { fg = "#5ad4e6" }) -- branch icon
+  vim.api.nvim_set_hl(0, "TabModified", { fg = "#5ad4e6" }) -- blue: path + dot of an unsaved buffer in the tabline
+  vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#525053" }) -- inactive window dividers: dark grey, so the active teal one stands out
 end
 diff_changed_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = diff_changed_hl })
 -- diff mode: changed lines light blue instead of Alabaster's yellow, changed words a stronger blue
 local function diff_colors()
-  vim.api.nvim_set_hl(0, "DiffChange", { bg = "#335261" })
-  vim.api.nvim_set_hl(0, "DiffText", { bg = "#4a7a94", bold = true })
+  vim.api.nvim_set_hl(0, "DiffChange", { bg = "#2b4a52" })
+  vim.api.nvim_set_hl(0, "DiffText", { bg = "#3d7a86", bold = true })
 end
 diff_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = diff_colors })
@@ -2424,9 +2460,9 @@ for _, key in ipairs({ "h", "j", "k", "l", "+", "-", "<Left>", "<Down>", "<Up>",
   end, { expr = true, silent = true })
 end
 
--- :Theme <name> switches the colour scheme for this session (the one at startup is tender).
+-- :Theme <name> switches the colour scheme for this session (the one at startup is monokai-pro spectrum).
 -- koda-<variant>: dark light moss glade. onedark-<style>: dark darker cool deep warm warmer light.
-local themes = { "tender", "alabaster", "koda-dark", "koda-light", "koda-moss", "koda-glade" }
+local themes = { "monokai-pro-spectrum", "tender", "alabaster", "koda-dark", "koda-light", "koda-moss", "koda-glade" }
 for _, style in ipairs({ "dark", "darker", "cool", "deep", "warm", "warmer", "light" }) do
   table.insert(themes, "onedark-" .. style)
 end
@@ -2439,7 +2475,7 @@ vim.api.nvim_create_user_command("Theme", function(opts)
     require("onedark").setup({ style = style })
     require("onedark").load()
   elseif vim.tbl_contains(themes, name) then
-    vim.opt.background = (name == "tender" or name == "koda-dark" or name == "koda-moss") and "dark" or "light"
+    vim.opt.background = (name == "monokai-pro-spectrum" or name == "tender" or name == "koda-dark" or name == "koda-moss") and "dark" or "light"
     vim.cmd.colorscheme(name)
   else
     vim.notify("Theme: unknown '" .. name .. "'. Options: " .. table.concat(themes, ", "), vim.log.levels.WARN)
