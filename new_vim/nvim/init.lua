@@ -2469,6 +2469,13 @@ function _G.buffer_tabline()
   for i, m in ipairs(marks) do
     local t = vim.fn.fnamemodify(m.buf_name, ":t")
     if seen[t] > 1 then t = vim.fn.fnamemodify(m.buf_name, ":h:t") .. "/" .. t end -- two tabs with one name: add the folder
+    -- a long name is cut in the middle so the start and the extension stay visible (side-sdk-clie…roller.test.ts)
+    local TAB_MAX = 22
+    if vim.fn.strchars(t) > TAB_MAX then
+      local keep = TAB_MAX - 1
+      local tail = math.floor(keep / 2)
+      t = vim.fn.strcharpart(t, 0, keep - tail) .. "…" .. vim.fn.strcharpart(t, vim.fn.strchars(t) - tail)
+    end
     local active = m.buf_id == cur
     if active then curi = i end
     local plain = " " .. i .. " " .. t .. " " -- the unsaved dot and the error / warning count are in the winbar (lua/saga_breadcrumb.lua)
