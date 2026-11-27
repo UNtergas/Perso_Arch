@@ -30,7 +30,7 @@ self=$(printf '%q' "$0")
 reader=$(printf '%q' "$(dirname "$0")/notif-read.sh")
 sel=$(list | fzf --ansi --no-sort --delimiter $'\t' --with-nth 1 --layout reverse --height 100% \
   --no-info --no-separator --prompt ' search: ' --pointer '▶' --header "$hdr" \
-  --color 'bg:#161514,fg:#d4cec4,bg+:#282522,fg+:#ffffff,pointer:#5e8099,prompt:#5e8099,header:#625b53,hl:#d29a5c,hl+:#d29a5c' \
+  --color 'bg:#202020,fg:#d4cec4,bg+:#333333,fg+:#ffffff,pointer:#5e8099,prompt:#5e8099,header:#625b53,hl:#d29a5c,hl+:#d29a5c' \
   --bind "ctrl-x:execute-silent(sed -i {3}d '$log'; $reader none)+reload($self --list)" \
   --bind "ctrl-l:execute-silent(: > '$log'; $reader none)+reload($self --list)") || exit 0
 

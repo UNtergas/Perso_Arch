@@ -1,6 +1,6 @@
 # Tender Nvim: Android Studio colour scheme
 
-Editor colour scheme that matches the nvim (tender) setup: background `#1b1f27` (a touch lighter than nvim's `#161920`, which looked darker in the IDE), tender syntax colours, the same selection, search and diff colours.
+Editor colour scheme that matches the nvim (tender) setup: background `#202020` (neutral grey, same as nvim, tmux and the DMS theme), tender syntax colours, the same selection, search and diff colours.
 It is a child of Darcula, so anything it does not set falls back to Darcula.
 
 ## Install
@@ -15,7 +15,7 @@ Only the editor, console, diff and log colours are covered. The IDE chrome (tool
 
 | Use | Colour |
 |---|---|
-| Background | `#1b1f27` (a touch lighter than nvim's `#161920`, which looked darker in the IDE) |
+| Background | `#202020` (same as nvim, tmux and the DMS theme) |
 | Text / identifiers | `#eeeeee` / `#dadada` |
 | Keywords, types, braces | `#73cef4` |
 | Functions | `#b3deef` |

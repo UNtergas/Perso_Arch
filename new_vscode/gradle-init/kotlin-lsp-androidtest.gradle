@@ -1,0 +1,18 @@
+// Gradle init script for the JetBrains Kotlin language server (the VS Code extension "Kotlin by JetBrains").
+// Its Gradle import fails on AGP 8.13.x ("Querying the mapped value ... generateDebugAndroidTestBuildConfig ... before task has
+// completed is not supported"). Leaving the androidTest variants out of the IMPORT lets it finish.
+// It only acts when the language server is importing: the server passes the system property below, Android Studio and normal
+// Gradle builds do not, so your builds (and connectedAndroidTest) are unchanged.
+// Install: copy to ~/.gradle/init.d/ . Remove it once the server handles androidTest variants itself.
+if (System.getProperty('com.jetbrains.ls.imports.gradle') != null) {
+    allprojects { project ->
+        ['com.android.application', 'com.android.library'].each { pluginId ->
+            project.plugins.withId(pluginId) {
+                def components = project.extensions.getByName('androidComponents')
+                components.beforeVariants(components.selector().all()) { variantBuilder ->
+                    variantBuilder.enableAndroidTest = false
+                }
+            }
+        }
+    }
+}

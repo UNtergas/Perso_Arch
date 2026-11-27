@@ -37,8 +37,8 @@ function M.project_colors()
   local key = mode_key[api.nvim_get_mode().mode:sub(1, 1)] or "normal"
   local a = _G.mode_a and _G.mode_a[key]
   local bg = (key ~= "normal" and a and a.bg) or "#8fabc4"
-  local fg = (key ~= "normal" and a and a.fg) or "#161514"
-  if vim.g.resize_mode then bg, fg = "#eab06e", "#161514" end -- C-w r: the peach of tmux's RESIZE label
+  local fg = (key ~= "normal" and a and a.fg) or "#202020"
+  if vim.g.resize_mode then bg, fg = "#eab06e", "#202020" end -- C-w r: the peach of tmux's RESIZE label
   local bar = api.nvim_get_hl(0, { name = "WinBar", link = false }).bg
   api.nvim_set_hl(0, "BarProject", { fg = fg, bg = bg, bold = true })
   api.nvim_set_hl(0, "BarProjectArrow", { fg = bg, bg = PATH_BG }) -- project block > path block

@@ -334,9 +334,9 @@ require("lazy").setup({
         "r-cr-o:hor25-CursorReplace",
       }, ",")
       local function cursor_colors()
-        vim.api.nvim_set_hl(0, "CursorNormal", { fg = "#161514", bg = "#8fabc4" })
-        vim.api.nvim_set_hl(0, "CursorInsert", { fg = "#161514", bg = "#eab06e" })
-        vim.api.nvim_set_hl(0, "CursorReplace", { fg = "#161514", bg = "#d98578" })
+        vim.api.nvim_set_hl(0, "CursorNormal", { fg = "#202020", bg = "#8fabc4" })
+        vim.api.nvim_set_hl(0, "CursorInsert", { fg = "#202020", bg = "#eab06e" })
+        vim.api.nvim_set_hl(0, "CursorReplace", { fg = "#202020", bg = "#d98578" })
       end
       cursor_colors()
       vim.api.nvim_create_autocmd("ColorScheme", { callback = cursor_colors })
@@ -346,7 +346,7 @@ require("lazy").setup({
   {
     "jacoborus/tender.vim",
     lazy = false,
-    priority = 800,
+    priority = 500, -- lowest of the startup schemes, so it loads last and wins
     config = function()
       vim.opt.background = "dark"
       -- tender's own search / selection / cursor groups are faint (white underline, #293b44 on #282828); stronger, tender-coloured ones
@@ -368,10 +368,10 @@ require("lazy").setup({
           set(0, "Added", { fg = "#c9d05c" })
           set(0, "Removed", { fg = "#f43753" })
           set(0, "NoiceCmdlinePopupBorder", { fg = "#73cef4" })
-          -- background: tender #282828 -> terminal/tmux surface, darkened to #161920 (every group that uses it, so floats/signs/winbar match)
+          -- background: tender #282828 -> DMS/terminal/tmux surface #202020 (every group that uses it, so floats/signs/winbar match)
           for name in pairs(vim.api.nvim_get_hl(0, {})) do
             local h = vim.api.nvim_get_hl(0, { name = name, link = false })
-            if h.bg == 0x282828 then h.bg = 0x161920; set(0, name, h) end
+            if h.bg == 0x282828 then h.bg = 0x202020; set(0, name, h) end
           end
         end,
       })
@@ -386,26 +386,26 @@ require("lazy").setup({
     config = function()
       vim.opt.background = "dark"
       require("monokai-pro").setup({ filter = "spectrum" })
-      -- background: Spectrum #222222 -> terminal/tmux surface #161514 (every group that uses it, so floats/signs/winbar match)
+      -- background: Spectrum #222222 -> terminal/tmux surface #202020 (every group that uses it, so floats/signs/winbar match)
       vim.api.nvim_create_autocmd("ColorScheme", {
         pattern = "monokai-pro*",
         callback = function()
           for name in pairs(vim.api.nvim_get_hl(0, {})) do
             local h = vim.api.nvim_get_hl(0, { name = name, link = false })
-            if h.bg == 0x222222 then h.bg = 0x161514; vim.api.nvim_set_hl(0, name, h) end
+            if h.bg == 0x222222 then h.bg = 0x202020; vim.api.nvim_set_hl(0, name, h) end
           end
           -- Spectrum's own search / selection groups are faint; stronger ones in the Spectrum accents
           local set = vim.api.nvim_set_hl
-          set(0, "Normal", { fg = "#d4cec4", bg = "#161514" }) -- dimmer text, same as the DMS theme (toaster)
+          set(0, "Normal", { fg = "#d4cec4", bg = "#202020" }) -- dimmer text, same as the DMS theme (toaster)
           set(0, "Visual", { bg = "#4a4f5c", bold = true })
           set(0, "Search", { bg = "#6b5d24", fg = "#d4cec4" })
-          set(0, "CurSearch", { bg = "#fce566", fg = "#161514" })
-          set(0, "IncSearch", { bg = "#fce566", fg = "#161514" })
+          set(0, "CurSearch", { bg = "#fce566", fg = "#202020" })
+          set(0, "IncSearch", { bg = "#fce566", fg = "#202020" })
           for _, n in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do set(0, n, { bg = "#2f2c29" }) end
-          set(0, "VM_Cursor", { bg = "#5ad4e6", fg = "#161514" })
+          set(0, "VM_Cursor", { bg = "#5ad4e6", fg = "#202020" })
           set(0, "VM_Extend", { bg = "#2f7a88" })
           set(0, "VM_Insert", { bg = "#4a4a2a" })
-          set(0, "VM_Mono", { bg = "#5ad4e6", fg = "#161514" })
+          set(0, "VM_Mono", { bg = "#5ad4e6", fg = "#202020" })
           set(0, "Added", { fg = "#7bd88f" })
           set(0, "Removed", { fg = "#fc618d" })
           set(0, "NoiceCmdlinePopupBorder", { fg = "#8fabc4" })
@@ -422,16 +422,16 @@ require("lazy").setup({
     config = function()
       vim.opt.background = "dark"
       require("kanagawa").setup({ theme = "dragon", background = { dark = "dragon" } })
-      -- background: dragon #181616 -> DMS surface #161514; text #eee8de, syntax brighter, same hue, comments grey #7a746a
+      -- background: dragon #181616 -> DMS surface #202020; text #eee8de, syntax brighter, same hue, comments grey #7a746a
       vim.api.nvim_create_autocmd("ColorScheme", {
         pattern = "kanagawa*",
         callback = function()
           for name in pairs(vim.api.nvim_get_hl(0, {})) do
             local h = vim.api.nvim_get_hl(0, { name = name, link = false })
-            if h.bg == 0x181616 then h.bg = 0x161514; vim.api.nvim_set_hl(0, name, h) end
+            if h.bg == 0x181616 then h.bg = 0x202020; vim.api.nvim_set_hl(0, name, h) end
           end
           local set = vim.api.nvim_set_hl
-          -- everything but comments brighter with the same hue (lightness up, saturation up a little), so kanagawa's colours stay colours
+          -- everything but comments brighter with the same hue (lightness up, saturation up a lot), so kanagawa's colours stay colours
           local function lighten(c)
             local r, g, b = (math.floor(c / 65536) % 256) / 255, (math.floor(c / 256) % 256) / 255, (c % 256) / 255
             local mx, mn = math.max(r, g, b), math.min(r, g, b)
@@ -442,7 +442,7 @@ require("lazy").setup({
               if mx == r then h = ((g - b) / d) % 6 elseif mx == g then h = (b - r) / d + 2 else h = (r - g) / d + 4 end
             end
             l = math.min(0.86, l + (1 - l) * 0.4)
-            sat = math.min(0.9, sat * 1.9)
+            if sat > 0.05 then sat = math.min(0.82, 0.3 + sat * 1.8) end -- dragon's colours are very washed out: lift saturation a lot (Claude-like pastel), greys stay grey
             local c2 = (1 - math.abs(2 * l - 1)) * sat
             local x = c2 * (1 - math.abs(h % 2 - 1))
             local m = l - c2 / 2
@@ -455,17 +455,37 @@ require("lazy").setup({
             local h = vim.api.nvim_get_hl(0, { name = name, link = false })
             if h.fg and not name:lower():find("comment", 1, true) then h.fg = lighten(h.fg); set(0, name, h) end
           end
-          set(0, "Normal", { fg = "#eee8de", bg = "#161514" })
+          set(0, "Normal", { fg = "#eee8de", bg = "#202020" })
           set(0, "Comment", { fg = "#7a746a", italic = true }) -- dim warm grey, clearly below the text
           set(0, "@comment", { link = "Comment" })
           set(0, "Visual", { bg = "#4a443d", bold = true })
           set(0, "Search", { bg = "#5a4f2a", fg = "#d4cec4" })
-          set(0, "CurSearch", { bg = "#e0d48e", fg = "#161514" })
-          set(0, "IncSearch", { bg = "#e0d48e", fg = "#161514" })
+          set(0, "CurSearch", { bg = "#e0d48e", fg = "#202020" })
+          set(0, "IncSearch", { bg = "#e0d48e", fg = "#202020" })
           for _, n in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do set(0, n, { bg = "#2f2c29" }) end
         end,
       })
       vim.cmd.colorscheme("kanagawa-dragon")
+    end,
+  },
+  -- Startup colour scheme: hybrid (priority 600 < 650, loads last so it wins over kanagawa). Background hybrid #1d1f21 -> DMS surface #202020. Other schemes: :Theme <name>
+  {
+    "w0ng/vim-hybrid",
+    lazy = false,
+    priority = 600,
+    config = function()
+      vim.opt.background = "dark"
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        pattern = "hybrid",
+        callback = function()
+          for name in pairs(vim.api.nvim_get_hl(0, {})) do
+            local h = vim.api.nvim_get_hl(0, { name = name, link = false })
+            if h.bg == 0x1d1f21 then h.bg = 0x202020; vim.api.nvim_set_hl(0, name, h) end
+          end
+          vim.api.nvim_set_hl(0, "Normal", { fg = "#c5c8c6", bg = "#202020" })
+        end,
+      })
+      vim.cmd.colorscheme("hybrid")
     end,
   },
   -- active window tracking: the border around the focused window is drawn thick in the same deep teal as the active
@@ -551,20 +571,28 @@ require("lazy").setup({
 	    "fallback",
 	  },
 
-	  -- Tab / S-Tab wrap around the list instead of stepping off its end onto "nothing selected" (there Enter was a newline, not accept)
+	  -- Tab / S-Tab wrap around the list instead of stepping off its end onto "nothing selected" (there Enter was a newline, not accept).
+	  -- The selection is made right away (blink's own select_next is scheduled): Tab and Enter arriving together, when nvim is busy, would
+	  -- otherwise run Enter before the selection exists, and Enter would be a newline.
 	  ["<Tab>"] = {
 	    function(cmp)
 	      local l = require("blink.cmp.completion.list")
-	      if cmp.is_menu_visible() and l.selected_item_idx and l.selected_item_idx == #l.items then l.select(1) return true end
+	      if not (cmp.is_menu_visible() and #l.items > 0) then return end
+	      local i = l.selected_item_idx
+	      l.select((i == nil or i >= #l.items) and 1 or i + 1)
+	      return true
 	    end,
-	    "select_next", "snippet_forward", "fallback",
+	    "snippet_forward", "fallback",
 	  },
 	  ["<S-Tab>"] = {
 	    function(cmp)
 	      local l = require("blink.cmp.completion.list")
-	      if cmp.is_menu_visible() and l.selected_item_idx == 1 then l.select(#l.items) return true end
+	      if not (cmp.is_menu_visible() and #l.items > 0) then return end
+	      local i = l.selected_item_idx
+	      l.select((i == nil or i <= 1) and #l.items or i - 1)
+	      return true
 	    end,
-	    "select_prev", "snippet_backward", "fallback",
+	    "snippet_backward", "fallback",
 	  },
 
 	  -- the arrows do not drive the menu: they move the cursor as usual (Tab / S-Tab / C-j do the selecting)
@@ -1155,7 +1183,7 @@ require("lazy").setup({
         -- middle window: no diff background, so only the conflict colors show there
         hl(0, "MergeLocal", { bg = "NONE" })
         hl(0, "MergeLocalText", { bg = "NONE" })
-        hl(0, "MergeFiller", { fg = "#525053", bg = "#161514" })
+        hl(0, "MergeFiller", { fg = "#525053", bg = "#202020" })
       end
       merge_colors()
       vim.api.nvim_create_autocmd("ColorScheme", { callback = merge_colors })
@@ -1310,11 +1338,11 @@ require("lazy").setup({
       local theme = require("lualine.themes.auto")
       local bg_c, bg_b = "#100f0e", "#2f2c29"
       local mode_a = {
-        normal = { fg = "#161514", bg = "#8fabc4", gui = "bold" },
-        insert = { fg = "#161514", bg = "#86bd80", gui = "bold" },
-        visual = { fg = "#161514", bg = "#e0d48e", gui = "bold" },
-        replace = { fg = "#161514", bg = "#d98578", gui = "bold" },
-        command = { fg = "#161514", bg = "#e6d6ba", gui = "bold" },
+        normal = { fg = "#202020", bg = "#8fabc4", gui = "bold" },
+        insert = { fg = "#202020", bg = "#86bd80", gui = "bold" },
+        visual = { fg = "#202020", bg = "#e0d48e", gui = "bold" },
+        replace = { fg = "#202020", bg = "#d98578", gui = "bold" },
+        command = { fg = "#202020", bg = "#e6d6ba", gui = "bold" },
       }
       for m, a in pairs(mode_a) do
         theme[m].a = a
@@ -1348,7 +1376,7 @@ require("lazy").setup({
             {
               "mode", -- NORMAL / INSERT / VISUAL ... (the project name is in the winbar now); RESIZE while C-w r is on
               fmt = function(name) return vim.g.resize_mode and "RESIZE" or name end,
-              color = function() if vim.g.resize_mode then return { fg = "#161514", bg = "#eab06e", gui = "bold" } end end,
+              color = function() if vim.g.resize_mode then return { fg = "#202020", bg = "#eab06e", gui = "bold" } end end,
             },
           },
           lualine_b = {
@@ -1388,13 +1416,13 @@ require("lazy").setup({
               block("#35312d", "#b8b1a6", { "encoding" }),
               block("#4a443d", "#eee8de", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
               -- line:column | percentage of the file (Top / Bot at the ends), one block: 76:42 | 5%
-              block("#8fabc4", "#161514", {
+              block("#8fabc4", "#202020", {
                 function()
                   local cur, total = vim.fn.line("."), vim.fn.line("$")
                   local pct = cur == 1 and "Top" or (cur == total and "Bot" or math.floor(cur / total * 100) .. "%%") -- %% : a lone % would be read as a statusline item
                   return string.format("%d:%d | %s", cur, vim.fn.col("."), pct)
                 end,
-                color = { fg = "#161514", bg = "#8fabc4", gui = "bold" },
+                color = { fg = "#202020", bg = "#8fabc4", gui = "bold" },
               }),
             }
           end)(),
@@ -1662,7 +1690,7 @@ end
 -- ctrl+w q: number every window (big digit in its middle, like tmux's Alt-e q), press the number to jump there; anything else
 -- cancels. Windows are numbered left to right, top to bottom. Up to 9 windows.
 -- tender blue (the normal-mode block of the statusline) with dark text; re-applied after a colour scheme change, which clears custom groups
-local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#161514", bg = "#8fabc4", bold = true }) end
+local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#202020", bg = "#8fabc4", bold = true }) end
 window_number_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.schedule(window_number_colors) end })
 local function pick_window()
@@ -2514,9 +2542,9 @@ for _, key in ipairs({ "h", "j", "k", "l", "+", "-", "<Left>", "<Down>", "<Up>",
   end, { expr = true, silent = true })
 end
 
--- :Theme <name> switches the colour scheme for this session (the one at startup is kanagawa-dragon).
+-- :Theme <name> switches the colour scheme for this session (the one at startup is tender).
 -- koda-<variant>: dark light moss glade. onedark-<style>: dark darker cool deep warm warmer light.
-local themes = { "kanagawa-dragon", "monokai-pro-spectrum", "tender", "alabaster", "koda-dark", "koda-light", "koda-moss", "koda-glade" }
+local themes = { "tender", "hybrid", "kanagawa-dragon", "monokai-pro-spectrum", "tender", "alabaster", "koda-dark", "koda-light", "koda-moss", "koda-glade" }
 for _, style in ipairs({ "dark", "darker", "cool", "deep", "warm", "warmer", "light" }) do
   table.insert(themes, "onedark-" .. style)
 end
@@ -2529,7 +2557,7 @@ vim.api.nvim_create_user_command("Theme", function(opts)
     require("onedark").setup({ style = style })
     require("onedark").load()
   elseif vim.tbl_contains(themes, name) then
-    vim.opt.background = (name == "kanagawa-dragon" or name == "monokai-pro-spectrum" or name == "tender" or name == "koda-dark" or name == "koda-moss") and "dark" or "light"
+    vim.opt.background = (name == "hybrid" or name == "kanagawa-dragon" or name == "monokai-pro-spectrum" or name == "tender" or name == "koda-dark" or name == "koda-moss") and "dark" or "light"
     vim.cmd.colorscheme(name)
   else
     vim.notify("Theme: unknown '" .. name .. "'. Options: " .. table.concat(themes, ", "), vim.log.levels.WARN)
