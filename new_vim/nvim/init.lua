@@ -936,6 +936,87 @@ require("lazy").setup({
       keymaps = { replace = false }, -- sync only: Replace ignores what's in the results list
     },
     config = function(_, opts)
+      -- synced lines get a green check in the sign column (a new search deletes the result lines, which drops their marks). grug-far itself only marks lines you edited in the results, and not at all in
+      -- the replace-diff view), so after SPC l / SPC v / SPC s you can see which results are already written to the file.
+      -- The wrapper goes in before anything requires the sync action (syncLine, syncFile, syncLocations take it at load).
+      vim.api.nvim_set_hl(0, "GrugFarSyncedSign", { fg = "#59e375", bold = true })
+      -- Sync changes the open buffer instead of writing the file: you look at the change in the buffer and save with :w (undo with u).
+      -- Files that are not open in nvim are still written directly, as grug-far does.
+      local current_entry, entry_by_id = nil, {}
+      local orig_files = require("grug-far.engine.syncChangedFiles")
+      package.loaded["grug-far.engine.syncChangedFiles"] = function(params)
+        local rest, errors = {}, ""
+        local loaded = {}
+        local entry = { bufs = {}, ids = {} } -- what this sync changed, for `u` in the grug-far window
+        current_entry = entry
+        for _, f in ipairs(params.changedFiles) do
+          local b = vim.fn.bufnr(vim.fn.fnamemodify(f.filename, ":p"))
+          if b > 0 and vim.api.nvim_buf_is_loaded(b) then loaded[#loaded + 1] = { buf = b, f = f }; entry.bufs[#entry.bufs + 1] = b else rest[#rest + 1] = f end
+        end
+        for _, l in ipairs(loaded) do
+          vim.schedule(function()
+            vim.api.nvim_buf_call(l.buf, function()
+              for i, c in ipairs(l.f.changedLines) do
+                if vim.api.nvim_buf_line_count(l.buf) < c.lnum then
+                  errors = errors .. "\nBuffer does not have line " .. c.lnum .. " anymore: " .. l.f.filename
+                else
+                  if i > 1 then pcall(vim.cmd.undojoin) end -- one `u` undoes the whole sync of this file
+                  vim.api.nvim_buf_set_lines(l.buf, c.lnum - 1, c.lnum, false, { c.newLine })
+                end
+              end
+            end)
+            params.report_progress(1)
+          end)
+        end
+        if #rest == 0 then
+          vim.schedule(function() params.on_finish(#errors > 0 and "error" or "success", errors) end) -- after the progress callbacks above
+          return function() end
+        end
+        local p2 = vim.tbl_extend("force", params, { changedFiles = rest })
+        local fin = params.on_finish
+        p2.on_finish = function(status, err) fin(status, (err or "") .. errors) end
+        return orig_files(p2)
+      end
+      local sync_ns = vim.api.nvim_create_namespace("grug_far_synced")
+      local orig_sync = require("grug-far.actions.sync")
+      package.loaded["grug-far.actions.sync"] = function(params)
+        local on_success = params.on_success
+        local buf, context, r1, r2 = params.buf, params.context, params.startRow, params.endRow
+        params.on_success = function()
+          if vim.api.nvim_buf_is_valid(buf) then
+            -- only the result rows (the ones that carry a file location) in the synced range
+            for _, m in ipairs(vim.api.nvim_buf_get_extmarks(buf, context.locationsNamespace, { r1, 0 }, { r2, -1 }, {})) do
+              -- a check at the start of the line (inline text at column 0): the sign column is taken by grug-far's own diff signs, and
+              -- text at the end of the line is cut off when the line is long
+              local ok, id = pcall(vim.api.nvim_buf_set_extmark, buf, sync_ns, m[2], 0, {
+                virt_text = { { "\u{2713} ", "GrugFarSyncedSign" } }, virt_text_pos = "inline", priority = 20,
+                invalidate = true, undo_restore = false,
+              })
+              if ok and current_entry then table.insert(current_entry.ids, id); entry_by_id[id] = current_entry end
+            end
+          end
+          if on_success then on_success() end
+        end
+        return orig_sync(params)
+      end
+      -- `u` on a synced result row (the one with the check) undoes that sync in the file buffer, as the file buffer is what changed;
+      -- anywhere else in the grug-far window `u` is the normal undo of the inputs
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "grug-far",
+        callback = function(ev)
+          vim.keymap.set("n", "u", function()
+            local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+            local marks = vim.api.nvim_buf_get_extmarks(ev.buf, sync_ns, { row, 0 }, { row, -1 }, {})
+            local entry = marks[1] and entry_by_id[marks[1][1]]
+            if not entry then vim.cmd("normal! " .. vim.v.count1 .. "u") return end
+            for _, b in ipairs(entry.bufs) do
+              if vim.api.nvim_buf_is_valid(b) then vim.api.nvim_buf_call(b, function() vim.cmd("silent! undo") end) end
+            end
+            for _, id in ipairs(entry.ids) do pcall(vim.api.nvim_buf_del_extmark, ev.buf, sync_ns, id); entry_by_id[id] = nil end
+            vim.notify("grug-far: undid the sync in the file buffer", vim.log.levels.INFO)
+          end, { buffer = ev.buf, desc = "Undo the sync of this result (or undo in the inputs)" })
+        end,
+      })
       require("grug-far").setup(opts)
       -- header shows Help and the sync actions; the other keys still work (g? lists them)
       local help = require("grug-far.render.help")
