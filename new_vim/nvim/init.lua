@@ -365,9 +365,42 @@ require("lazy").setup({
           set(0, "VM_Extend", { bg = "#3d5a6b" })
           set(0, "VM_Insert", { bg = "#464632" })
           set(0, "VM_Mono", { bg = "#b3deef", fg = "#282828" })
-          set(0, "Added", { fg = "#c9d05c" })
+          set(0, "Added", { fg = "#b8c665" })
+          -- floating windows (Lspsaga finder / peek / hover, completion menu): neutral grey instead of tender's blue #335261, which hid the text
+          -- terminal buffers: tender's "black" (#282828) and "bright black" (#1d1d1d) are almost the background, so zsh autosuggestions,
+          -- dimmed output (pnpm run format ...) were invisible. Bright black is the autosuggestion colour: a readable grey.
+          vim.g.terminal_color_0 = "#4a4a4a"
+          vim.g.terminal_color_8 = "#7a7a7a"
+          set(0, "NormalFloat", { fg = "#dadada", bg = "#2b2b2b" })
+          set(0, "Pmenu", { fg = "#dadada", bg = "#2b2b2b" })
+          set(0, "FloatBorder", { fg = "#6a6a6a", bg = "#2b2b2b" })
+          set(0, "PmenuSel", { fg = "#202020", bg = "#b8c665" }) -- selected completion item: the toned-down green, dark text
           set(0, "Removed", { fg = "#f43753" })
           set(0, "NoiceCmdlinePopupBorder", { fg = "#73cef4" })
+          -- strings green; imports, decorators (@Put) and other preprocessor-like groups yellow (tender has them the other way round); the green is #b8c665, less bright than tender's #c9d05c: swap the two colours on the string / import groups only
+          local todo = {}
+          for name in pairs(vim.api.nvim_get_hl(0, {})) do
+            if name == "String" or name == "Include" or name:find("^@string") or name:find("^@keyword%.import")
+              or name == "PreProc" or name == "Macro" or name == "Define" or name == "PreCondit" or name == "@attribute" or name:find("^@function%.macro")
+              or name:find("^@lsp%.type%.macro") or name:find("^@lsp%.type%.decorator") or name:find("^@keyword%.directive") then
+              local h = vim.api.nvim_get_hl(0, { name = name, link = false })
+              if h.fg == 0xd3b987 then h.fg = 0x59e375; todo[name] = h -- strings: #59E375
+              elseif h.fg == 0xc9d05c then h.fg = 0xd3b987; todo[name] = h end
+            end
+          end
+          -- every other tender-green syntax group (if / else, js* / css* legacy groups ...) goes yellow too; git, diff, UI and string groups stay green
+          for name in pairs(vim.api.nvim_get_hl(0, {})) do
+            local h = vim.api.nvim_get_hl(0, { name = name, link = false })
+            if not todo[name] and h.fg == 0xc9d05c then
+              local keep = name:find("^Added") or name:lower():find("add") or name:lower():find("plus") or name:find("^Nvim")
+                or name:find("^Fugitive") or name:find("^gitcommit") or name:find("^Harp") or name:find("^NERD") or name:find("^Pmenu")
+                or name:find("^Saga") or name:find("^plug") or name:find("^help") or name:find("^markdown") or name == "Question"
+                or name:find("^PreInsert") or name:lower():find("string")
+              h.fg = keep and 0xb8c665 or 0xd3b987 -- syntax groups yellow; git, diff, UI and string groups the toned-down green
+              todo[name] = h
+            end
+          end
+          for name, h in pairs(todo) do set(0, name, h) end -- read everything first, so a group linked to another is not swapped twice
           -- background: tender #282828 -> DMS/terminal/tmux surface #202020 (every group that uses it, so floats/signs/winbar match)
           for name in pairs(vim.api.nvim_get_hl(0, {})) do
             local h = vim.api.nvim_get_hl(0, { name = name, link = false })
@@ -639,6 +672,9 @@ require("lazy").setup({
         -- ":" menu: Tab / S-Tab select, Enter accepts; the arrows go back to history (Up/Down) and cursor moves (Left/Right)
         keymap = {
           preset = "cmdline",
+          -- Enter with a suggestion selected (Tab) puts it on the line (also for "/" and "?" search); a second Enter runs it.
+          -- With nothing selected Enter falls through and runs the line as usual.
+          ["<CR>"] = { "accept", "fallback" },
           ["<Up>"] = false,
           ["<Down>"] = false,
           ["<Left>"] = false,
@@ -2330,8 +2366,8 @@ local function tab_colors()
 end
 -- harpoon slots (right end of the tab row): the tab colours with a green tint, so they read as another group of tabs
 local function harpoon_colors()
-  vim.api.nvim_set_hl(0, "HarpTab", { fg = 0xc9d05c, bg = 0x464632 })
-  vim.api.nvim_set_hl(0, "HarpTabSel", { fg = 0x282828, bg = 0xc9d05c, bold = true })
+  vim.api.nvim_set_hl(0, "HarpTab", { fg = 0xb8c665, bg = 0x464632 })
+  vim.api.nvim_set_hl(0, "HarpTabSel", { fg = 0x282828, bg = 0xb8c665, bold = true })
   vim.api.nvim_set_hl(0, "HarpTabIcon", { fg = 0x282828, bg = 0x9faa00 })
   vim.api.nvim_set_hl(0, "HarpTabArrow", { fg = 0x9faa00, bg = 0x1d1d1d })
 end
