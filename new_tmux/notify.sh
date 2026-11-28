@@ -68,7 +68,7 @@ if [ "${#focused[@]}" -gt 0 ]; then
     cw=${focused_win[$i]}
     ww=$(tmux display-message -p -t "$cw" '#{window_width}' 2>/dev/null) || continue
     id=$(tmux new-pane -d -A -P -F '#{pane_id}' -t "$cw" -x "$w" -y 7 -X 1 -Y 0 -B heavy \
-      -s "bg=#202020,fg=#d4cec4" -S "fg=$bg" -R "fg=$bg" \
+      -s "bg=#1b1a1a,fg=#d4cec4" -S "fg=$bg" -R "fg=$bg" \
       -e "NT_TITLE=$title_big" -e "NT_WHERE=$where" -e "NT_COLOR=$bg" -e "NT_SECS=$secs" \
       bash -c "$script" 2>/dev/null) && [ -n "$id" ] && tmux set -p -t "$id" @toast_src "$wid" 2>/dev/null
   done

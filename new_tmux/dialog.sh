@@ -50,7 +50,7 @@ case "$action" in
       tmux list-windows -a -F '#{session_name}:#{window_index}  #{window_name}  (#{window_panes} pane#{?#{==:#{window_panes},1},,s})' \
         -f "#{!=:#{window_id},$(tmux display-message -p -t "$target" '#{window_id}')}" | awk '{t=$1; sub(/^[^ ]+ +/,""); print $0 "\t" t}'; } )
     pick=$(printf '%s\n' "$list" | fzf --delimiter $'\t' --with-nth 1 --no-info --no-separator --prompt ' move pane to: ' --pointer ' ' \
-      --color 'bg:#202020,fg:#d4cec4,prompt:#5e8099,pointer:#5e8099,hl:#999187,hl+:#999187,bg+:#211f1d' --height 100% --layout reverse) || exit 0
+      --color 'bg:#1b1a1a,fg:#d4cec4,prompt:#5e8099,pointer:#5e8099,hl:#999187,hl+:#999187,bg+:#211f1d' --height 100% --layout reverse) || exit 0
     dest=${pick##*$'\t'}
     if [ -z "$dest" ]; then tmux break-pane -s "$target"
     else tmux join-pane -h -s "$target" -t "$dest" \; select-window -t "$dest" \; select-pane -t "$target"; fi
@@ -59,7 +59,7 @@ case "$action" in
     here=$(tmux display-message -p -t "$target" '#{window_id}')
     pick=$(tmux list-panes -a -F '#{pane_id}'$'\t''#{session_name}:#{window_index} #{window_name}  #{pane_current_command}  #{b:pane_current_path}' -f "#{!=:#{window_id},$here}" \
       | fzf --delimiter $'\t' --with-nth 2 --no-info --no-separator --prompt ' pull pane here: ' --pointer ' ' \
-        --color 'bg:#202020,fg:#d4cec4,prompt:#5e8099,pointer:#5e8099,hl:#999187,hl+:#999187,bg+:#211f1d' --height 100% --layout reverse) || exit 0
+        --color 'bg:#1b1a1a,fg:#d4cec4,prompt:#5e8099,pointer:#5e8099,hl:#999187,hl+:#999187,bg+:#211f1d' --height 100% --layout reverse) || exit 0
     src=${pick%%$'\t'*}
     [ -n "$src" ] && tmux join-pane -h -s "$src" -t "$target" \; select-pane -t "$src"
     exit 0 ;;
@@ -67,7 +67,7 @@ case "$action" in
     pick=$(tmux list-commands | awk '{n=$1; u=$0; sub(/^[^ ]+ \([^)]*\) */,"",u); printf "%s\t%s\n", n, u}' \
       | fzf --print-query --delimiter $'\t' --nth 1 --with-nth '1,2' --no-info --no-separator --prompt ' : ' --pointer ' ' --tiebreak begin \
         --bind 'tab:transform-query(echo {1} )' \
-        --color 'bg:#202020,fg:#d4cec4,prompt:#5e8099,pointer:#5e8099,hl:#999187,hl+:#999187,bg+:#211f1d,query:#d4cec4' \
+        --color 'bg:#1b1a1a,fg:#d4cec4,prompt:#5e8099,pointer:#5e8099,hl:#999187,hl+:#999187,bg+:#211f1d,query:#d4cec4' \
         --height 100% --layout reverse)
     out=${pick%%$'\n'*}; out=${out%% }
     [ -n "$out" ] && tmux "$out"
@@ -105,7 +105,7 @@ case "$action" in
 esac
 out=$(fzf --print-query --query "$query" --disabled --no-info --no-separator \
   --prompt "$prompt" --pointer ' ' \
-  --color 'bg:#202020,fg:#d4cec4,prompt:#5e8099,query:#d4cec4,bg+:#202020' \
+  --color 'bg:#1b1a1a,fg:#d4cec4,prompt:#5e8099,query:#d4cec4,bg+:#1b1a1a' \
   --height 100% --layout reverse </dev/null)
 rc=$?
 # fzf returns 1 on Enter when its empty candidate list has no match; the query is still valid.

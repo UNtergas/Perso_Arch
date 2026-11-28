@@ -334,9 +334,9 @@ require("lazy").setup({
         "r-cr-o:hor25-CursorReplace",
       }, ",")
       local function cursor_colors()
-        vim.api.nvim_set_hl(0, "CursorNormal", { fg = "#202020", bg = "#8fabc4" })
-        vim.api.nvim_set_hl(0, "CursorInsert", { fg = "#202020", bg = "#eab06e" })
-        vim.api.nvim_set_hl(0, "CursorReplace", { fg = "#202020", bg = "#d98578" })
+        vim.api.nvim_set_hl(0, "CursorNormal", { fg = "#1b1a1a", bg = "#8fabc4" })
+        vim.api.nvim_set_hl(0, "CursorInsert", { fg = "#1b1a1a", bg = "#eab06e" })
+        vim.api.nvim_set_hl(0, "CursorReplace", { fg = "#1b1a1a", bg = "#d98578" })
       end
       cursor_colors()
       vim.api.nvim_create_autocmd("ColorScheme", { callback = cursor_colors })
@@ -374,7 +374,7 @@ require("lazy").setup({
           set(0, "NormalFloat", { fg = "#dadada", bg = "#2b2b2b" })
           set(0, "Pmenu", { fg = "#dadada", bg = "#2b2b2b" })
           set(0, "FloatBorder", { fg = "#6a6a6a", bg = "#2b2b2b" })
-          set(0, "PmenuSel", { fg = "#202020", bg = "#b8c665" }) -- selected completion item: the toned-down green, dark text
+          set(0, "PmenuSel", { fg = "#1b1a1a", bg = "#b8c665" }) -- selected completion item: the toned-down green, dark text
           set(0, "Removed", { fg = "#f43753" })
           set(0, "NoiceCmdlinePopupBorder", { fg = "#73cef4" })
           -- strings green; imports, decorators (@Put) and other preprocessor-like groups yellow (tender has them the other way round); the green is #b8c665, less bright than tender's #c9d05c: swap the two colours on the string / import groups only
@@ -401,10 +401,10 @@ require("lazy").setup({
             end
           end
           for name, h in pairs(todo) do set(0, name, h) end -- read everything first, so a group linked to another is not swapped twice
-          -- background: tender #282828 -> DMS/terminal/tmux surface #202020 (every group that uses it, so floats/signs/winbar match)
+          -- background: tender #282828 -> DMS/terminal/tmux surface #1b1a1a (every group that uses it, so floats/signs/winbar match)
           for name in pairs(vim.api.nvim_get_hl(0, {})) do
             local h = vim.api.nvim_get_hl(0, { name = name, link = false })
-            if h.bg == 0x282828 then h.bg = 0x202020; set(0, name, h) end
+            if h.bg == 0x282828 then h.bg = 0x1b1a1a; set(0, name, h) end
           end
         end,
       })
@@ -419,26 +419,26 @@ require("lazy").setup({
     config = function()
       vim.opt.background = "dark"
       require("monokai-pro").setup({ filter = "spectrum" })
-      -- background: Spectrum #222222 -> terminal/tmux surface #202020 (every group that uses it, so floats/signs/winbar match)
+      -- background: Spectrum #222222 -> terminal/tmux surface #1b1a1a (every group that uses it, so floats/signs/winbar match)
       vim.api.nvim_create_autocmd("ColorScheme", {
         pattern = "monokai-pro*",
         callback = function()
           for name in pairs(vim.api.nvim_get_hl(0, {})) do
             local h = vim.api.nvim_get_hl(0, { name = name, link = false })
-            if h.bg == 0x222222 then h.bg = 0x202020; vim.api.nvim_set_hl(0, name, h) end
+            if h.bg == 0x222222 then h.bg = 0x1b1a1a; vim.api.nvim_set_hl(0, name, h) end
           end
           -- Spectrum's own search / selection groups are faint; stronger ones in the Spectrum accents
           local set = vim.api.nvim_set_hl
-          set(0, "Normal", { fg = "#d4cec4", bg = "#202020" }) -- dimmer text, same as the DMS theme (toaster)
+          set(0, "Normal", { fg = "#d4cec4", bg = "#1b1a1a" }) -- dimmer text, same as the DMS theme (toaster)
           set(0, "Visual", { bg = "#4a4f5c", bold = true })
           set(0, "Search", { bg = "#6b5d24", fg = "#d4cec4" })
-          set(0, "CurSearch", { bg = "#fce566", fg = "#202020" })
-          set(0, "IncSearch", { bg = "#fce566", fg = "#202020" })
+          set(0, "CurSearch", { bg = "#fce566", fg = "#1b1a1a" })
+          set(0, "IncSearch", { bg = "#fce566", fg = "#1b1a1a" })
           for _, n in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do set(0, n, { bg = "#2f2c29" }) end
-          set(0, "VM_Cursor", { bg = "#5ad4e6", fg = "#202020" })
+          set(0, "VM_Cursor", { bg = "#5ad4e6", fg = "#1b1a1a" })
           set(0, "VM_Extend", { bg = "#2f7a88" })
           set(0, "VM_Insert", { bg = "#4a4a2a" })
-          set(0, "VM_Mono", { bg = "#5ad4e6", fg = "#202020" })
+          set(0, "VM_Mono", { bg = "#5ad4e6", fg = "#1b1a1a" })
           set(0, "Added", { fg = "#7bd88f" })
           set(0, "Removed", { fg = "#fc618d" })
           set(0, "NoiceCmdlinePopupBorder", { fg = "#8fabc4" })
@@ -455,13 +455,13 @@ require("lazy").setup({
     config = function()
       vim.opt.background = "dark"
       require("kanagawa").setup({ theme = "dragon", background = { dark = "dragon" } })
-      -- background: dragon #181616 -> DMS surface #202020; text #eee8de, syntax brighter, same hue, comments grey #7a746a
+      -- background: dragon #181616 -> DMS surface #1b1a1a; text #eee8de, syntax brighter, same hue, comments grey #7a746a
       vim.api.nvim_create_autocmd("ColorScheme", {
         pattern = "kanagawa*",
         callback = function()
           for name in pairs(vim.api.nvim_get_hl(0, {})) do
             local h = vim.api.nvim_get_hl(0, { name = name, link = false })
-            if h.bg == 0x181616 then h.bg = 0x202020; vim.api.nvim_set_hl(0, name, h) end
+            if h.bg == 0x181616 then h.bg = 0x1b1a1a; vim.api.nvim_set_hl(0, name, h) end
           end
           local set = vim.api.nvim_set_hl
           -- everything but comments brighter with the same hue (lightness up, saturation up a lot), so kanagawa's colours stay colours
@@ -488,20 +488,20 @@ require("lazy").setup({
             local h = vim.api.nvim_get_hl(0, { name = name, link = false })
             if h.fg and not name:lower():find("comment", 1, true) then h.fg = lighten(h.fg); set(0, name, h) end
           end
-          set(0, "Normal", { fg = "#eee8de", bg = "#202020" })
+          set(0, "Normal", { fg = "#eee8de", bg = "#1b1a1a" })
           set(0, "Comment", { fg = "#7a746a", italic = true }) -- dim warm grey, clearly below the text
           set(0, "@comment", { link = "Comment" })
           set(0, "Visual", { bg = "#4a443d", bold = true })
           set(0, "Search", { bg = "#5a4f2a", fg = "#d4cec4" })
-          set(0, "CurSearch", { bg = "#e0d48e", fg = "#202020" })
-          set(0, "IncSearch", { bg = "#e0d48e", fg = "#202020" })
+          set(0, "CurSearch", { bg = "#e0d48e", fg = "#1b1a1a" })
+          set(0, "IncSearch", { bg = "#e0d48e", fg = "#1b1a1a" })
           for _, n in ipairs({ "LspReferenceText", "LspReferenceRead", "LspReferenceWrite" }) do set(0, n, { bg = "#2f2c29" }) end
         end,
       })
       vim.cmd.colorscheme("kanagawa-dragon")
     end,
   },
-  -- Startup colour scheme: hybrid (priority 600 < 650, loads last so it wins over kanagawa). Background hybrid #1d1f21 -> DMS surface #202020. Other schemes: :Theme <name>
+  -- Startup colour scheme: hybrid (priority 600 < 650, loads last so it wins over kanagawa). Background hybrid #1d1f21 -> DMS surface #1b1a1a. Other schemes: :Theme <name>
   {
     "w0ng/vim-hybrid",
     lazy = false,
@@ -513,9 +513,9 @@ require("lazy").setup({
         callback = function()
           for name in pairs(vim.api.nvim_get_hl(0, {})) do
             local h = vim.api.nvim_get_hl(0, { name = name, link = false })
-            if h.bg == 0x1d1f21 then h.bg = 0x202020; vim.api.nvim_set_hl(0, name, h) end
+            if h.bg == 0x1d1f21 then h.bg = 0x1b1a1a; vim.api.nvim_set_hl(0, name, h) end
           end
-          vim.api.nvim_set_hl(0, "Normal", { fg = "#c5c8c6", bg = "#202020" })
+          vim.api.nvim_set_hl(0, "Normal", { fg = "#c5c8c6", bg = "#1b1a1a" })
         end,
       })
       vim.cmd.colorscheme("hybrid")
@@ -1300,7 +1300,7 @@ require("lazy").setup({
         -- middle window: no diff background, so only the conflict colors show there
         hl(0, "MergeLocal", { bg = "NONE" })
         hl(0, "MergeLocalText", { bg = "NONE" })
-        hl(0, "MergeFiller", { fg = "#525053", bg = "#202020" })
+        hl(0, "MergeFiller", { fg = "#525053", bg = "#1b1a1a" })
       end
       merge_colors()
       vim.api.nvim_create_autocmd("ColorScheme", { callback = merge_colors })
@@ -1455,11 +1455,11 @@ require("lazy").setup({
       local theme = require("lualine.themes.auto")
       local bg_c, bg_b = "#100f0e", "#2f2c29"
       local mode_a = {
-        normal = { fg = "#202020", bg = "#8fabc4", gui = "bold" },
-        insert = { fg = "#202020", bg = "#86bd80", gui = "bold" },
-        visual = { fg = "#202020", bg = "#e0d48e", gui = "bold" },
-        replace = { fg = "#202020", bg = "#d98578", gui = "bold" },
-        command = { fg = "#202020", bg = "#e6d6ba", gui = "bold" },
+        normal = { fg = "#1b1a1a", bg = "#8fabc4", gui = "bold" },
+        insert = { fg = "#1b1a1a", bg = "#86bd80", gui = "bold" },
+        visual = { fg = "#1b1a1a", bg = "#e0d48e", gui = "bold" },
+        replace = { fg = "#1b1a1a", bg = "#d98578", gui = "bold" },
+        command = { fg = "#1b1a1a", bg = "#e6d6ba", gui = "bold" },
       }
       for m, a in pairs(mode_a) do
         theme[m].a = a
@@ -1493,7 +1493,7 @@ require("lazy").setup({
             {
               "mode", -- NORMAL / INSERT / VISUAL ... (the project name is in the winbar now); RESIZE while C-w r is on
               fmt = function(name) return vim.g.resize_mode and "RESIZE" or name end,
-              color = function() if vim.g.resize_mode then return { fg = "#202020", bg = "#eab06e", gui = "bold" } end end,
+              color = function() if vim.g.resize_mode then return { fg = "#1b1a1a", bg = "#eab06e", gui = "bold" } end end,
             },
           },
           lualine_b = {
@@ -1533,13 +1533,13 @@ require("lazy").setup({
               block("#35312d", "#b8b1a6", { "encoding" }),
               block("#4a443d", "#eee8de", { function() return _G.indent_label() end, on_click = function() _G.indent_choose() end }),
               -- line:column | percentage of the file (Top / Bot at the ends), one block: 76:42 | 5%
-              block("#8fabc4", "#202020", {
+              block("#8fabc4", "#1b1a1a", {
                 function()
                   local cur, total = vim.fn.line("."), vim.fn.line("$")
                   local pct = cur == 1 and "Top" or (cur == total and "Bot" or math.floor(cur / total * 100) .. "%%") -- %% : a lone % would be read as a statusline item
                   return string.format("%d:%d | %s", cur, vim.fn.col("."), pct)
                 end,
-                color = { fg = "#202020", bg = "#8fabc4", gui = "bold" },
+                color = { fg = "#1b1a1a", bg = "#8fabc4", gui = "bold" },
               }),
             }
           end)(),
@@ -1807,10 +1807,10 @@ end
 -- ctrl+w q: number every window (big digit in its middle, like tmux's Alt-e q), press the number to jump there; anything else
 -- cancels. Windows are numbered left to right, top to bottom. Up to 9 windows.
 -- tender blue (the normal-mode block of the statusline) with dark text; re-applied after a colour scheme change, which clears custom groups
-local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#202020", bg = "#8fabc4", bold = true }) end
+local function window_number_colors() vim.api.nvim_set_hl(0, "WindowNumber", { fg = "#1b1a1a", bg = "#8fabc4", bold = true }) end
 window_number_colors()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = function() vim.schedule(window_number_colors) end })
-local function pick_window()
+local function numbered_wins()
   local wins = {}
   for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
     if vim.api.nvim_win_get_config(w).relative == "" then wins[#wins + 1] = w end
@@ -1820,6 +1820,14 @@ local function pick_window()
     if pa[2] ~= pb[2] then return pa[2] < pb[2] end
     return pa[1] < pb[1]
   end)
+  return wins
+end
+-- the window's number (same as C-w q / C-w 1..9), shown first in its winbar
+function _G.window_number(win)
+  for i, w in ipairs(numbered_wins()) do if w == win then return i end end
+end
+local function pick_window()
+  local wins = numbered_wins()
   local labels = {}
   for i, w in ipairs(wins) do
     if i > 9 then break end
@@ -1838,6 +1846,10 @@ local function pick_window()
   for _, l in ipairs(labels) do pcall(vim.api.nvim_win_close, l, true) end
   local n = ok and tonumber(c)
   if n and wins[n] then vim.api.nvim_set_current_win(wins[n]) end
+end
+-- ctrl+w 1..9: jump straight to the window with that number (same numbering as ctrl+w q)
+for i = 1, 9 do
+  map("n", "<C-w>" .. i, function() local w = numbered_wins()[i]; if w then vim.api.nvim_set_current_win(w) end end, { desc = "Focus window " .. i })
 end
 map("n", "<C-w>q", pick_window, { desc = "Number the windows, press a number to jump" })
 -- ctrl+w ctrl+w: close buffer, ctrl+w a: close all buffers

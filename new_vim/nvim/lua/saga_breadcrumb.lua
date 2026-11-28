@@ -12,6 +12,12 @@ local function eligible(win, buf)
   if vim.bo[buf].buftype == "" then return vim.bo[buf].filetype ~= "oil" end
   return _G.githist_label ~= nil and _G.githist_label(name) ~= nil -- old file versions (githist://)
 end
+-- [ n]> : the window's number (C-w q / C-w 1..9), arrow into the project block
+local function num_block(win)
+  local n = _G.window_number and _G.window_number(win)
+  local on = win == api.nvim_get_current_win() and "Active" or ""
+  return n and ("%#BarNum" .. on .. "# " .. n .. " %#BarNum" .. on .. "Arrow#\u{e0b0}") or ""
+end
 local function escape(s) return s:gsub("%%", "%%%%"):gsub("[\r\n]", " ") end
 
 -- The project block takes the colour of the mode block of the statusline (insert green, visual blue, replace yellow, command
@@ -37,10 +43,14 @@ function M.project_colors()
   local key = mode_key[api.nvim_get_mode().mode:sub(1, 1)] or "normal"
   local a = _G.mode_a and _G.mode_a[key]
   local bg = (key ~= "normal" and a and a.bg) or "#8fabc4"
-  local fg = (key ~= "normal" and a and a.fg) or "#202020"
-  if vim.g.resize_mode then bg, fg = "#eab06e", "#202020" end -- C-w r: the peach of tmux's RESIZE label
+  local fg = (key ~= "normal" and a and a.fg) or "#1b1a1a"
+  if vim.g.resize_mode then bg, fg = "#eab06e", "#1b1a1a" end -- C-w r: the peach of tmux's RESIZE label
   local bar = api.nvim_get_hl(0, { name = "WinBar", link = false }).bg
   api.nvim_set_hl(0, "BarProject", { fg = fg, bg = bg, bold = true })
+  api.nvim_set_hl(0, "BarNum", { fg = 0xd4cec4, bg = 0x3a3530, bold = true }) -- number block, then an arrow into the project block
+  api.nvim_set_hl(0, "BarNumArrow", { fg = 0x3a3530, bg = bg })
+  api.nvim_set_hl(0, "BarNumActive", { fg = 0x1b1a1a, bg = 0xf2eee6, bold = true }) -- the focused window's number: inverted (light block, dark digit)
+  api.nvim_set_hl(0, "BarNumActiveArrow", { fg = 0xf2eee6, bg = bg })
   api.nvim_set_hl(0, "BarProjectArrow", { fg = bg, bg = PATH_BG }) -- project block > path block
   api.nvim_set_hl(0, "BarProjectArrowEnd", { fg = bg, bg = bar }) -- project block > bar (nothing after it)
 end
@@ -84,7 +94,7 @@ function M.render(win)
   local mod = vim.bo[buf].modified
   -- [ project]>path : the project (folder name of the window's cwd) is a block with a folder icon, then the path
   local project = vim.fn.fnamemodify(vim.fn.getcwd(vim.fn.win_id2win(win)), ":t")
-  local left = "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<%#BarPath# " .. (label and "" or file_icon(name)) .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
+  local left = num_block(win) .. "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<%#BarPath# " .. (label and "" or file_icon(name)) .. (mod and "%#BarModified#" or "%#BarPath#") .. escape(path)
     .. (mod and " \u{f444}" or "") .. diag_indicator(buf) .. " %#BarPathArrow#\u{e0b0}%#WinBar#" .. (_G.diff_status and _G.diff_status(buf) or "") .. "%#WinBar#"
   return left
 end
@@ -104,8 +114,9 @@ function M.oil_bar(win)
   else
     path = api.nvim_buf_get_name(buf) -- trash / ssh: the buffer name
   end
-  if path == "" then return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrowEnd#\u{e0b0}" end
-  return "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<%#BarPath# " .. escape(path) .. " %#BarPathArrow#\u{e0b0}"
+  local num = num_block(win)
+  if path == "" then return num .. "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrowEnd#\u{e0b0}" end
+  return num .. "%#BarProject# \u{f024b} " .. escape(project) .. " %#BarProjectArrow#\u{e0b0}%<%#BarPath# " .. escape(path) .. " %#BarPathArrow#\u{e0b0}"
 end
 
 function M.install(buf)
@@ -134,6 +145,8 @@ function M.setup()
   local group = api.nvim_create_augroup("SagaBreadcrumbRefresh", { clear = true })
   api.nvim_create_autocmd("ColorScheme", { group = group, callback = function() vim.schedule(colors) end }) -- after the theme hooks set Comment
   api.nvim_create_autocmd("ModeChanged", { group = group, callback = function() M.project_colors(); vim.cmd("redrawstatus") end })
+  -- the focused window's number is inverted: redraw every winbar when focus moves
+  api.nvim_create_autocmd({ "WinEnter", "WinLeave" }, { group = group, callback = function() pcall(api.nvim__redraw, { winbar = true }) end })
   api.nvim_create_autocmd({ "BufWinEnter", "WinEnter", "BufFilePost", "FileType" }, {
     group = group, callback = function() M.install() end,
   })
